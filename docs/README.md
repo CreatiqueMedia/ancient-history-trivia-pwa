@@ -20,6 +20,8 @@ Welcome to the documentation for the Ancient History Progressive Web App. This f
 
 ### 🔐 Authentication & Security
 - **[AUTHENTICATION_SYSTEM.md](AUTHENTICATION_SYSTEM.md)** - Authentication system documentation
+- **[SECURITY.md](SECURITY.md)** - Security policy and vulnerability reporting
+- **[SECURITY_SETUP.md](SECURITY_SETUP.md)** - Security configuration guide
 
 ### 📋 Project Information
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
