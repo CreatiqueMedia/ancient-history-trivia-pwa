@@ -4,6 +4,11 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
 
+console.log('App starting...', { 
+  NODE_ENV: process.env.NODE_ENV,
+  location: window.location.href 
+});
+
 // Register service worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -19,7 +24,7 @@ if ('serviceWorker' in navigator) {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.NODE_ENV === 'production' ? '/ancient-history-trivia-pwa' : ''}>
       <App />
     </BrowserRouter>
   </React.StrictMode>,
