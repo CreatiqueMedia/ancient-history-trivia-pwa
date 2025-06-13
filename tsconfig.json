@@ -21,5 +21,6 @@
     }
   },
   "include": ["src"],
+  "exclude": ["src/data/bundles-backup.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
