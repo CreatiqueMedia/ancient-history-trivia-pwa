@@ -291,6 +291,11 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     isPremium: true,
     isOwned: false,
     difficulty: 'hard',
+    difficultyBreakdown: {
+      easy: 25,
+      medium: 35,
+      hard: 40
+    },
     format: 'Mixed',
     historicalAge: 'Iron Age',
     releaseDate: '2025-05-02',
@@ -315,6 +320,11 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     isPremium: true,
     isOwned: false,
     difficulty: 'hard',
+    difficultyBreakdown: {
+      easy: 30,
+      medium: 40,
+      hard: 30
+    },
     format: 'Mixed',
     historicalAge: 'Prehistoric',
     releaseDate: '2025-05-02',
@@ -341,6 +351,11 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     isPremium: true,
     isOwned: false,
     difficulty: 'medium',
+    difficultyBreakdown: {
+      easy: 20,
+      medium: 60,
+      hard: 20
+    },
     format: 'Multiple Choice',
     releaseDate: '2025-05-02',
     version: 'v1',
@@ -364,6 +379,11 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     isPremium: true,
     isOwned: false,
     difficulty: 'easy',
+    difficultyBreakdown: {
+      easy: 70,
+      medium: 25,
+      hard: 5
+    },
     format: 'True/False',
     releaseDate: '2025-05-02',
     version: 'v1',
@@ -389,6 +409,11 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     isPremium: true,
     isOwned: false,
     difficulty: 'easy',
+    difficultyBreakdown: {
+      easy: 80,
+      medium: 15,
+      hard: 5
+    },
     format: 'Mixed',
     releaseDate: '2025-05-02',
     version: 'v1',
@@ -412,6 +437,11 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     isPremium: true,
     isOwned: false,
     difficulty: 'hard',
+    difficultyBreakdown: {
+      easy: 5,
+      medium: 20,
+      hard: 75
+    },
     format: 'Mixed',
     releaseDate: '2025-05-02',
     version: 'v1',
