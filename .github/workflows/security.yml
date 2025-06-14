@@ -1,5 +1,8 @@
 name: Security Audit
 
+# Force refresh - Updated to use yarn audit exclusively
+# No npm commands should be used in this workflow
+
 on:
   push:
     branches: [ main, develop ]
@@ -24,9 +27,20 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Verify package manager
+        run: |
+          echo "🔍 Verifying we're using Yarn (not npm)..."
+          which yarn
+          yarn --version
+          echo "📦 Package manager verification complete"
+
       - name: Run security audit
         run: |
-          echo "🔍 Running Yarn security audit..."
+          echo "🔍 Running Yarn security audit (NOT npm audit)..."
+          echo "⚠️  This workflow uses YARN ONLY - no npm commands"
+          
+          # Verify we're using yarn
+          echo "📋 Yarn version: $(yarn --version)"
           
           # Run yarn audit and capture JSON output
           echo "📊 Getting audit summary in JSON format..."
@@ -81,3 +95,4 @@ jobs:
           name: yarn-security-audit-results
           path: |
             audit-full.json
+# Test comment to force workflow refresh
