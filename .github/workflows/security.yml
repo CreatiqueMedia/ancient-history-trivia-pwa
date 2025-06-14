@@ -28,62 +28,51 @@ jobs:
         run: |
           echo "🔍 Running Yarn security audit..."
           
-          # First, run a basic audit to see overall status
-          echo "📊 Overall audit summary:"
-          yarn audit || true
+          # Run yarn audit and capture JSON output
+          echo "📊 Getting audit summary in JSON format..."
+          yarn audit --json > audit-full.json || true
           
-          echo ""
-          echo "🎯 Checking specifically for high and critical vulnerabilities..."
-          
-          # Use yarn audit with specific level filtering
-          # yarn audit --level high will exit with code 4 if moderate vulnerabilities exist
-          # but we only care about high/critical, so we need to parse the output
-          
-          set +e  # Don't exit immediately on command failure
-          
-          # Run yarn audit for high/critical only and capture output
-          yarn audit --level high > audit-high.txt 2>&1
-          HIGH_EXIT_CODE=$?
-          
-          # Run yarn audit for critical only and capture output  
-          yarn audit --level critical > audit-critical.txt 2>&1
-          CRITICAL_EXIT_CODE=$?
-          
-          set -e  # Re-enable exit on error
-          
-          echo "High audit exit code: $HIGH_EXIT_CODE"
-          echo "Critical audit exit code: $CRITICAL_EXIT_CODE"
-          
-          # Check if we have actual high or critical vulnerabilities
-          if [ -f audit-high.txt ]; then
-            HIGH_VULNS=$(grep -c "high" audit-high.txt || echo "0")
-            echo "High vulnerabilities found: $HIGH_VULNS"
+          # Parse the JSON to extract vulnerability counts
+          if [ -f audit-full.json ]; then
+            echo "📋 Audit results found, parsing JSON..."
+            
+            # Extract vulnerability counts from JSON
+            HIGH_COUNT=$(cat audit-full.json | grep '"type":"auditSummary"' | sed 's/.*"high":\([0-9]*\).*/\1/' || echo "0")
+            CRITICAL_COUNT=$(cat audit-full.json | grep '"type":"auditSummary"' | sed 's/.*"critical":\([0-9]*\).*/\1/' || echo "0")
+            MODERATE_COUNT=$(cat audit-full.json | grep '"type":"auditSummary"' | sed 's/.*"moderate":\([0-9]*\).*/\1/' || echo "0")
+            LOW_COUNT=$(cat audit-full.json | grep '"type":"auditSummary"' | sed 's/.*"low":\([0-9]*\).*/\1/' || echo "0")
+            
+            echo "🔢 Vulnerability counts:"
+            echo "  Critical: $CRITICAL_COUNT"
+            echo "  High: $HIGH_COUNT"
+            echo "  Moderate: $MODERATE_COUNT"
+            echo "  Low: $LOW_COUNT"
+            
+            # Only fail if we have high or critical vulnerabilities
+            if [ "$HIGH_COUNT" -gt 0 ] || [ "$CRITICAL_COUNT" -gt 0 ]; then
+              echo "❌ High or critical vulnerabilities found!"
+              echo "📋 Full audit output:"
+              cat audit-full.json
+              echo ""
+              echo "🔍 Detailed audit report:"
+              yarn audit --level high || true
+              exit 1
+            else
+              echo "✅ No high or critical vulnerabilities found!"
+              if [ "$MODERATE_COUNT" -gt 0 ] || [ "$LOW_COUNT" -gt 0 ]; then
+                echo "ℹ️  Found $MODERATE_COUNT moderate and $LOW_COUNT low vulnerabilities (acceptable)"
+              fi
+              echo "🔒 Build will continue"
+            fi
           else
-            HIGH_VULNS=0
+            echo "⚠️ No audit results file found, running fallback audit..."
+            yarn audit --level high || {
+              echo "❌ Audit command failed unexpectedly"
+              exit 1
+            }
           fi
           
-          if [ -f audit-critical.txt ]; then
-            CRITICAL_VULNS=$(grep -c "critical" audit-critical.txt || echo "0")
-            echo "Critical vulnerabilities found: $CRITICAL_VULNS"
-          else
-            CRITICAL_VULNS=0
-          fi
-          
-          # Only fail if we have actual high or critical vulnerabilities
-          if [ "$HIGH_VULNS" -eq 0 ] && [ "$CRITICAL_VULNS" -eq 0 ]; then
-            echo "✅ No high or critical vulnerabilities detected!"
-            echo "ℹ️  Build will continue (moderate/low vulnerabilities are acceptable)"
-          else
-            echo "❌ High or critical vulnerabilities found!"
-            echo "📋 High severity audit results:"
-            cat audit-high.txt || echo "No high audit results"
-            echo ""
-            echo "📋 Critical severity audit results:"
-            cat audit-critical.txt || echo "No critical audit results"
-            exit 1
-          fi
-          
-          echo "🔒 Yarn security audit completed successfully"
+          echo "🎉 Security audit completed successfully!"
 
       - name: Upload audit results
         if: always()
@@ -91,5 +80,4 @@ jobs:
         with:
           name: yarn-security-audit-results
           path: |
-            audit-high.txt
-            audit-critical.txt
+            audit-full.json
