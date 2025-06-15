@@ -4,28 +4,38 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
 
-console.log('App starting...', { 
-  NODE_ENV: process.env.NODE_ENV,
-  location: window.location.href 
-});
+// Simple environment detection
+const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-// Register service worker
-if ('serviceWorker' in navigator) {
+
+
+// Correct basename for local vs production
+const basename = isDev ? '' : '/ancient-history-trivia-pwa';
+
+
+// Register service worker only in production
+if ('serviceWorker' in navigator && !isDev) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    const swUrl = '/ancient-history-trivia-pwa/sw.js';
+    navigator.serviceWorker.register(swUrl)
       .then((registration) => {
-        console.log('SW registered: ', registration);
+        console.log('✅ SW registered: ', registration);
       })
       .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError);
+        console.log('❌ SW registration failed: ', registrationError);
       });
   });
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter basename={process.env.NODE_ENV === 'production' ? '/ancient-history-trivia-pwa' : ''}>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>,
-)
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  console.error('❌ Root element not found!');
+} else {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <BrowserRouter basename={basename}>
+        <App />
+      </BrowserRouter>
+    </React.StrictMode>,
+  )
+}
