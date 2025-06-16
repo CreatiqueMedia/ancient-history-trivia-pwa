@@ -1,0 +1,80 @@
+# Dependabot configuration for Ancient History PWA
+# This file enables automatic dependency updates and security vulnerability detection
+
+version: 2
+updates:
+  # Enable updates for npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "CreatiqueMedia"
+    assignees:
+      - "CreatiqueMedia"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "automated"
+    # Group updates for better management
+    groups:
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      testing:
+        patterns:
+          - "*jest*"
+          - "*test*"
+          - "vitest*"
+          - "@testing-library/*"
+      build-tools:
+        patterns:
+          - "vite*"
+          - "@vitejs/*"
+          - "typescript"
+          - "eslint*"
+          - "@typescript-eslint/*"
+      tailwind:
+        patterns:
+          - "tailwind*"
+          - "autoprefixer"
+          - "postcss*"
+    # Security updates - always allow
+    allow:
+      - dependency-type: "all"
+    # Ignore major version updates for stable dependencies
+    ignore:
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+    # Auto-merge security patches
+    auto-merge:
+      - match:
+          dependency-type: "all"
+          update-type: "security"
+
+  # Enable updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    reviewers:
+      - "CreatiqueMedia"
+    assignees:
+      - "CreatiqueMedia"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "github-actions"
+      - "automated"

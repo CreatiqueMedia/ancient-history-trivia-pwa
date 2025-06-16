@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/ancient-history-pwa/sw.js', { scope: '/ancient-history-pwa/' })})}
