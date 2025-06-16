@@ -17,8 +17,8 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',
-        scope: '/',
-        start_url: '/',
+        scope: '/ancient-history-pwa/',
+        start_url: '/ancient-history-pwa/',
         categories: ['education', 'games', 'entertainment'],
         lang: 'en',
         icons: [
