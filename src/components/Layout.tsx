@@ -20,6 +20,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/MockAuthContext';
 import AuthModal from './AuthModal';
+import { Logo } from './Logo';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -96,9 +97,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Bars3Icon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
               )}
             </button>
-            <h1 className="ml-3 text-xl font-bold text-gray-900 dark:text-white">
-              Ancient History Trivia
-            </h1>
+            <div className="flex items-center ml-3">
+              <Logo size={32} className="mr-3" />
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                Ancient History Trivia
+              </h1>
+            </div>
           </div>
 
           {/* User Profile Section */}
