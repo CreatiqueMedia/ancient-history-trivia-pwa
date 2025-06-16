@@ -1,4 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <circle cx="64" cy="64" r="64" fill="#FFD700"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-size="16" font-family="Arial">Eye of Ra</text>
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
   <rect width="128" height="128" fill="#4A90E2"/>
   <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="16" font-family="Arial">Logo</text>
 </svg>
