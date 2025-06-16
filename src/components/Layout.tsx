@@ -82,7 +82,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Desktop Header with Toggle */}
       <header className="hidden md:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
         <div className="flex items-center justify-between px-4 py-3">
@@ -168,7 +168,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex flex-1"> {/* Changed to flex-1 to allow footer to stick to bottom */}
         {/* Desktop Sidebar */}
         <aside className={`hidden md:block fixed left-0 top-0 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-30 transition-transform duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-0'
@@ -216,6 +216,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </main>
       </div>
+
+      {/* New Desktop Footer */}
+      <footer className="hidden md:block bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-center">
+          <Logo size={64} className="mr-2" />
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            &copy; {new Date().getFullYear()} Ancient History Trivia. All rights reserved.
+          </p>
+        </div>
+      </footer>
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 md:hidden z-50">

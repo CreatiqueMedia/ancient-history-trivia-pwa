@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logos/logo_192.svg', 'logos/logo_512.svg', 'logos/logo_64.svg'],
+      includeAssets: ['logos/logo_192.svg', 'logos/logo_512.svg', 'logos/logo_64.svg', 'logos/logo_128.svg'],
       manifest: {
         name: 'Ancient History Trivia',
         short_name: 'History Trivia',
