@@ -10,13 +10,13 @@ const isDev = window.location.hostname === 'localhost' || window.location.hostna
 
 
 // Correct basename for local vs production
-const basename = isDev ? '' : '/ancient-history-trivia-pwa';
+const basename = isDev ? '' : '/ancient-history-pwa';
 
 
 // Register service worker only in production
 if ('serviceWorker' in navigator && !isDev) {
   window.addEventListener('load', () => {
-    const swUrl = '/ancient-history-trivia-pwa/sw.js';
+    const swUrl = '/ancient-history-pwa/sw.js';
     navigator.serviceWorker.register(swUrl)
       .then((registration) => {
         console.log('✅ SW registered: ', registration);
