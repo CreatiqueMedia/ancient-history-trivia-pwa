@@ -13,11 +13,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "deploy": "yarn build && yarn gh-pages -d dist",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
     "@heroicons/react": "^2.0.18",
@@ -43,14 +44,18 @@
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
+    "gh-pages": "^6.3.0",
     "jsdom": "^26.1.0",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.2.2",
-    "vite": "^5.0.0",
-    "vite-plugin-pwa": "^0.17.4",
+    "vite": "^6.3.5",
+    "vite-plugin-pwa": "^1.0.0",
     "vitest": "^3.2.3",
     "workbox-build": "^7.3.0",
     "workbox-window": "^7.0.0"
+  },
+  "resolutions": {
+    "brace-expansion": "^2.0.2"
   }
 }

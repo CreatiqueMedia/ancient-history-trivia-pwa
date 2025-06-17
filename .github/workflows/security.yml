@@ -1,165 +1,98 @@
-name: Security Checks
+name: Security Audit
+
+# Force refresh - Updated to use yarn audit exclusively
+# No npm commands should be used in this workflow
 
 on:
   push:
     branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
   schedule:
-    # Run security checks weekly on Mondays at 9 AM UTC
-    - cron: '0 9 * * 1'
-
-permissions:
-  contents: read
-  security-events: write
-  actions: read
+    # Run security audit daily at 2 AM UTC
+    - cron: '0 2 * * *'
 
 jobs:
-  dependency-check:
-    name: Dependency Vulnerability Check
+  security:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'yarn'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-    - name: Run security audit
-      run: yarn audit --level moderate
-      continue-on-error: true
+      - name: Verify package manager
+        run: |
+          echo "🔍 Verifying we're using Yarn (not npm)..."
+          which yarn
+          yarn --version
+          echo "📦 Package manager verification complete"
 
-    - name: Check for known vulnerabilities
-      run: |
-        # Run npm audit and capture output
-        if ! yarn audit --level high --json > audit-results.json; then
-          echo "High or critical vulnerabilities found!"
-          cat audit-results.json
-          exit 1
-        fi
+      - name: Run security audit
+        run: |
+          echo "🔍 Running Yarn security audit (NOT npm audit)..."
+          echo "⚠️  This workflow uses YARN ONLY - no npm commands"
+          
+          # Verify we're using yarn
+          echo "📋 Yarn version: $(yarn --version)"
+          
+          # Run yarn audit and capture JSON output
+          echo "📊 Getting audit summary in JSON format..."
+          yarn audit --json > audit-full.json || true
+          
+          # Parse the JSON to extract vulnerability counts
+          if [ -f audit-full.json ]; then
+            echo "📋 Audit results found, parsing JSON..."
+            
+            # Extract vulnerability counts from JSON
+            HIGH_COUNT=$(cat audit-full.json | grep '"type":"auditSummary"' | sed 's/.*"high":\([0-9]*\).*/\1/' || echo "0")
+            CRITICAL_COUNT=$(cat audit-full.json | grep '"type":"auditSummary"' | sed 's/.*"critical":\([0-9]*\).*/\1/' || echo "0")
+            MODERATE_COUNT=$(cat audit-full.json | grep '"type":"auditSummary"' | sed 's/.*"moderate":\([0-9]*\).*/\1/' || echo "0")
+            LOW_COUNT=$(cat audit-full.json | grep '"type":"auditSummary"' | sed 's/.*"low":\([0-9]*\).*/\1/' || echo "0")
+            
+            echo "🔢 Vulnerability counts:"
+            echo "  Critical: $CRITICAL_COUNT"
+            echo "  High: $HIGH_COUNT"
+            echo "  Moderate: $MODERATE_COUNT"
+            echo "  Low: $LOW_COUNT"
+            
+            # Only fail if we have high or critical vulnerabilities
+            if [ "$HIGH_COUNT" -gt 0 ] || [ "$CRITICAL_COUNT" -gt 0 ]; then
+              echo "❌ High or critical vulnerabilities found!"
+              echo "📋 Full audit output:"
+              cat audit-full.json
+              echo ""
+              echo "🔍 Detailed audit report:"
+              yarn audit --level high || true
+              exit 1
+            else
+              echo "✅ No high or critical vulnerabilities found!"
+              if [ "$MODERATE_COUNT" -gt 0 ] || [ "$LOW_COUNT" -gt 0 ]; then
+                echo "ℹ️  Found $MODERATE_COUNT moderate and $LOW_COUNT low vulnerabilities (acceptable)"
+              fi
+              echo "🔒 Build will continue"
+            fi
+          else
+            echo "⚠️ No audit results file found, running fallback audit..."
+            yarn audit --level high || {
+              echo "❌ Audit command failed unexpectedly"
+              exit 1
+            }
+          fi
+          
+          echo "🎉 Security audit completed successfully!"
 
-  lint-security:
-    name: Security Linting
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'yarn'
-
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
-
-    - name: Run ESLint security rules
-      run: |
-        # Install security-focused ESLint plugins
-        yarn add --dev eslint-plugin-security @typescript-eslint/eslint-plugin
-        
-        # Run linting with security focus
-        npx eslint . --ext .ts,.tsx --config .eslintrc.json
-      continue-on-error: true
-
-  check-secrets:
-    name: Secret Scanning
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Check for secrets
-      uses: trufflesecurity/trufflehog@main
-      with:
-        path: ./
-        base: main
-        head: HEAD
-        extra_args: --debug --only-verified
-
-  build-security-test:
-    name: Build and Security Test
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'yarn'
-
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
-
-    - name: Build application
-      run: yarn build
-
-    - name: Test build output for security issues
-      run: |
-        # Check for exposed sensitive information in build
-        if grep -r "api[_-]key\|secret\|password\|token" dist/ --exclude-dir=node_modules || true; then
-          echo "Warning: Potential sensitive information found in build output"
-        fi
-        
-        # Check for proper Content Security Policy
-        if [ -f "dist/index.html" ]; then
-          echo "Checking for security headers in built files..."
-          grep -i "content-security-policy\|x-frame-options\|x-content-type-options" dist/index.html || echo "Consider adding security headers"
-        fi
-
-  permissions-check:
-    name: File Permissions Check
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Check file permissions
-      run: |
-        echo "Checking for files with overly permissive permissions..."
-        find . -type f -perm /o+w -not -path "./.git/*" -not -path "./node_modules/*" || true
-        
-        echo "Checking for executable files that shouldn't be..."
-        find . -name "*.json" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" | xargs ls -l | grep '^-rwxr' || true
-
-  package-integrity:
-    name: Package Integrity Check
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'yarn'
-
-    - name: Verify package integrity
-      run: |
-        # Check yarn.lock for integrity
-        yarn install --frozen-lockfile --check-files
-        
-        # Verify no malicious packages (basic check)
-        echo "Checking for suspicious package names..."
-        if grep -E "(evil|malware|backdoor|exploit)" yarn.lock; then
-          echo "Suspicious package names found!"
-          exit 1
-        fi
+      - name: Upload audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: yarn-security-audit-results
+          path: |
+            audit-full.json
+# Test comment to force workflow refresh

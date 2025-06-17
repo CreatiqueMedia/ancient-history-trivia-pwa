@@ -3,12 +3,12 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/ancient-history-pwa/' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/ancient-history-trivia-pwa/' : '/',
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-192.svg', 'icon-512.svg'],
+      includeAssets: ['logos/logo_192.svg', 'logos/logo_64.svg', 'logos/logo_128.svg'],
       manifest: {
         name: 'Ancient History Trivia',
         short_name: 'History Trivia',
@@ -17,31 +17,21 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',
-        scope: '/',
-        start_url: '/',
+        scope: '/ancient-history-trivia-pwa/',
+        start_url: '/ancient-history-trivia-pwa/',
         categories: ['education', 'games', 'entertainment'],
         lang: 'en',
         icons: [
           {
-            src: 'icon-192.svg',
+            src: 'logos/logo_192.svg',
             sizes: '192x192',
             type: 'image/svg+xml'
-          },
-          {
-            src: 'icon-512.svg',
-            sizes: '512x512',
-            type: 'image/svg+xml'
-          },
-          {
-            src: 'icon-512.svg',
-            sizes: '512x512',
-            type: 'image/svg+xml',
-            purpose: 'any maskable'
           }
         ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        maximumFileSizeToCacheInBytes: 3000000, // 3MB to handle large SVG files
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\//,
