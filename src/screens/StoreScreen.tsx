@@ -29,7 +29,8 @@ import {
   CubeIcon,
   SparklesIcon,
   BoltIcon,
-  FlagIcon
+  FlagIcon,
+  PencilSquareIcon
 } from '@heroicons/react/24/outline';
 
 import { QUESTION_BUNDLES, getBundleGroups, SUBSCRIPTION_TIERS } from '../data/bundles';
@@ -38,8 +39,6 @@ import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles'
 
 const StoreScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'bundles' | 'subscription'>('bundles');
-  const [filter, setFilter] = useState<'all' | 'region' | 'historical_age' | 'format' | 'difficulty'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'difficulty' | 'questions' | 'price'>('name');
   
   const { 
     hasAccessToBundle, 
@@ -50,7 +49,44 @@ const StoreScreen: React.FC = () => {
     isProcessing 
   } = usePurchase();
 
-  const bundleGroups = getBundleGroups();
+  // Organize bundles into the sections you requested
+  const organizeBundles = () => {
+    // Age Bundle Packs
+    const ageBundles = QUESTION_BUNDLES.filter(bundle => 
+      bundle.category === 'historical_age' && 
+      ['Prehistoric', 'Bronze Age', 'Iron Age'].includes(bundle.subcategory)
+    );
+
+    // Format Bundle Packs  
+    const formatBundles = QUESTION_BUNDLES.filter(bundle => 
+      bundle.category === 'format' && 
+      ['Multiple Choice', 'True/False', 'Fill-in-the-Blank'].includes(bundle.subcategory)
+    );
+
+    // Region Bundle Packs
+    const regionBundles = QUESTION_BUNDLES.filter(bundle => 
+      bundle.category === 'region' && 
+      ['Roman', 'Egyptian', 'Greek', 'Mesopotamian', 'Chinese', 'Indian', 'American', 'European'].includes(bundle.subcategory)
+    );
+
+    // Other Bundle Packs (everything else)
+    const otherBundles = QUESTION_BUNDLES.filter(bundle => {
+      const isAge = bundle.category === 'historical_age' && ['Prehistoric', 'Bronze Age', 'Iron Age'].includes(bundle.subcategory);
+      const isFormat = bundle.category === 'format' && ['Multiple Choice', 'True/False', 'Fill-in-the-Blank'].includes(bundle.subcategory);
+      const isRegion = bundle.category === 'region' && ['Roman', 'Egyptian', 'Greek', 'Mesopotamian', 'Chinese', 'Indian', 'American', 'European'].includes(bundle.subcategory);
+      
+      return !isAge && !isFormat && !isRegion;
+    });
+
+    return {
+      'Age Bundle Packs': ageBundles,
+      'Format Bundle Packs': formatBundles, 
+      'Region Bundle Packs': regionBundles,
+      'Other Bundle Packs': otherBundles
+    };
+  };
+
+  const bundleSections = organizeBundles();
 
   // Get icon component by name
   const getIconComponent = (iconName: string, className: string = "w-6 h-6") => {
@@ -75,32 +111,16 @@ const StoreScreen: React.FC = () => {
       'home': HomeIcon,
       'bolt': BoltIcon,
       'flag': FlagIcon,
+      'pencil-square': PencilSquareIcon,
     };
     
     const IconComponent = iconMap[iconName] || AcademicCapIcon;
     return <IconComponent className={className} />;
   };
 
-  const filteredBundles = QUESTION_BUNDLES.filter(bundle => {
-    if (filter === 'all') return true;
-    return bundle.category === filter;
-  });
+  const filteredBundles = QUESTION_BUNDLES;
 
-  const sortedBundles = [...filteredBundles].sort((a, b) => {
-    switch (sortBy) {
-      case 'name':
-        return a.name.localeCompare(b.name);
-      case 'difficulty':
-        const difficultyOrder = { easy: 1, medium: 2, hard: 3 };
-        return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
-      case 'questions':
-        return b.questionCount - a.questionCount;
-      case 'price':
-        return a.price - b.price;
-      default:
-        return 0;
-    }
-  });
+  const sortedBundles = [...filteredBundles];
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -380,46 +400,15 @@ const StoreScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Filters and Sorting - Only show for bundles tab */}
+          {/* Section Header for Bundle Packs */}
           {activeTab === 'bundles' && (
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-              {/* Category Filters */}
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { key: 'all', label: 'All Categories' },
-                  { key: 'region', label: 'Regions' },
-                  { key: 'historical_age', label: 'Historical Ages' },
-                  { key: 'format', label: 'Question Formats' },
-                  { key: 'difficulty', label: 'Difficulty Levels' }
-                ].map(({ key, label }) => (
-                  <button
-                    key={key}
-                    onClick={() => setFilter(key as typeof filter)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                      filter === key
-                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Sort Dropdown */}
-              <div className="flex items-center gap-2">
-                <FunnelIcon className="w-5 h-5 text-gray-400" />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                  className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white"
-                >
-                  <option value="name">Sort by Name</option>
-                  <option value="difficulty">Sort by Difficulty</option>
-                  <option value="questions">Sort by Questions</option>
-                  <option value="price">Sort by Price</option>
-                </select>
-              </div>
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Bundle Packs
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Organized by category for easy browsing
+              </p>
             </div>
           )}
         </div>
@@ -429,40 +418,41 @@ const StoreScreen: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {activeTab === 'bundles' ? (
           <>
-            {/* Bundle Groups Promotion */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Bundle Deals - Save Up to 30%
-              </h2>
-              <div className="space-y-4">
-                {bundleGroups.map(group => renderGroupCard(group))}
-              </div>
+            {/* Organized Bundle Sections */}
+            <div className="space-y-12">
+              {/* Loop through sections in alphabetical order */}
+              {Object.entries(bundleSections)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([sectionName, bundles]) => (
+                  bundles.length > 0 && (
+                    <div key={sectionName} className="space-y-6">
+                      <div className="text-center">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                          {sectionName}
+                        </h2>
+                        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {bundles.map(bundle => renderBundleCard(bundle))}
+                      </div>
+                    </div>
+                  )
+                ))}
             </div>
 
-            {/* Individual Bundles */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Individual Question Bundles
-              </h2>
-              
-              {/* Bundles Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sortedBundles.map(bundle => renderBundleCard(bundle))}
+            {/* Empty State */}
+            {Object.values(bundleSections).every(bundles => bundles.length === 0) && (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">📚</div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  No bundles found
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Check back later for new content.
+                </p>
               </div>
-
-              {/* Empty State */}
-              {sortedBundles.length === 0 && (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">📚</div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    No bundles found
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Try adjusting your filters to see more options.
-                  </p>
-                </div>
-              )}
-            </div>
+            )}
           </>
         ) : (
           <>

@@ -249,6 +249,64 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     }
   },
 
+  // Additional Region Packs
+  {
+    id: 'region_pack_americas',
+    name: 'Ancient Americas',
+    description: '100 questions about Ancient Americas. Maya, Aztec, Inca, and other pre-Columbian civilizations.',
+    category: 'region',
+    subcategory: 'American',
+    price: PRICING.pack,
+    questionCount: 100,
+    questions: [],
+    isPremium: true,
+    isOwned: false,
+    difficulty: 'medium',
+    difficultyBreakdown: {
+      easy: 25,
+      medium: 50,
+      hard: 25
+    },
+    format: 'Mixed',
+    releaseDate: '2025-05-02',
+    version: 'v1',
+    bpType: 'RegionPackType',
+    iconName: 'globe-americas',
+    themeColors: {
+      primary: '#059669',
+      background: '#D1FAE5',
+      text: '#FFFFFF'
+    }
+  },
+  {
+    id: 'region_pack_europe',
+    name: 'Ancient Europe',
+    description: '100 questions on Ancient Europe. Celtic, Germanic, Norse cultures and early European civilizations.',
+    category: 'region',
+    subcategory: 'European',
+    price: PRICING.pack,
+    questionCount: 100,
+    questions: [],
+    isPremium: true,
+    isOwned: false,
+    difficulty: 'medium',
+    difficultyBreakdown: {
+      easy: 25,
+      medium: 50,
+      hard: 25
+    },
+    format: 'Mixed',
+    releaseDate: '2025-05-02',
+    version: 'v1',
+    bpType: 'RegionPackType',
+    iconName: 'flag',
+    themeColors: {
+      primary: '#7C2D12',
+      background: '#FED7AA',
+      text: '#FFFFFF'
+    }
+  },
+
   // Age Packs
   {
     id: 'age_pack_bronze_age',
@@ -392,6 +450,34 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     themeColors: {
       primary: '#14B8A6',
       background: '#CCFBF1',
+      text: '#FFFFFF'
+    }
+  },
+  {
+    id: 'format_pack_fill_blank',
+    name: 'Fill-in-the-Blank Pack',
+    description: '100 Fill-in-the-Blank questions. Test your recall and specific knowledge with completion challenges.',
+    category: 'format',
+    subcategory: 'Fill-in-the-Blank',
+    price: PRICING.pack,
+    questionCount: 100,
+    questions: [],
+    isPremium: true,
+    isOwned: false,
+    difficulty: 'medium',
+    difficultyBreakdown: {
+      easy: 25,
+      medium: 50,
+      hard: 25
+    },
+    format: 'Fill-in-the-Blank',
+    releaseDate: '2025-05-02',
+    version: 'v1',
+    bpType: 'FormatPackType',
+    iconName: 'pencil-square',
+    themeColors: {
+      primary: '#7C3AED',
+      background: '#EDE9FE',
       text: '#FFFFFF'
     }
   },
