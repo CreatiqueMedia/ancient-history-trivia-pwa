@@ -82,7 +82,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   // Region Packs
   {
     id: 'region_pack_rome',
-    name: 'Ancient Rome',
+    name: 'Ancient Rome Pack',
     description: 'Test your knowledge of Ancient Rome. 100 questions covering the Republic, Empire, culture, and key figures.',
     category: 'region',
     subcategory: 'Roman',
@@ -110,7 +110,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   },
   {
     id: 'region_pack_egypt',
-    name: 'Ancient Egypt',
+    name: 'Ancient Egypt Pack',
     description: '100 questions about Ancient Egypt. Pharaohs, pyramids, culture, and the Nile civilization.',
     category: 'region',
     subcategory: 'Egyptian',
@@ -138,7 +138,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   },
   {
     id: 'region_pack_greece',
-    name: 'Ancient Greece',
+    name: 'Ancient Greece Pack',
     description: '100 questions on Ancient Greece. Philosophy, democracy, mythology, and classical civilization.',
     category: 'region',
     subcategory: 'Greek',
@@ -166,7 +166,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   },
   {
     id: 'region_pack_mesopotamia',
-    name: 'Ancient Mesopotamia',
+    name: 'Ancient Mesopotamia Pack',
     description: '100 questions on Mesopotamia. Sumer, Akkad, Babylon, and the cradle of civilization.',
     category: 'region',
     subcategory: 'Mesopotamian',
@@ -194,7 +194,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   },
   {
     id: 'region_pack_china',
-    name: 'Ancient China',
+    name: 'Ancient China Pack',
     description: '100 questions on Ancient China. Dynasties, inventions, philosophy, and the Great Wall.',
     category: 'region',
     subcategory: 'Chinese',
@@ -222,7 +222,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   },
   {
     id: 'region_pack_india',
-    name: 'Ancient India',
+    name: 'Ancient India Pack',
     description: '100 questions about Ancient India. Vedic period, empires, religion, and cultural achievements.',
     category: 'region',
     subcategory: 'Indian',
@@ -252,7 +252,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   // Additional Region Packs
   {
     id: 'region_pack_americas',
-    name: 'Ancient Americas',
+    name: 'Ancient Americas Pack',
     description: '100 questions about Ancient Americas. Maya, Aztec, Inca, and other pre-Columbian civilizations.',
     category: 'region',
     subcategory: 'American',
@@ -280,7 +280,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   },
   {
     id: 'region_pack_europe',
-    name: 'Ancient Europe',
+    name: 'Ancient Europe Pack',
     description: '100 questions on Ancient Europe. Celtic, Germanic, Norse cultures and early European civilizations.',
     category: 'region',
     subcategory: 'European',
@@ -310,7 +310,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   // Age Packs
   {
     id: 'age_pack_bronze_age',
-    name: 'Bronze Age',
+    name: 'Bronze Age Pack',
     description: '100 Bronze Age questions. Early civilizations, technology, and cultural developments.',
     category: 'historical_age',
     subcategory: 'Bronze Age',
@@ -339,7 +339,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   },
   {
     id: 'age_pack_iron_age',
-    name: 'Iron Age',
+    name: 'Iron Age Pack',
     description: '100 Iron Age questions. Advanced civilizations, warfare, and technological progress.',
     category: 'historical_age',
     subcategory: 'Iron Age',
@@ -368,7 +368,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
   },
   {
     id: 'age_pack_prehistoric',
-    name: 'Prehistoric Age',
+    name: 'Prehistoric Age Pack',
     description: '100 Prehistoric Age questions. Early human history, evolution, and stone age cultures.',
     category: 'historical_age',
     subcategory: 'Prehistoric',
