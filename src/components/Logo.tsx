@@ -16,11 +16,13 @@ export const Logo: React.FC<LogoProps> = ({
 
   // Use Vite's base URL to ensure proper paths in both dev and production
   const getLogoSrc = (requestedSize: number): string => {
-    // Fix the path - remove logo_512.svg since we deleted it
     const basePath = import.meta.env.BASE_URL;
-    if (requestedSize <= 64) return `${basePath}logos/logo_64.svg`;
-    if (requestedSize <= 128) return `${basePath}logos/logo_128.svg`;
-    return `${basePath}logos/logo_192.png`; // Use optimized PNG instead of bloated SVG
+    // Ensure base path ends with / and logo path doesn't start with /
+    const normalizedBasePath = basePath.endsWith('/') ? basePath : `${basePath}/`;
+    
+    if (requestedSize <= 64) return `${normalizedBasePath}logos/logo_64.svg`;
+    if (requestedSize <= 128) return `${normalizedBasePath}logos/logo_128.svg`;
+    return `${normalizedBasePath}logos/logo_192.png`;
   };
 
   const logoSrc = getLogoSrc(size);
