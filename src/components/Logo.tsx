@@ -20,7 +20,7 @@ export const Logo: React.FC<LogoProps> = ({
     const basePath = import.meta.env.BASE_URL;
     if (requestedSize <= 64) return `${basePath}logos/logo_64.svg`;
     if (requestedSize <= 128) return `${basePath}logos/logo_128.svg`;
-    return `${basePath}logos/logo_192.svg`; // Use 192 as max instead of 512
+    return `${basePath}logos/logo_192.png`; // Use optimized PNG instead of bloated SVG
   };
 
   const logoSrc = getLogoSrc(size);

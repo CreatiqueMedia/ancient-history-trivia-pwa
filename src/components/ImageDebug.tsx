@@ -13,7 +13,7 @@ const ImageDebug: React.FC = () => {
     const imagePaths = [
       `${basePath}logos/logo_64.svg`,
       `${basePath}logos/logo_128.svg`,
-      `${basePath}logos/logo_192.svg`,
+      `${basePath}logos/logo_192.png`,
       `${basePath}logos/logo_512.svg`
     ];
 

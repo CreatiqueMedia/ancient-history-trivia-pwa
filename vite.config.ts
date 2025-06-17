@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logos/logo_192.svg', 'logos/logo_64.svg', 'logos/logo_128.svg'],
+      includeAssets: ['logos/logo_192.png', 'logos/logo_512.png', 'logos/logo_64.svg', 'logos/logo_128.svg'],
       manifest: {
         name: 'Ancient History Trivia',
         short_name: 'History Trivia',
@@ -23,9 +23,14 @@ export default defineConfig({
         lang: 'en',
         icons: [
           {
-            src: 'logos/logo_192.svg',
+            src: 'logos/logo_192.png',
             sizes: '192x192',
-            type: 'image/svg+xml'
+            type: 'image/png'
+          },
+          {
+            src: 'logos/logo_512.png',
+            sizes: '512x512',
+            type: 'image/png'
           }
         ]
       },
