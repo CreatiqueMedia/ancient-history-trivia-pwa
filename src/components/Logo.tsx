@@ -16,11 +16,11 @@ export const Logo: React.FC<LogoProps> = ({
 
   // Use Vite's base URL to ensure proper paths in both dev and production
   const getLogoSrc = (requestedSize: number): string => {
+    // Fix the path - remove logo_512.svg since we deleted it
     const basePath = import.meta.env.BASE_URL;
     if (requestedSize <= 64) return `${basePath}logos/logo_64.svg`;
     if (requestedSize <= 128) return `${basePath}logos/logo_128.svg`;
-    if (requestedSize <= 192) return `${basePath}logos/logo_192.svg`;
-    return `${basePath}logos/logo_512.svg`;
+    return `${basePath}logos/logo_192.svg`; // Use 192 as max instead of 512
   };
 
   const logoSrc = getLogoSrc(size);
@@ -34,7 +34,7 @@ export const Logo: React.FC<LogoProps> = ({
     setImageError(true);
   };
 
-  // Fallback SVG if image fails to load
+  // Clean, simple fallback SVG if image fails to load
   const FallbackLogo = () => (
     <svg
       width={size}
@@ -44,11 +44,11 @@ export const Logo: React.FC<LogoProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      <circle cx="32" cy="32" r="30" fill="#FFD700" stroke="#B8860B" strokeWidth="2"/>
-      <path d="M16 32 Q32 24 48 32 Q32 40 16 32 Z" fill="#8B4513" stroke="#654321" strokeWidth="1"/>
-      <ellipse cx="32" cy="32" rx="12" ry="6" fill="#FFFFFF"/>
-      <circle cx="32" cy="32" r="4" fill="#000000"/>
-      <circle cx="33" cy="30" r="1.5" fill="#FFFFFF"/>
+      {/* Simple, clean eye design matching your brand */}
+      <circle cx="32" cy="32" r="28" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth="2"/>
+      <path d="M12 32 Q32 20 52 32 Q32 44 12 32 Z" fill="currentColor" fillOpacity="0.2"/>
+      <ellipse cx="32" cy="32" rx="8" ry="4" fill="currentColor" fillOpacity="0.8"/>
+      <circle cx="32" cy="32" r="2" fill="currentColor"/>
     </svg>
   );
 
