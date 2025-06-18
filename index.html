@@ -2,19 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- FAVICON LINKS - Using absolute paths for GitHub Pages -->
-    <link rel="icon" type="image/svg+xml" href="/logos/logo_64.svg?v=FORCE_NEW_LOGO&bust=1734384000" />
-    <link rel="shortcut icon" type="image/svg+xml" href="/logos/logo_64.svg?v=FORCE_NEW_LOGO&bust=1734384000" />
-    <link rel="icon" sizes="64x64" href="/logos/logo_64.svg?v=FORCE_NEW_LOGO&bust=1734384000" />
-    <link rel="icon" sizes="128x128" href="/logos/logo_128.svg?v=FORCE_NEW_LOGO&bust=1734384000" />
-    <link rel="icon" sizes="192x192" href="/logos/logo_192.png?v=OPTIMIZED_PNG&bust=1734384000" />
-    <link rel="apple-touch-icon" sizes="192x192" href="/logos/logo_192.png?v=OPTIMIZED_PNG&bust=1734384000" />
-    <link rel="apple-touch-icon-precomposed" href="/logos/logo_192.png?v=OPTIMIZED_PNG&bust=1734384000" />
+    <!-- FAVICON LINKS - Using correct GitHub Pages paths -->
+    <link rel="icon" type="image/svg+xml" href="/ancient-history-trivia-pwa/logos/logo_64.svg?v=FORCE_NEW_LOGO&bust=1734384000" />
+    <link rel="shortcut icon" type="image/svg+xml" href="/ancient-history-trivia-pwa/logos/logo_64.svg?v=FORCE_NEW_LOGO&bust=1734384000" />
+    <link rel="icon" sizes="64x64" href="/ancient-history-trivia-pwa/logos/logo_64.svg?v=FORCE_NEW_LOGO&bust=1734384000" />
+    <link rel="icon" sizes="128x128" href="/ancient-history-trivia-pwa/logos/logo_128.svg?v=FORCE_NEW_LOGO&bust=1734384000" />
+    <link rel="icon" sizes="192x192" href="/ancient-history-trivia-pwa/logos/logo_192.png?v=OPTIMIZED_PNG&bust=1734384000" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/ancient-history-trivia-pwa/logos/logo_192.png?v=OPTIMIZED_PNG&bust=1734384000" />
+    <link rel="apple-touch-icon-precomposed" href="/ancient-history-trivia-pwa/logos/logo_192.png?v=OPTIMIZED_PNG&bust=1734384000" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Test your knowledge of ancient civilizations and historical events with our comprehensive trivia app." />
     <meta name="theme-color" content="#1f2937" />
     <!-- Manifest with strong cache-busting -->
-    <link rel="manifest" href="/manifest.webmanifest?v=FORCE_NEW_LOGO&bust=1734384000" />
+    <link rel="manifest" href="/ancient-history-trivia-pwa/manifest.webmanifest?v=FORCE_NEW_LOGO&bust=1734384000" />
     <!-- Force no-cache headers -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -47,18 +47,18 @@
           link.parentNode.removeChild(link);
         });
         
-        // Add new favicon with current timestamp
+        // Add new favicon with current timestamp - using GitHub Pages base path
         var newFavicon = document.createElement('link');
         newFavicon.rel = 'icon';
         newFavicon.type = 'image/svg+xml';
-        newFavicon.href = '/logos/logo_64.svg?nuclear=' + Date.now();
+        newFavicon.href = '/ancient-history-trivia-pwa/logos/logo_64.svg?nuclear=' + Date.now();
         document.head.appendChild(newFavicon);
         
         // Also add shortcut icon
         var newShortcut = document.createElement('link');
         newShortcut.rel = 'shortcut icon';
         newShortcut.type = 'image/svg+xml';
-        newShortcut.href = '/logos/logo_64.svg?nuclear=' + Date.now();
+        newShortcut.href = '/ancient-history-trivia-pwa/logos/logo_64.svg?nuclear=' + Date.now();
         document.head.appendChild(newShortcut);
       }, 100);
     </script>
