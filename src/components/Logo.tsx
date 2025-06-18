@@ -11,50 +11,31 @@ export const Logo: React.FC<LogoProps> = ({
   size = 64, 
   animated = false 
 }) => {
-  const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  // Use Vite's base URL to ensure proper paths in both dev and production
-  const getLogoSrc = (requestedSize: number): string => {
-    const basePath = import.meta.env.BASE_URL;
-    if (requestedSize <= 64) return `${basePath}logos/logo_64.svg`;
-    if (requestedSize <= 128) return `${basePath}logos/logo_128.svg`;
-    if (requestedSize <= 192) return `${basePath}logos/logo_192.svg`;
-    return `${basePath}logos/logo_512.svg`;
-  };
+  // Always use logo_192.svg as requested
+  const basePath = import.meta.env.BASE_URL;
+  const normalizedBasePath = basePath.endsWith('/') ? basePath : `${basePath}/`;
+  const logoSrc = `${normalizedBasePath}logos/logo_192.svg`;
 
-  const logoSrc = getLogoSrc(size);
+  // Debug logging
+  console.log('🔍 Logo Debug Info:');
+  console.log('  - BASE_URL:', import.meta.env.BASE_URL);
+  console.log('  - MODE:', import.meta.env.MODE);
+  console.log('  - Normalized base path:', normalizedBasePath);
+  console.log('  - Final logo src:', logoSrc);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
-    setImageError(false);
+    console.log('✅ Logo loaded successfully from:', logoSrc);
   };
 
-  const handleImageError = () => {
-    setImageError(true);
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error('❌ Logo failed to load from:', logoSrc);
+    console.error('Base URL:', import.meta.env.BASE_URL);
+    console.error('Mode:', import.meta.env.MODE);
+    console.error('Error details:', e);
   };
-
-  // Fallback SVG if image fails to load
-  const FallbackLogo = () => (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-    >
-      <circle cx="32" cy="32" r="30" fill="#FFD700" stroke="#B8860B" strokeWidth="2"/>
-      <path d="M16 32 Q32 24 48 32 Q32 40 16 32 Z" fill="#8B4513" stroke="#654321" strokeWidth="1"/>
-      <ellipse cx="32" cy="32" rx="12" ry="6" fill="#FFFFFF"/>
-      <circle cx="32" cy="32" r="4" fill="#000000"/>
-      <circle cx="33" cy="30" r="1.5" fill="#FFFFFF"/>
-    </svg>
-  );
-
-  if (imageError) {
-    return <FallbackLogo />;
-  }
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
