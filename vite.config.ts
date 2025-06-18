@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logos/logo_192.png', 'logos/logo_512.png', 'logos/logo_64.svg', 'logos/logo_128.svg'],
+      includeAssets: ['logos/logo_64.svg', 'logos/logo_128.svg', 'logos/logo_192.svg'],
       manifest: {
         name: 'Ancient History Trivia',
         short_name: 'History Trivia',
@@ -23,20 +23,15 @@ export default defineConfig({
         lang: 'en',
         icons: [
           {
-            src: 'logos/logo_192.png',
+            src: 'logos/logo_192.svg',
             sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'logos/logo_512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            type: 'image/svg+xml'
           }
         ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        maximumFileSizeToCacheInBytes: 3000000, // 3MB to handle large SVG files
+        maximumFileSizeToCacheInBytes: 5000000, // 5MB to handle large SVG files
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\//,
