@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   PlayIcon, 
   LockClosedIcon, 
@@ -35,10 +35,12 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { QUESTION_BUNDLES, getBundleGroups, SUBSCRIPTION_TIERS } from '../data/bundles';
+import { getSampleQuestionsForBundle } from '../data/sampleQuestions';
 import { usePurchase } from '../context/PurchaseContext';
 import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles';
 
 const StoreScreen: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'bundles' | 'subscription' | 'legacy'>('bundles');
   const [showSampleQuiz, setShowSampleQuiz] = useState<string | null>(null);
   
@@ -58,8 +60,14 @@ const StoreScreen: React.FC = () => {
   // Handle sample quiz
   const handleSampleQuiz = (bundle: QuestionBundle) => {
     try {
-      // Use the bundle's sample questions if available
-      const sampleQuestions = bundle.sampleQuestions || [];
+      // Get the actual sample questions for this bundle
+      const sampleQuestions = getSampleQuestionsForBundle(bundle.id);
+      
+      if (sampleQuestions.length === 0) {
+        alert('Sample questions not available for this bundle yet.');
+        return;
+      }
+      
       // Store the sample questions and navigate to quiz
       localStorage.setItem('sampleQuiz', JSON.stringify({
         bundleId: bundle.id,
@@ -69,8 +77,8 @@ const StoreScreen: React.FC = () => {
         isSample: true
       }));
       
-      // Navigate to quiz screen with sample mode
-      window.location.href = '/quiz/' + bundle.id + '?mode=sample';
+      // Navigate to quiz screen with sample mode using React Router
+      navigate(`/quiz/${bundle.id}?mode=sample`);
     } catch (error) {
       console.error('Sample quiz generation error:', error);
       alert('Unable to generate sample quiz. Please try again.');

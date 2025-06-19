@@ -1,4 +1,5 @@
 import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles';
+import { getSampleQuestionsForBundle } from './sampleQuestions';
 
 // Pricing configuration matching the original app
 export const PRICING = {
@@ -549,11 +550,20 @@ const RAW_BUNDLES = [
 ];
 
 // Export bundles with required properties added
-export const QUESTION_BUNDLES: QuestionBundle[] = RAW_BUNDLES.map(bundle => ({
-  ...bundle,
-  sampleQuestions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // Default sample questions
-  isCurrentVersion: true // Default to current version
-} as QuestionBundle));
+export const QUESTION_BUNDLES: QuestionBundle[] = RAW_BUNDLES.map((bundle, index) => {
+  const sampleQuestions = getSampleQuestionsForBundle(bundle.id);
+  // Create numeric IDs for sample questions (starting from bundle index * 100)
+  const baseId = (index + 1) * 100;
+  const sampleQuestionIds = sampleQuestions.length > 0 
+    ? sampleQuestions.map((_, i) => baseId + i + 1)
+    : [baseId + 1, baseId + 2, baseId + 3, baseId + 4, baseId + 5, baseId + 6, baseId + 7, baseId + 8, baseId + 9, baseId + 10];
+  
+  return {
+    ...bundle,
+    sampleQuestions: sampleQuestionIds,
+    isCurrentVersion: true
+  } as QuestionBundle;
+});
 
 // Helper function to group bundles by category
 export const getBundleGroups = (): BundleGroup[] => {
