@@ -136,7 +136,7 @@ export const FEATURE_GATES = {
 
 // Pricing configuration for individual bundles (if needed)
 export const BUNDLE_PRICING = {
-  individual: 1.99,
+  individual: 2.99,
   categoryDiscount: 0.20, // 20% off when buying all bundles in a category
   allBundlesDiscount: 0.30 // 30% off when buying all bundles
 };
