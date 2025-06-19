@@ -2,7 +2,7 @@ import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles'
 
 // Pricing configuration matching the original app
 export const PRICING = {
-  pack: 1.99,
+  pack: 2.99,
   groupDiscount: 0.8, // 20% off
   allDiscount: 0.7,   // 30% off
   subscription: {
@@ -89,6 +89,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     price: PRICING.pack,
     questionCount: 100,
     questions: [], // Will be populated with actual question IDs
+    sampleQuestions: [], // Will be populated with sample question IDs
     isPremium: true,
     isOwned: false,
     difficulty: 'medium',
@@ -100,6 +101,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     format: 'Mixed',
     releaseDate: '2025-05-02',
     version: 'v1',
+    isCurrentVersion: true,
     bpType: 'RegionPackType',
     iconName: 'shield-check', // Roman shields and military
     themeColors: {
@@ -117,6 +119,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     price: PRICING.pack,
     questionCount: 100,
     questions: [],
+    sampleQuestions: [], // Will be populated with sample question IDs
     isPremium: true,
     isOwned: false,
     difficulty: 'medium',
@@ -128,6 +131,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     format: 'Mixed',
     releaseDate: '2025-05-02',
     version: 'v1',
+    isCurrentVersion: true,
     bpType: 'RegionPackType',
     iconName: 'sun',
     themeColors: {
