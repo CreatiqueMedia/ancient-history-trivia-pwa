@@ -78,7 +78,8 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
 ];
 
 // Enhanced question bundles based on the original app structure
-export const QUESTION_BUNDLES: QuestionBundle[] = [
+// Raw bundle data without the required fields
+const RAW_BUNDLES = [
   // Region Packs
   {
     id: 'region_pack_rome',
@@ -149,6 +150,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     price: PRICING.pack,
     questionCount: 100,
     questions: [],
+    sampleQuestions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     isPremium: true,
     isOwned: false,
     difficulty: 'medium',
@@ -160,6 +162,7 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     format: 'Mixed',
     releaseDate: '2025-05-02',
     version: 'v1',
+    isCurrentVersion: true,
     bpType: 'RegionPackType',
     iconName: 'building-library', // Classical Greek architecture
     themeColors: {
@@ -544,6 +547,13 @@ export const QUESTION_BUNDLES: QuestionBundle[] = [
     }
   }
 ];
+
+// Export bundles with required properties added
+export const QUESTION_BUNDLES: QuestionBundle[] = RAW_BUNDLES.map(bundle => ({
+  ...bundle,
+  sampleQuestions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // Default sample questions
+  isCurrentVersion: true // Default to current version
+} as QuestionBundle));
 
 // Helper function to group bundles by category
 export const getBundleGroups = (): BundleGroup[] => {

@@ -9,7 +9,8 @@ import {
   ShoppingCartIcon,
   FireIcon,
   CalendarDaysIcon,
-  TrophyIcon
+  TrophyIcon,
+  BeakerIcon as FlaskIcon
 } from '@heroicons/react/24/solid';
 import { 
   SunIcon, 
@@ -38,7 +39,8 @@ import { usePurchase } from '../context/PurchaseContext';
 import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles';
 
 const StoreScreen: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'bundles' | 'subscription'>('bundles');
+  const [activeTab, setActiveTab] = useState<'bundles' | 'subscription' | 'legacy'>('bundles');
+  const [showSampleQuiz, setShowSampleQuiz] = useState<string | null>(null);
   
   const { 
     hasAccessToBundle, 
@@ -49,28 +51,54 @@ const StoreScreen: React.FC = () => {
     isProcessing 
   } = usePurchase();
 
+  // Get version information
+  const currentBundles = QUESTION_BUNDLES.filter(bundle => bundle.isCurrentVersion !== false);
+  const legacyBundles = QUESTION_BUNDLES.filter(bundle => bundle.isCurrentVersion === false);
+
+  // Handle sample quiz
+  const handleSampleQuiz = (bundle: QuestionBundle) => {
+    try {
+      // Use the bundle's sample questions if available
+      const sampleQuestions = bundle.sampleQuestions || [];
+      // Store the sample questions and navigate to quiz
+      localStorage.setItem('sampleQuiz', JSON.stringify({
+        bundleId: bundle.id,
+        bundleName: bundle.name,
+        version: bundle.version || 'v1',
+        questions: sampleQuestions,
+        isSample: true
+      }));
+      
+      // Navigate to quiz screen with sample mode
+      window.location.href = '/quiz/' + bundle.id + '?mode=sample';
+    } catch (error) {
+      console.error('Sample quiz generation error:', error);
+      alert('Unable to generate sample quiz. Please try again.');
+    }
+  };
+
   // Organize bundles into the sections you requested
-  const organizeBundles = () => {
+  const organizeBundles = (bundleList: QuestionBundle[] = currentBundles) => {
     // Age Bundle Packs
-    const ageBundles = QUESTION_BUNDLES.filter(bundle => 
+    const ageBundles = bundleList.filter(bundle => 
       bundle.category === 'historical_age' && 
       ['Prehistoric', 'Bronze Age', 'Iron Age'].includes(bundle.subcategory)
     );
 
     // Format Bundle Packs  
-    const formatBundles = QUESTION_BUNDLES.filter(bundle => 
+    const formatBundles = bundleList.filter(bundle => 
       bundle.category === 'format' && 
       ['Multiple Choice', 'True/False', 'Fill-in-the-Blank'].includes(bundle.subcategory)
     );
 
     // Region Bundle Packs
-    const regionBundles = QUESTION_BUNDLES.filter(bundle => 
+    const regionBundles = bundleList.filter(bundle => 
       bundle.category === 'region' && 
       ['Roman', 'Egyptian', 'Greek', 'Mesopotamian', 'Chinese', 'Indian', 'American', 'European'].includes(bundle.subcategory)
     );
 
     // Other Bundle Packs (everything else)
-    const otherBundles = QUESTION_BUNDLES.filter(bundle => {
+    const otherBundles = bundleList.filter(bundle => {
       const isAge = bundle.category === 'historical_age' && ['Prehistoric', 'Bronze Age', 'Iron Age'].includes(bundle.subcategory);
       const isFormat = bundle.category === 'format' && ['Multiple Choice', 'True/False', 'Fill-in-the-Blank'].includes(bundle.subcategory);
       const isRegion = bundle.category === 'region' && ['Roman', 'Egyptian', 'Greek', 'Mesopotamian', 'Chinese', 'Indian', 'American', 'European'].includes(bundle.subcategory);
@@ -87,6 +115,7 @@ const StoreScreen: React.FC = () => {
   };
 
   const bundleSections = organizeBundles();
+  const legacyBundleSections = organizeBundles(legacyBundles);
 
   // Get icon component by name
   const getIconComponent = (iconName: string, className: string = "w-6 h-6") => {
@@ -171,7 +200,7 @@ const StoreScreen: React.FC = () => {
     }
   };
 
-  const renderBundleCard = (bundle: QuestionBundle) => {
+  const renderBundleCard = (bundle: QuestionBundle, showVersion: boolean = true) => {
     const isOwned = hasAccessToBundle(bundle.id);
     const canAccess = isOwned || isPremiumUser;
 
@@ -190,7 +219,14 @@ const StoreScreen: React.FC = () => {
               {getIconComponent(bundle.iconName, "w-8 h-8")}
               <div>
                 <h3 className="font-bold text-lg">{bundle.name}</h3>
-                <p className="text-sm opacity-90">{bundle.subcategory}</p>
+                <div className="flex items-center space-x-2">
+                  <p className="text-sm opacity-90">{bundle.subcategory}</p>
+                  {showVersion && (
+                    <span className="bg-white/20 px-2 py-1 rounded text-xs font-medium">
+                      {bundle.version}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             {canAccess && (
@@ -214,6 +250,9 @@ const StoreScreen: React.FC = () => {
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {bundle.format}
               </span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                Released: {new Date(bundle.releaseDate).toLocaleDateString()}
+              </span>
             </div>
             
             {/* Difficulty breakdown */}
@@ -236,6 +275,17 @@ const StoreScreen: React.FC = () => {
             </div>
           </div>
 
+          {/* Sample Quiz Button - Always visible */}
+          <div className="mb-4">
+            <button
+              onClick={() => handleSampleQuiz(bundle)}
+              className="w-full bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-4 py-2 rounded-md text-sm font-medium flex items-center justify-center space-x-2 transition-colors border border-purple-200 dark:border-purple-700"
+            >
+              <FlaskIcon className="w-4 h-4" />
+              <span>Take Sample Quiz (10 Questions)</span>
+            </button>
+          </div>
+
           {/* Action buttons */}
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold text-gray-900 dark:text-white">
@@ -249,7 +299,7 @@ const StoreScreen: React.FC = () => {
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors"
               >
                 <PlayIcon className="w-4 h-4" />
-                <span>Start Quiz</span>
+                <span>Start Full Quiz</span>
               </Link>
             ) : (
               <button
@@ -374,18 +424,48 @@ const StoreScreen: React.FC = () => {
             </p>
           </div>
 
+          {/* Version Information Banner */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 mb-6 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="bg-blue-100 dark:bg-blue-900/30 rounded-full p-2">
+                  <CalendarDaysIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                    Current Question Versions
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Latest release: {new Date().toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  v1
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Next release: Coming Soon
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Tab Navigation */}
           <div className="flex justify-center mb-6">
             <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
               <button
                 onClick={() => setActiveTab('bundles')}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${
                   activeTab === 'bundles'
                     ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                Question Bundles
+                <span>Current Packs</span>
+                <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full text-xs">
+                  {currentBundles.length}
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab('subscription')}
@@ -397,6 +477,21 @@ const StoreScreen: React.FC = () => {
               >
                 Premium Subscription
               </button>
+              {legacyBundles.length > 0 && (
+                <button
+                  onClick={() => setActiveTab('legacy')}
+                  className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${
+                    activeTab === 'legacy'
+                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span>Previous Versions</span>
+                  <span className="bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full text-xs">
+                    {legacyBundles.length}
+                  </span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -454,7 +549,7 @@ const StoreScreen: React.FC = () => {
               </div>
             )}
           </>
-        ) : (
+        ) : activeTab === 'subscription' ? (
           <>
             {/* Subscription Plans */}
             <div className="mb-8">
@@ -527,7 +622,56 @@ const StoreScreen: React.FC = () => {
               </div>
             </div>
           </>
-        )}
+        ) : activeTab === 'legacy' ? (
+          <>
+            {/* Legacy Versions */}
+            <div className="mb-8">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Previous Question Versions
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Access older versions of question packs for additional practice
+                </p>
+              </div>
+
+              {/* Legacy Bundle Sections */}
+              <div className="space-y-12">
+                {Object.entries(legacyBundleSections)
+                  .sort(([a], [b]) => a.localeCompare(b))
+                  .map(([sectionName, bundles]) => (
+                    bundles.length > 0 && (
+                      <div key={sectionName} className="space-y-6">
+                        <div className="text-center">
+                          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                            {sectionName} - Legacy Versions
+                          </h2>
+                          <div className="w-24 h-1 bg-gradient-to-r from-gray-400 to-gray-600 mx-auto rounded-full"></div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {bundles.map(bundle => renderBundleCard(bundle, true))}
+                        </div>
+                      </div>
+                    )
+                  ))}
+              </div>
+
+              {/* Empty State for Legacy */}
+              {Object.values(legacyBundleSections).every(bundles => bundles.length === 0) && (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">🏛️</div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    No Legacy Versions Available
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Previous versions will appear here when new releases are published.
+                  </p>
+                </div>
+              )}
+            </div>
+          </>
+        ) : null}
 
         {/* Info Section */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">

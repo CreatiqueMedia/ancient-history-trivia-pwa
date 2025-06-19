@@ -32,6 +32,7 @@ export interface QuestionBundle {
   price: number; // In USD
   questionCount: number;
   questions: number[]; // Array of question IDs
+  sampleQuestions: number[]; // Array of 10 sample question IDs (3 easy, 4 medium, 3 hard)
   isPremium: boolean;
   isOwned: boolean;
   difficulty: 'easy' | 'medium' | 'hard'; // Overall difficulty rating (for compatibility)
@@ -43,7 +44,9 @@ export interface QuestionBundle {
   format: QuestionFormat;
   historicalAge?: HistoricalAge;
   releaseDate: string;
-  version: string;
+  version: string; // Current version (e.g., "v1", "v2", etc.)
+  versionHistory?: BundleVersion[]; // Previous versions
+  isCurrentVersion: boolean; // True if this is the latest version
   bpType: 'RegionPackType' | 'AgePackType' | 'FormatPackType' | 'DifficultyPackType';
   imageUrl?: string;
   iconName: string; // For Heroicons
@@ -52,6 +55,15 @@ export interface QuestionBundle {
     background: string;
     text: string;
   };
+}
+
+export interface BundleVersion {
+  version: string;
+  releaseDate: string;
+  questionCount: number;
+  sampleQuestions: number[];
+  isAvailable: boolean; // Can users still purchase this version?
+  price: number; // Price might change between versions
 }
 
 export interface BundleGroup {

@@ -19,19 +19,45 @@ const QuizScreen: React.FC = () => {
 
   // Memoize the quiz initialization to prevent re-renders
   const initializeQuiz = useCallback(() => {
+    // Check if this is a sample quiz
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const isSampleQuiz = mode === 'sample';
+    
+    // Check for sample quiz data in localStorage
+    const sampleQuizData = localStorage.getItem('sampleQuiz');
+    let sampleQuiz = null;
+    
+    if (isSampleQuiz && sampleQuizData) {
+      try {
+        sampleQuiz = JSON.parse(sampleQuizData);
+      } catch (error) {
+        console.error('Failed to parse sample quiz data:', error);
+      }
+    }
+    
     // Prevent reinitialization if quiz is already loaded for this bundle
-    if (currentQuiz && questions.length > 0 && bundleId === currentBundle?.id) {
+    if (currentQuiz && questions.length > 0 && (
+      (sampleQuiz && bundleId === sampleQuiz.bundleId) ||
+      (!sampleQuiz && bundleId === currentBundle?.id)
+    )) {
       setIsLoading(false);
       return;
     }
     
     setIsLoading(true);
     
-    // Load questions based on bundle or use random questions
+    // Load questions based on sample quiz, bundle, or use random questions
     let quizQuestions: Question[];
     let bundle = null;
     
-    if (bundleId) {
+    if (sampleQuiz && isSampleQuiz) {
+      // Load sample quiz questions
+      quizQuestions = sampleQuiz.questions;
+      bundle = QUESTION_BUNDLES.find(b => b.id === sampleQuiz.bundleId);
+      setCurrentBundle(bundle);
+      console.log('Loading sample quiz for:', sampleQuiz.bundleName, 'with', quizQuestions.length, 'questions');
+    } else if (bundleId) {
       // Find the bundle for UI display
       bundle = QUESTION_BUNDLES.find(b => b.id === bundleId);
       setCurrentBundle(bundle);
@@ -54,7 +80,16 @@ const QuizScreen: React.FC = () => {
 
   useEffect(() => {
     initializeQuiz();
-  }, [bundleId]); // Only depend on bundleId, not startQuiz
+    
+    // Cleanup function to clear sample quiz data when leaving the quiz
+    return () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode');
+      if (mode === 'sample') {
+        localStorage.removeItem('sampleQuiz');
+      }
+    };
+  }, [bundleId, initializeQuiz]);
 
   useEffect(() => {
     // Only run timer if there's a time limit set
@@ -121,17 +156,28 @@ const QuizScreen: React.FC = () => {
           {/* Bundle Info */}
           {currentBundle && (
             <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: currentBundle.themeColors.background }}>
-              <div className="flex items-center space-x-3">
-                <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg"
-                  style={{ backgroundColor: currentBundle.themeColors.primary }}
-                >
-                  📚
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div 
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg"
+                    style={{ backgroundColor: currentBundle.themeColors.primary }}
+                  >
+                    📚
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-gray-900 dark:text-white">{currentBundle.name}</h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{currentBundle.description}</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="font-bold text-gray-900 dark:text-white">{currentBundle.name}</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{currentBundle.description}</p>
-                </div>
+                {(() => {
+                  const urlParams = new URLSearchParams(window.location.search);
+                  const mode = urlParams.get('mode');
+                  return mode === 'sample' && (
+                    <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-medium border border-purple-200 dark:border-purple-700">
+                      🧪 Sample Quiz
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
