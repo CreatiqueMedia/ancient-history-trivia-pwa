@@ -893,6 +893,260 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
     }
   ],
 
+  // Ancient Europe Pack
+  region_pack_europe: [
+    // Easy Questions (33% - Celtic, Germanic, and Norse Cultures)
+    {
+      id: 'europe-easy-1',
+      question: 'Which ancient Celtic priests were known for their knowledge of astronomy and law?',
+      options: ['Bards', 'Druids', 'Warriors', 'Chieftains'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Religion',
+      region: 'Europe',
+      period: 'Iron Age',
+      explanation: 'Druids were Celtic priests who served as judges, teachers, and astronomers in ancient Celtic society.',
+      tags: ['druids', 'celts', 'priests']
+    },
+    {
+      id: 'europe-easy-2',
+      question: 'What type of ships did the Vikings use for their voyages?',
+      options: ['Galleys', 'Longships', 'Caravels', 'Triremes'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Technology',
+      region: 'Scandinavia',
+      period: 'Viking Age',
+      explanation: 'Vikings used longships, which were fast, shallow-draft vessels perfect for both sea and river travel.',
+      tags: ['vikings', 'longships', 'technology']
+    },
+    {
+      id: 'europe-easy-3',
+      question: 'Which Germanic tribe sacked Rome in 410 CE?',
+      options: ['Vandals', 'Visigoths', 'Ostrogoths', 'Franks'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Military',
+      region: 'Europe',
+      period: 'Late Antiquity',
+      explanation: 'The Visigoths under Alaric I sacked Rome in 410 CE, marking a major event in the fall of the Western Roman Empire.',
+      tags: ['visigoths', 'rome', 'sack']
+    },
+    // Medium Questions (33% - European Civilizations and Culture)
+    {
+      id: 'europe-medium-1',
+      question: 'The Minoan civilization flourished on which Mediterranean island?',
+      options: ['Sicily', 'Sardinia', 'Crete', 'Cyprus'],
+      correctAnswer: 2,
+      difficulty: 'medium',
+      category: 'Geography',
+      region: 'Mediterranean',
+      period: 'Bronze Age',
+      explanation: 'The Minoan civilization was centered on the island of Crete and was one of Europe\'s first advanced civilizations.',
+      tags: ['minoans', 'crete', 'bronze age']
+    },
+    {
+      id: 'europe-medium-2',
+      question: 'What was the purpose of Celtic oppida?',
+      options: ['Religious ceremonies', 'Fortified settlements', 'Trade markets', 'Agricultural centers'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Architecture',
+      region: 'Europe',
+      period: 'Iron Age',
+      explanation: 'Oppida were large fortified settlements built by Celtic tribes, serving as centers of trade and defense.',
+      tags: ['oppida', 'celts', 'fortifications']
+    },
+    {
+      id: 'europe-medium-3',
+      question: 'Which ancient European civilization created the Antikythera mechanism?',
+      options: ['Romans', 'Greeks', 'Celts', 'Etruscans'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Technology',
+      region: 'Greece',
+      period: 'Hellenistic',
+      explanation: 'The Antikythera mechanism was an ancient Greek analog computer used to predict astronomical positions.',
+      tags: ['antikythera', 'greeks', 'technology']
+    },
+    // Hard Questions (33% - Advanced European History)
+    {
+      id: 'europe-hard-1',
+      question: 'The La Tène culture is associated with which period of Celtic civilization?',
+      options: ['Early Celtic', 'Late Iron Age Celtic', 'Roman Celtic', 'Medieval Celtic'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Culture',
+      region: 'Europe',
+      period: 'Iron Age',
+      explanation: 'La Tène culture (c. 450-50 BCE) represents the later Iron Age Celtic culture in Europe.',
+      tags: ['la tene', 'celts', 'iron age']
+    },
+    {
+      id: 'europe-hard-2',
+      question: 'Which ancient Germanic confederation fought against Rome in the Teutoburg Forest?',
+      options: ['Suebi', 'Cherusci', 'Cimbri', 'Alemanni'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Military',
+      region: 'Germania',
+      period: 'Roman',
+      explanation: 'The Cherusci, led by Arminius, defeated three Roman legions in the Battle of the Teutoburg Forest in 9 CE.',
+      tags: ['cherusci', 'teutoburg', 'arminius']
+    },
+    {
+      id: 'europe-hard-3',
+      question: 'What was the significance of the Sutton Hoo burial in Anglo-Saxon England?',
+      options: ['First Christian burial', 'Royal ship burial', 'Peasant cemetery', 'Viking raid site'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Archaeology',
+      region: 'England',
+      period: 'Early Medieval',
+      explanation: 'Sutton Hoo contains a magnificent Anglo-Saxon royal burial with a ship and rich grave goods.',
+      tags: ['sutton hoo', 'anglo-saxon', 'burial']
+    },
+    {
+      id: 'europe-hard-4',
+      question: 'Which Thracian civilization is famous for its elaborate gold artifacts?',
+      options: ['Dacians', 'Odessos', 'Getae', 'Thracian Kingdom'],
+      correctAnswer: 3,
+      difficulty: 'hard',
+      category: 'Art',
+      region: 'Thrace',
+      period: 'Iron Age',
+      explanation: 'The Thracian Kingdom produced elaborate gold artifacts, including the famous Panagyurishte treasure.',
+      tags: ['thracians', 'gold', 'artifacts']
+    }
+  ],
+
+  // Ancient Americas Pack
+  region_pack_americas: [
+    // Easy Questions (33% - Major Pre-Columbian Civilizations)
+    {
+      id: 'americas-easy-1',
+      question: 'Which ancient civilization built Machu Picchu?',
+      options: ['Maya', 'Aztec', 'Inca', 'Olmec'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Architecture',
+      region: 'South America',
+      period: 'Pre-Columbian',
+      explanation: 'The Inca Empire built Machu Picchu, a remarkable mountain citadel in modern-day Peru.',
+      tags: ['inca', 'machu picchu', 'peru']
+    },
+    {
+      id: 'americas-easy-2',
+      question: 'What type of writing system did the Maya develop?',
+      options: ['Alphabetic', 'Hieroglyphic', 'Cuneiform', 'Pictographic'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Writing Systems',
+      region: 'Mesoamerica',
+      period: 'Pre-Columbian',
+      explanation: 'The Maya developed a sophisticated hieroglyphic writing system with over 800 symbols.',
+      tags: ['maya', 'hieroglyphs', 'writing']
+    },
+    {
+      id: 'americas-easy-3',
+      question: 'Which Aztec city was built on a lake?',
+      options: ['Chichen Itza', 'Teotihuacan', 'Tenochtitlan', 'Copan'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Geography',
+      region: 'Mesoamerica',
+      period: 'Pre-Columbian',
+      explanation: 'Tenochtitlan, the Aztec capital, was built on an island in Lake Texcoco in modern-day Mexico City.',
+      tags: ['aztec', 'tenochtitlan', 'lake']
+    },
+    // Medium Questions (33% - Cultural and Technological Achievements)
+    {
+      id: 'americas-medium-1',
+      question: 'Which ancient American civilization is considered the "mother culture" of Mesoamerica?',
+      options: ['Maya', 'Aztec', 'Olmec', 'Zapotec'],
+      correctAnswer: 2,
+      difficulty: 'medium',
+      category: 'Culture',
+      region: 'Mesoamerica',
+      period: 'Pre-Columbian',
+      explanation: 'The Olmec civilization (1400-400 BCE) is considered the first major civilization in Mesoamerica.',
+      tags: ['olmec', 'mother culture', 'mesoamerica']
+    },
+    {
+      id: 'americas-medium-2',
+      question: 'What agricultural technique did the Inca use on mountain slopes?',
+      options: ['Slash-and-burn', 'Terracing', 'Irrigation canals', 'Crop rotation'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Agriculture',
+      region: 'South America',
+      period: 'Pre-Columbian',
+      explanation: 'The Inca built extensive terraces on mountain slopes to create farmable land in the Andes.',
+      tags: ['inca', 'terracing', 'agriculture']
+    },
+    {
+      id: 'americas-medium-3',
+      question: 'Which North American culture built large earthen mounds?',
+      options: ['Pueblo', 'Mississippian', 'Iroquois', 'Apache'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Architecture',
+      region: 'North America',
+      period: 'Pre-Columbian',
+      explanation: 'The Mississippian culture built large ceremonial and burial mounds throughout the southeastern United States.',
+      tags: ['mississippian', 'mounds', 'north america']
+    },
+    // Hard Questions (33% - Advanced Knowledge of Americas)
+    {
+      id: 'americas-hard-1',
+      question: 'The Nazca Lines in Peru were created by which ancient civilization?',
+      options: ['Inca', 'Chavin', 'Nazca', 'Moche'],
+      correctAnswer: 2,
+      difficulty: 'hard',
+      category: 'Art',
+      region: 'South America',
+      period: 'Pre-Columbian',
+      explanation: 'The Nazca civilization created the famous Nazca Lines, large geoglyphs in the Peruvian desert.',
+      tags: ['nazca lines', 'nazca', 'geoglyphs']
+    },
+    {
+      id: 'americas-hard-2',
+      question: 'Which Mesoamerican ball game had religious significance?',
+      options: ['Tlachtli', 'Patolli', 'Chunkey', 'Lacrosse'],
+      correctAnswer: 0,
+      difficulty: 'hard',
+      category: 'Religion',
+      region: 'Mesoamerica',
+      period: 'Pre-Columbian',
+      explanation: 'Tlachtli was a ritual ball game played throughout Mesoamerica with deep religious and cosmological meaning.',
+      tags: ['tlachtli', 'ball game', 'religion']
+    },
+    {
+      id: 'americas-hard-3',
+      question: 'The Chavin culture of Peru is known for which artistic style?',
+      options: ['Geometric patterns', 'Realistic portraits', 'Supernatural beings', 'Abstract symbols'],
+      correctAnswer: 2,
+      difficulty: 'hard',
+      category: 'Art',
+      region: 'South America',
+      period: 'Pre-Columbian',
+      explanation: 'Chavin art featured complex supernatural beings, jaguars, and serpents in their religious iconography.',
+      tags: ['chavin', 'supernatural', 'art']
+    },
+    {
+      id: 'americas-hard-4',
+      question: 'Which advanced calendar system calculated a year as 365.2420 days?',
+      options: ['Aztec', 'Maya', 'Inca', 'Olmec'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Astronomy',
+      region: 'Mesoamerica',
+      period: 'Pre-Columbian',
+      explanation: 'The Maya calculated the solar year as 365.2420 days, remarkably close to the modern calculation of 365.2422 days.',
+      tags: ['maya', 'calendar', 'astronomy']
+    }
+  ],
+
   // Iron Age Pack
   age_pack_iron_age: [
     // Easy Questions (33% - Global Iron Age Civilizations)
