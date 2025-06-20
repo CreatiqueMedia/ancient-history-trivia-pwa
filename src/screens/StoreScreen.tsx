@@ -105,8 +105,8 @@ const StoreScreen: React.FC = () => {
       ['Roman', 'Egyptian', 'Greek', 'Mesopotamian', 'Chinese', 'Indian', 'American', 'European'].includes(bundle.subcategory)
     );
 
-    // Other Bundle Packs (everything else)
-    const otherBundles = bundleList.filter(bundle => {
+    // Difficulty Packs (everything else - mainly difficulty-based bundles)
+    const difficultyBundles = bundleList.filter(bundle => {
       const isAge = bundle.category === 'historical_age' && ['Prehistoric', 'Bronze Age', 'Iron Age'].includes(bundle.subcategory);
       const isFormat = bundle.category === 'format' && ['Multiple Choice', 'True/False', 'Fill-in-the-Blank'].includes(bundle.subcategory);
       const isRegion = bundle.category === 'region' && ['Roman', 'Egyptian', 'Greek', 'Mesopotamian', 'Chinese', 'Indian', 'American', 'European'].includes(bundle.subcategory);
@@ -116,9 +116,9 @@ const StoreScreen: React.FC = () => {
 
     return {
       'Age Bundle Packs': ageBundles,
+      'Difficulty Packs': difficultyBundles,
       'Format Bundle Packs': formatBundles, 
-      'Region Bundle Packs': regionBundles,
-      'Other Bundle Packs': otherBundles
+      'Region Bundle Packs': regionBundles
     };
   };
 
@@ -523,24 +523,10 @@ const StoreScreen: React.FC = () => {
           <>
             {/* Organized Bundle Sections */}
             <div className="space-y-12">
-              {/* Loop through sections in custom order */}
+              {/* Loop through sections in alphabetical order */}
               {Object.entries(bundleSections)
                 .sort(([a], [b]) => {
-                  // Define custom order with Other Bundle Packs last
-                  const order = ['Age Bundle Packs', 'Format Bundle Packs', 'Region Bundle Packs', 'Other Bundle Packs'];
-                  const aIndex = order.indexOf(a);
-                  const bIndex = order.indexOf(b);
-                  
-                  // If both sections are in our defined order, sort by that order
-                  if (aIndex !== -1 && bIndex !== -1) {
-                    return aIndex - bIndex;
-                  }
-                  
-                  // If only one is in our order, prioritize the ordered one
-                  if (aIndex !== -1) return -1;
-                  if (bIndex !== -1) return 1;
-                  
-                  // For any other sections, fall back to alphabetical
+                  // Sort sections alphabetically
                   return a.localeCompare(b);
                 })
                 .map(([sectionName, bundles]) => (
