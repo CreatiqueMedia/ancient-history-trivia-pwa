@@ -523,9 +523,26 @@ const StoreScreen: React.FC = () => {
           <>
             {/* Organized Bundle Sections */}
             <div className="space-y-12">
-              {/* Loop through sections in alphabetical order */}
+              {/* Loop through sections in custom order */}
               {Object.entries(bundleSections)
-                .sort(([a], [b]) => a.localeCompare(b))
+                .sort(([a], [b]) => {
+                  // Define custom order with Other Bundle Packs last
+                  const order = ['Age Bundle Packs', 'Format Bundle Packs', 'Region Bundle Packs', 'Other Bundle Packs'];
+                  const aIndex = order.indexOf(a);
+                  const bIndex = order.indexOf(b);
+                  
+                  // If both sections are in our defined order, sort by that order
+                  if (aIndex !== -1 && bIndex !== -1) {
+                    return aIndex - bIndex;
+                  }
+                  
+                  // If only one is in our order, prioritize the ordered one
+                  if (aIndex !== -1) return -1;
+                  if (bIndex !== -1) return 1;
+                  
+                  // For any other sections, fall back to alphabetical
+                  return a.localeCompare(b);
+                })
                 .map(([sectionName, bundles]) => (
                   bundles.length > 0 && (
                     <div key={sectionName} className="space-y-6">
