@@ -3,6 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <!-- FAVICON LINKS - Local development paths -->
+    <link rel="icon" type="image/svg+xml" href="/ancient-history-trivia-pwa/logos/logo_64.svg" />
+    <link rel="shortcut icon" type="image/svg+xml" href="/ancient-history-trivia-pwa/logos/logo_64.svg" />
+    <link rel="icon" sizes="64x64" href="/ancient-history-trivia-pwa/logos/logo_64.svg" />
+    <link rel="icon" sizes="128x128" href="/ancient-history-trivia-pwa/logos/logo_128.svg" />
+    <link rel="icon" sizes="192x192" href="/ancient-history-trivia-pwa/logos/logo_192.svg" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/ancient-history-trivia-pwa/logos/logo_192.svg" />
+    <link rel="apple-touch-icon-precomposed" href="/ancient-history-trivia-pwa/logos/logo_192.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Test your knowledge of ancient civilizations and historical events with our comprehensive trivia app." />
+    <meta name="theme-color" content="#1f2937" />
+    <!-- Manifest -->
+    <link rel="manifest" href="/ancient-history-trivia-pwa/manifest.webmanifest" />html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- FAVICON LINKS - Local development paths -->
     <link rel="icon" type="image/svg+xml" href="/logos/logo_64.svg" />
     <link rel="shortcut icon" type="image/svg+xml" href="/logos/logo_64.svg" />
     <link rel="icon" sizes="64x64" href="/logos/logo_64.svg" />
@@ -51,14 +66,14 @@
         var newFavicon = document.createElement('link');
         newFavicon.rel = 'icon';
         newFavicon.type = 'image/svg+xml';
-        newFavicon.href = '/quiz/logos/logo_64.svg?nuclear=' + Date.now();
+        newFavicon.href = '/ancient-history-trivia-pwa/logos/logo_64.svg?nuclear=' + Date.now();
         document.head.appendChild(newFavicon);
         
         // Also add shortcut icon
         var newShortcut = document.createElement('link');
         newShortcut.rel = 'shortcut icon';
         newShortcut.type = 'image/svg+xml';
-        newShortcut.href = '/quiz/logos/logo_64.svg?nuclear=' + Date.now();
+        newShortcut.href = '/ancient-history-trivia-pwa/logos/logo_64.svg?nuclear=' + Date.now();
         document.head.appendChild(newShortcut);
       }, 100);
     </script>
