@@ -514,128 +514,128 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
 
   // Bronze Age Pack
   age_pack_bronze_age: [
-    // Easy Questions
+    // Easy Questions (33% - Global Bronze Age Civilizations & Culture)
     {
       id: 'bronze-easy-1',
-      question: 'What metal combination makes bronze?',
-      options: ['Iron and carbon', 'Copper and tin', 'Gold and silver', 'Lead and zinc'],
+      question: 'Which ancient Mesopotamian civilization built the first cities during the Bronze Age?',
+      options: ['Babylonians', 'Sumerians', 'Assyrians', 'Persians'],
       correctAnswer: 1,
       difficulty: 'easy',
-      category: 'Technology',
-      region: 'Global',
-      period: 'Bronze Age',
-      explanation: 'Bronze is an alloy made by combining copper with tin.',
-      tags: ['bronze', 'copper', 'tin']
-    },
-    {
-      id: 'bronze-easy-2',
-      question: 'Bronze tools were stronger than tools made of what earlier material?',
-      options: ['Iron', 'Stone', 'Wood', 'Bone'],
-      correctAnswer: 1,
-      difficulty: 'easy',
-      category: 'Technology',
-      region: 'Global',
-      period: 'Bronze Age',
-      explanation: 'Bronze tools replaced stone tools because bronze was harder and more durable.',
-      tags: ['tools', 'stone', 'technology']
-    },
-    {
-      id: 'bronze-easy-3',
-      question: 'The Bronze Age came after which period?',
-      options: ['Iron Age', 'Stone Age', 'Modern Age', 'Classical Age'],
-      correctAnswer: 1,
-      difficulty: 'easy',
-      category: 'Chronology',
-      region: 'Global',
-      period: 'Bronze Age',
-      explanation: 'The Bronze Age followed the Stone Age in human technological development.',
-      tags: ['chronology', 'periods', 'development']
-    },
-    // Medium Questions
-    {
-      id: 'bronze-medium-1',
-      question: 'Which civilization is considered to have begun the Bronze Age?',
-      options: ['Egyptians', 'Sumerians', 'Greeks', 'Chinese'],
-      correctAnswer: 1,
-      difficulty: 'medium',
       category: 'Civilization',
       region: 'Mesopotamia',
       period: 'Bronze Age',
-      explanation: 'The Sumerians were among the first to develop bronze-working technology around 3500 BCE.',
-      tags: ['sumerians', 'first', 'technology']
+      explanation: 'The Sumerians built the first cities like Ur and Uruk around 3500-3000 BCE.',
+      tags: ['sumerians', 'cities', 'mesopotamia']
+    },
+    {
+      id: 'bronze-easy-2',
+      question: 'What was the primary building material for Egyptian pyramids during the Bronze Age?',
+      options: ['Brick', 'Wood', 'Stone', 'Clay'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Architecture',
+      region: 'Egypt',
+      period: 'Bronze Age',
+      explanation: 'Egyptian pyramids were built primarily from limestone and granite blocks.',
+      tags: ['pyramids', 'egypt', 'stone']
+    },
+    {
+      id: 'bronze-easy-3',
+      question: 'Which Bronze Age civilization developed the first known written law code?',
+      options: ['Egyptians', 'Babylonians', 'Indus Valley', 'Minoans'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Law',
+      region: 'Mesopotamia',
+      period: 'Bronze Age',
+      explanation: 'The Code of Hammurabi (c. 1750 BCE) was one of the first written legal codes.',
+      tags: ['hammurabi', 'laws', 'babylon']
+    },
+    // Medium Questions (33% - Complex Bronze Age Societies)
+    {
+      id: 'bronze-medium-1',
+      question: 'The Indus Valley Civilization was notable for which urban planning feature?',
+      options: ['Pyramids', 'Advanced drainage systems', 'Defensive walls', 'Temples'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Urban Planning',
+      region: 'India',
+      period: 'Bronze Age',
+      explanation: 'Harappa and Mohenjo-daro had sophisticated sewage and drainage systems.',
+      tags: ['indus valley', 'drainage', 'urban planning']
     },
     {
       id: 'bronze-medium-2',
-      question: 'What major trade networks developed during the Bronze Age?',
-      options: ['Silk Road', 'Maritime trading routes', 'Overland caravan routes', 'All of the above'],
-      correctAnswer: 3,
+      question: 'Which Bronze Age civilization dominated trade in the Eastern Mediterranean?',
+      options: ['Mycenaeans', 'Minoans', 'Hittites', 'Phoenicians'],
+      correctAnswer: 1,
       difficulty: 'medium',
       category: 'Trade',
-      region: 'Global',
+      region: 'Mediterranean',
       period: 'Bronze Age',
-      explanation: 'The Bronze Age saw the development of extensive trade networks to obtain tin for bronze-making.',
-      tags: ['trade', 'networks', 'tin']
+      explanation: 'The Minoans controlled maritime trade networks throughout the Eastern Mediterranean.',
+      tags: ['minoans', 'trade', 'mediterranean']
     },
     {
       id: 'bronze-medium-3',
-      question: 'Which Bronze Age civilization built the first cities in Europe?',
-      options: ['Minoans', 'Mycenaeans', 'Celts', 'Romans'],
-      correctAnswer: 0,
-      difficulty: 'medium',
-      category: 'Civilization',
-      region: 'Europe',
-      period: 'Bronze Age',
-      explanation: 'The Minoan civilization on Crete built the first urban centers in Europe.',
-      tags: ['minoans', 'cities', 'europe']
-    },
-    // Hard Questions
-    {
-      id: 'bronze-hard-1',
-      question: 'What caused the Late Bronze Age collapse around 1200 BCE?',
-      options: ['Single cause: invasion', 'Multiple factors including climate change', 'Natural disasters only', 'Economic collapse only'],
+      question: 'What caused the Bronze Age Collapse around 1200 BCE?',
+      options: ['Natural disasters only', 'Multiple factors including invasions', 'Climate change only', 'Disease epidemics'],
       correctAnswer: 1,
-      difficulty: 'hard',
-      category: 'History',
+      difficulty: 'medium',
+      category: 'Historical Events',
       region: 'Mediterranean',
       period: 'Bronze Age',
-      explanation: 'The Bronze Age collapse was likely caused by multiple factors including climate change, invasions, and internal conflicts.',
-      tags: ['collapse', 'multiple factors', 'crisis']
+      explanation: 'The Bronze Age Collapse involved invasions by Sea Peoples, natural disasters, and internal conflicts.',
+      tags: ['collapse', 'sea peoples', 'crisis']
+    },
+    // Hard Questions (33% - Advanced Bronze Age Knowledge)
+    {
+      id: 'bronze-hard-1',
+      question: 'Which Chinese Bronze Age dynasty is famous for oracle bone divination?',
+      options: ['Zhou Dynasty', 'Shang Dynasty', 'Xia Dynasty', 'Qin Dynasty'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Religion',
+      region: 'China',
+      period: 'Bronze Age',
+      explanation: 'The Shang Dynasty (c. 1600-1046 BCE) used oracle bones for divination and early Chinese writing.',
+      tags: ['shang', 'oracle bones', 'china']
     },
     {
       id: 'bronze-hard-2',
-      question: 'Which Bronze Age civilization used Linear B script?',
-      options: ['Minoans', 'Mycenaeans', 'Hittites', 'Egyptians'],
-      correctAnswer: 1,
+      question: 'The Hittites were the first civilization to extensively use which military technology?',
+      options: ['Bronze weapons', 'Iron weapons', 'Horse-drawn chariots', 'Composite bows'],
+      correctAnswer: 2,
       difficulty: 'hard',
-      category: 'Language',
-      region: 'Greece',
+      category: 'Military',
+      region: 'Anatolia',
       period: 'Bronze Age',
-      explanation: 'Linear B was used by the Mycenaeans and was deciphered as an early form of Greek.',
-      tags: ['linear b', 'mycenaeans', 'script']
+      explanation: 'The Hittites were among the first to effectively use horse-drawn chariots in warfare.',
+      tags: ['hittites', 'chariots', 'warfare']
     },
     {
       id: 'bronze-hard-3',
-      question: 'What was the primary source of tin for Mediterranean Bronze Age civilizations?',
-      options: ['Local mines', 'Afghanistan and Britain', 'Africa', 'China'],
+      question: 'Linear A script, still undeciphered, belonged to which Bronze Age civilization?',
+      options: ['Mycenaeans', 'Minoans', 'Trojans', 'Cypriots'],
       correctAnswer: 1,
       difficulty: 'hard',
-      category: 'Trade',
-      region: 'Mediterranean',
+      category: 'Writing Systems',
+      region: 'Crete',
       period: 'Bronze Age',
-      explanation: 'Tin was rare in the Mediterranean and had to be imported from distant sources like Afghanistan and Britain.',
-      tags: ['tin', 'trade', 'sources']
+      explanation: 'Linear A was the writing system of the Minoan civilization and remains undeciphered.',
+      tags: ['linear a', 'minoans', 'writing']
     },
     {
       id: 'bronze-hard-4',
-      question: 'Which Bronze Age technology led to more efficient warfare?',
-      options: ['Bronze swords', 'Horse-drawn chariots', 'Composite bows', 'All of the above'],
-      correctAnswer: 3,
+      question: 'Which Bronze Age site in Turkey is considered the legendary city of Troy?',
+      options: ['Çatalhöyük', 'Hisarlik', 'Gordion', 'Sardis'],
+      correctAnswer: 1,
       difficulty: 'hard',
-      category: 'Military',
-      region: 'Global',
+      category: 'Archaeology',
+      region: 'Turkey',
       period: 'Bronze Age',
-      explanation: 'The Bronze Age saw innovations in weapons, chariots, and archery that revolutionized warfare.',
-      tags: ['warfare', 'technology', 'innovation']
+      explanation: 'Hisarlik (Troy) was excavated by Heinrich Schliemann and is identified with Homer\'s Troy.',
+      tags: ['troy', 'hisarlik', 'archaeology']
     }
   ],
 
@@ -895,255 +895,255 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
 
   // Iron Age Pack
   age_pack_iron_age: [
-    // Easy Questions
+    // Easy Questions (33% - Global Iron Age Civilizations)
     {
       id: 'iron-easy-1',
-      question: 'Iron tools were stronger than tools made of what metal?',
-      options: ['Steel', 'Bronze', 'Gold', 'Silver'],
+      question: 'Which ancient Greek city-state was known for its powerful military during the Iron Age?',
+      options: ['Athens', 'Sparta', 'Corinth', 'Thebes'],
       correctAnswer: 1,
       difficulty: 'easy',
-      category: 'Technology',
-      region: 'Global',
+      category: 'Military',
+      region: 'Greece',
       period: 'Iron Age',
-      explanation: 'Iron was harder and more durable than bronze, leading to better tools and weapons.',
-      tags: ['iron', 'bronze', 'tools']
+      explanation: 'Sparta was renowned for its disciplined military society and powerful warriors.',
+      tags: ['sparta', 'military', 'greece']
     },
     {
       id: 'iron-easy-2',
-      question: 'The Iron Age came after which period?',
-      options: ['Stone Age', 'Bronze Age', 'Modern Age', 'Classical Age'],
-      correctAnswer: 1,
+      question: 'What were the Celtic warriors of Iron Age Europe famous for?',
+      options: ['Archery', 'Naval warfare', 'Fierce fighting', 'Siege warfare'],
+      correctAnswer: 2,
       difficulty: 'easy',
-      category: 'Chronology',
-      region: 'Global',
+      category: 'Military',
+      region: 'Europe',
       period: 'Iron Age',
-      explanation: 'The Iron Age followed the Bronze Age in technological development.',
-      tags: ['chronology', 'bronze age', 'sequence']
+      explanation: 'Celtic warriors were known for their fierce fighting style and warrior culture.',
+      tags: ['celts', 'warriors', 'europe']
     },
     {
       id: 'iron-easy-3',
-      question: 'What do you need to make iron from iron ore?',
-      options: ['Water', 'Very hot fire', 'Cold temperatures', 'Salt'],
+      question: 'Which Iron Age empire conquered Babylon and freed the Jewish exiles?',
+      options: ['Assyrian Empire', 'Persian Empire', 'Roman Empire', 'Greek Empire'],
       correctAnswer: 1,
       difficulty: 'easy',
-      category: 'Technology',
-      region: 'Global',
+      category: 'History',
+      region: 'Persia',
       period: 'Iron Age',
-      explanation: 'High temperatures are needed to smelt iron ore and extract pure iron.',
-      tags: ['smelting', 'fire', 'iron ore']
+      explanation: 'Cyrus the Great of Persia conquered Babylon in 539 BCE and allowed the Jews to return to Jerusalem.',
+      tags: ['persia', 'cyrus', 'babylon']
     },
-    // Medium Questions
+    // Medium Questions (33% - Iron Age Societies & Culture)
     {
       id: 'iron-medium-1',
-      question: 'Which people were among the first to master iron working?',
-      options: ['Egyptians', 'Hittites', 'Greeks', 'Romans'],
+      question: 'The Phoenicians contributed which major innovation to world civilization?',
+      options: ['Democracy', 'The alphabet', 'Mathematics', 'Philosophy'],
       correctAnswer: 1,
       difficulty: 'medium',
-      category: 'Technology',
-      region: 'Anatolia',
+      category: 'Writing Systems',
+      region: 'Levant',
       period: 'Iron Age',
-      explanation: 'The Hittites were among the first to develop iron-working technology around 1500 BCE.',
-      tags: ['hittites', 'iron working', 'technology']
+      explanation: 'The Phoenician alphabet became the basis for Greek, Latin, and many modern alphabets.',
+      tags: ['phoenicians', 'alphabet', 'writing']
     },
     {
       id: 'iron-medium-2',
-      question: 'What advantage did iron weapons give in warfare?',
-      options: ['Lighter weight', 'Better durability', 'Easier to make', 'All of the above'],
-      correctAnswer: 3,
+      question: 'Which Iron Age African kingdom was famous for its wealth from gold and ivory trade?',
+      options: ['Nubia', 'Kush', 'Aksum', 'Great Zimbabwe'],
+      correctAnswer: 2,
       difficulty: 'medium',
-      category: 'Military',
-      region: 'Global',
+      category: 'Trade',
+      region: 'Africa',
       period: 'Iron Age',
-      explanation: 'Iron weapons were more durable, could be mass-produced, and gave military advantages.',
-      tags: ['weapons', 'warfare', 'advantages']
+      explanation: 'The Kingdom of Aksum controlled Red Sea trade routes and was known for its wealth.',
+      tags: ['aksum', 'africa', 'trade']
     },
     {
       id: 'iron-medium-3',
-      question: 'Which Iron Age culture built impressive hill forts in Europe?',
-      options: ['Romans', 'Celts', 'Vikings', 'Saxons'],
+      question: 'What form of government did Athens develop during the Iron Age?',
+      options: ['Monarchy', 'Democracy', 'Oligarchy', 'Tyranny'],
       correctAnswer: 1,
       difficulty: 'medium',
-      category: 'Architecture',
-      region: 'Europe',
+      category: 'Government',
+      region: 'Greece',
       period: 'Iron Age',
-      explanation: 'Celtic tribes built fortified settlements called oppida on hilltops.',
-      tags: ['celts', 'hill forts', 'oppida']
+      explanation: 'Athens developed the world\'s first democracy, allowing citizens to participate in government.',
+      tags: ['athens', 'democracy', 'government']
     },
-    // Hard Questions
+    // Hard Questions (33% - Advanced Iron Age Knowledge)
     {
       id: 'iron-hard-1',
-      question: 'What was the main challenge in early iron working?',
-      options: ['Finding iron ore', 'Achieving high enough temperatures', 'Lack of tools', 'Transportation'],
-      correctAnswer: 1,
+      question: 'Which Chinese philosophy emphasized harmony with nature during the Iron Age?',
+      options: ['Confucianism', 'Legalism', 'Taoism', 'Buddhism'],
+      correctAnswer: 2,
       difficulty: 'hard',
-      category: 'Technology',
-      region: 'Global',
+      category: 'Philosophy',
+      region: 'China',
       period: 'Iron Age',
-      explanation: 'Iron requires much higher temperatures than bronze, making it technically challenging.',
-      tags: ['temperature', 'smelting', 'challenges']
+      explanation: 'Taoism, founded by Laozi, emphasized living in harmony with the natural order (Tao).',
+      tags: ['taoism', 'china', 'philosophy']
     },
     {
       id: 'iron-hard-2',
-      question: 'Which Iron Age kingdom dominated the ancient Near East?',
-      options: ['Babylon', 'Assyria', 'Persia', 'Egypt'],
+      question: 'The La Tène culture was associated with which Iron Age people?',
+      options: ['Romans', 'Celts', 'Germans', 'Scythians'],
       correctAnswer: 1,
       difficulty: 'hard',
-      category: 'Politics',
-      region: 'Mesopotamia',
+      category: 'Culture',
+      region: 'Europe',
       period: 'Iron Age',
-      explanation: 'The Assyrian Empire used iron weapons to dominate the region from 900-600 BCE.',
-      tags: ['assyria', 'empire', 'dominance']
+      explanation: 'La Tène culture (c. 450-50 BCE) was the later Iron Age culture of the Celts in Europe.',
+      tags: ['la tene', 'celts', 'culture']
     },
     {
       id: 'iron-hard-3',
-      question: 'What was the significance of the Phoenicians during the Iron Age?',
-      options: ['Military conquest', 'Maritime trade networks', 'Religious influence', 'Agricultural innovations'],
+      question: 'Which Iron Age Indian kingdom was ruled by Chandragupta Maurya?',
+      options: ['Gupta Empire', 'Maurya Empire', 'Chola Empire', 'Mughal Empire'],
       correctAnswer: 1,
       difficulty: 'hard',
-      category: 'Trade',
-      region: 'Mediterranean',
+      category: 'Politics',
+      region: 'India',
       period: 'Iron Age',
-      explanation: 'Phoenicians established extensive trade networks across the Mediterranean.',
-      tags: ['phoenicians', 'trade', 'maritime']
+      explanation: 'Chandragupta Maurya founded the Maurya Empire, one of the largest empires in ancient India.',
+      tags: ['maurya', 'chandragupta', 'india']
     },
     {
       id: 'iron-hard-4',
-      question: 'Which innovation accompanied the spread of iron technology?',
-      options: ['Alphabetic writing', 'Coinage', 'Urban planning', 'All of the above'],
-      correctAnswer: 3,
+      question: 'Which Iron Age script was used to write the earliest Sanskrit texts in India?',
+      options: ['Devanagari', 'Brahmi', 'Kharosthi', 'Tamil'],
+      correctAnswer: 1,
       difficulty: 'hard',
-      category: 'Culture',
-      region: 'Global',
+      category: 'Writing Systems',
+      region: 'India',
       period: 'Iron Age',
-      explanation: 'The Iron Age saw multiple innovations including writing systems, currency, and urban development.',
-      tags: ['innovations', 'writing', 'coinage']
+      explanation: 'Brahmi script was used for early Sanskrit inscriptions and texts during the Iron Age.',
+      tags: ['brahmi', 'sanskrit', 'india']
     }
   ],
 
   // Prehistoric Age Pack  
   age_pack_prehistoric: [
-    // Easy Questions
+    // Easy Questions (33% - Global Prehistoric Human Development)
     {
       id: 'prehistoric-easy-1',
-      question: 'What was the first tool material used by early humans?',
-      options: ['Bronze', 'Iron', 'Stone', 'Wood'],
+      question: 'Where did modern humans (Homo sapiens) first evolve?',
+      options: ['Asia', 'Europe', 'Africa', 'Australia'],
       correctAnswer: 2,
       difficulty: 'easy',
-      category: 'Technology',
-      region: 'Global',
-      period: 'Stone Age',
-      explanation: 'The Stone Age is named for the use of stone tools by early humans.',
-      tags: ['stone', 'tools', 'early humans']
+      category: 'Human Evolution',
+      region: 'Africa',
+      period: 'Prehistoric',
+      explanation: 'Modern humans first evolved in Africa around 200,000-300,000 years ago.',
+      tags: ['homo sapiens', 'africa', 'evolution']
     },
     {
       id: 'prehistoric-easy-2',
-      question: 'What did early humans live in before building houses?',
-      options: ['Caves', 'Trees', 'Tents', 'Underground'],
-      correctAnswer: 0,
-      difficulty: 'easy',
-      category: 'Society',
-      region: 'Global',
-      period: 'Stone Age',
-      explanation: 'Early humans often used natural caves for shelter.',
-      tags: ['caves', 'shelter', 'housing']
-    },
-    {
-      id: 'prehistoric-easy-3',
-      question: 'How did early humans get their food?',
-      options: ['Farming', 'Hunting and gathering', 'Trading', 'Buying'],
+      question: 'What major discovery changed human life during the Neolithic period?',
+      options: ['Fire', 'Agriculture', 'The wheel', 'Writing'],
       correctAnswer: 1,
       difficulty: 'easy',
-      category: 'Society',
-      region: 'Global',
-      period: 'Stone Age',
-      explanation: 'Before agriculture, humans were hunter-gatherers.',
-      tags: ['hunting', 'gathering', 'food']
-    },
-    // Medium Questions
-    {
-      id: 'prehistoric-medium-1',
-      question: 'What major change marked the Neolithic Revolution?',
-      options: ['Use of fire', 'Development of agriculture', 'Making tools', 'Language development'],
-      correctAnswer: 1,
-      difficulty: 'medium',
       category: 'Technology',
       region: 'Global',
       period: 'Neolithic',
-      explanation: 'The Neolithic Revolution was the transition from hunting-gathering to agriculture.',
-      tags: ['neolithic', 'agriculture', 'revolution']
+      explanation: 'The development of agriculture (farming) revolutionized human society during the Neolithic period.',
+      tags: ['agriculture', 'neolithic', 'farming']
     },
     {
-      id: 'prehistoric-medium-2',
-      question: 'Where were some of the earliest cave paintings found?',
-      options: ['Egypt', 'France and Spain', 'China', 'Australia'],
+      id: 'prehistoric-easy-3',
+      question: 'The famous prehistoric site Stonehenge is located in which country?',
+      options: ['France', 'England', 'Germany', 'Ireland'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Archaeology',
+      region: 'Britain',
+      period: 'Neolithic',
+      explanation: 'Stonehenge is a prehistoric monument located in Wiltshire, England.',
+      tags: ['stonehenge', 'england', 'monument']
+    },
+    // Medium Questions (33% - Prehistoric Cultures & Societies)
+    {
+      id: 'prehistoric-medium-1',
+      question: 'Which prehistoric culture created the famous cave paintings at Lascaux?',
+      options: ['Neanderthals', 'Cro-Magnon people', 'Homo erectus', 'Denisovans'],
       correctAnswer: 1,
       difficulty: 'medium',
       category: 'Art',
       region: 'Europe',
       period: 'Paleolithic',
-      explanation: 'Famous cave paintings were discovered at Lascaux (France) and Altamira (Spain).',
-      tags: ['cave paintings', 'lascaux', 'art']
+      explanation: 'Cro-Magnon people (early modern humans) created the Lascaux cave paintings around 20,000 years ago.',
+      tags: ['lascaux', 'cro-magnon', 'cave art']
+    },
+    {
+      id: 'prehistoric-medium-2',
+      question: 'What evidence suggests that Neanderthals cared for their sick and elderly?',
+      options: ['Tool making', 'Burial practices', 'Cave paintings', 'Fire use'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Social Behavior',
+      region: 'Europe',
+      period: 'Paleolithic',
+      explanation: 'Neanderthal burial sites show evidence of caring for disabled individuals and ritual burial practices.',
+      tags: ['neanderthals', 'burial', 'social care']
     },
     {
       id: 'prehistoric-medium-3',
-      question: 'What was Lucy, discovered in Africa?',
-      options: ['Early human tools', 'Cave paintings', 'Early human fossil', 'Ancient settlement'],
-      correctAnswer: 2,
+      question: 'The first humans to reach Australia did so by what means?',
+      options: ['Land bridge', 'Sea voyage', 'Ice bridge', 'Migration through Asia'],
+      correctAnswer: 1,
       difficulty: 'medium',
-      category: 'Evolution',
-      region: 'Africa',
-      period: 'Prehistoric',
-      explanation: 'Lucy is a famous early human ancestor fossil found in Ethiopia.',
-      tags: ['lucy', 'fossil', 'evolution']
+      category: 'Migration',
+      region: 'Australia',
+      period: 'Paleolithic',
+      explanation: 'Early humans reached Australia around 50,000 years ago by crossing water, showing advanced seafaring skills.',
+      tags: ['australia', 'sea voyage', 'migration']
     },
-    // Hard Questions
+    // Hard Questions (33% - Advanced Prehistoric Knowledge)
     {
       id: 'prehistoric-hard-1',
-      question: 'Which species is considered the first to use fire systematically?',
-      options: ['Homo sapiens', 'Homo erectus', 'Neanderthals', 'Homo habilis'],
+      question: 'Göbekli Tepe in Turkey is significant because it represents:',
+      options: ['The first city', 'The oldest known temple complex', 'The first farm', 'The earliest writing'],
       correctAnswer: 1,
       difficulty: 'hard',
-      category: 'Evolution',
-      region: 'Global',
-      period: 'Prehistoric',
-      explanation: 'Homo erectus was likely the first human ancestor to control and use fire regularly.',
-      tags: ['homo erectus', 'fire', 'evolution']
+      category: 'Religion',
+      region: 'Turkey',
+      period: 'Neolithic',
+      explanation: 'Göbekli Tepe, built around 9,000 BCE, predates Stonehenge and is the world\'s oldest known temple complex.',
+      tags: ['gobekli tepe', 'temple', 'turkey']
     },
     {
       id: 'prehistoric-hard-2',
-      question: 'What does the term "Clovis culture" refer to?',
-      options: ['European cave painters', 'Early American hunter-gatherers', 'African tool makers', 'Asian farmers'],
+      question: 'The "Venus figurines" found across prehistoric Europe likely represented:',
+      options: ['Trade goods', 'Fertility symbols', 'Children\'s toys', 'Currency'],
       correctAnswer: 1,
       difficulty: 'hard',
-      category: 'Culture',
-      region: 'Americas',
+      category: 'Art',
+      region: 'Europe',
       period: 'Paleolithic',
-      explanation: 'Clovis culture refers to early Native American people known for distinctive spear points.',
-      tags: ['clovis', 'americas', 'hunters']
+      explanation: 'Venus figurines are believed to be fertility symbols or goddess figures from the Paleolithic period.',
+      tags: ['venus figurines', 'fertility', 'symbols']
     },
     {
       id: 'prehistoric-hard-3',
-      question: 'What was the significance of Göbekli Tepe?',
-      options: ['Earliest city', 'Oldest known temple complex', 'First farm', 'Ancient burial site'],
+      question: 'The Clovis culture is associated with which prehistoric achievement?',
+      options: ['First European cave art', 'Early settlement of the Americas', 'Invention of pottery', 'Development of agriculture'],
       correctAnswer: 1,
       difficulty: 'hard',
-      category: 'Architecture',
-      region: 'Turkey',
-      period: 'Neolithic',
-      explanation: 'Göbekli Tepe in Turkey is considered the world\'s oldest temple complex.',
-      tags: ['gobekli tepe', 'temple', 'oldest']
+      category: 'Migration',
+      region: 'Americas',
+      period: 'Paleolithic',
+      explanation: 'Clovis culture represents some of the earliest evidence of human settlement in North America.',
+      tags: ['clovis', 'americas', 'settlement']
     },
     {
       id: 'prehistoric-hard-4',
-      question: 'What evidence suggests Neanderthals had symbolic behavior?',
-      options: ['Tool use only', 'Burial practices and art', 'Fire control', 'Hunting techniques'],
+      question: 'What was the main advantage of the Atlatl (spear-thrower) used by prehistoric hunters?',
+      options: ['Accuracy', 'Range and power', 'Ease of use', 'Durability'],
       correctAnswer: 1,
       difficulty: 'hard',
-      category: 'Culture',
-      region: 'Europe',
+      category: 'Technology',
+      region: 'Global',
       period: 'Paleolithic',
-      explanation: 'Neanderthal burial sites and cave art suggest symbolic thinking and culture.',
-      tags: ['neanderthals', 'burial', 'symbolism']
+      explanation: 'The atlatl increased the range and force of thrown spears, making hunting more effective.',
+      tags: ['atlatl', 'hunting', 'technology']
     }
   ]
 };
