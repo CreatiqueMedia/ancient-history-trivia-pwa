@@ -39,6 +39,16 @@ const HomeScreen = () => {
               />
             </div>
             
+            {/* Brought to you by text */}
+            <div className="mb-4">
+              <p className="text-primary-200 text-sm md:text-base font-medium tracking-wide">
+                Brought to you by, 
+                <span className="text-white font-bold ml-1 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                  "The Awakened Hybrid"
+                </span>
+              </p>
+            </div>
+            
             {user && userProfile ? (
               <>
                 <h1 className="text-2xl md:text-3xl font-bold mb-2">
