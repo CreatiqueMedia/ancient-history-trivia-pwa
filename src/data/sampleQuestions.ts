@@ -1399,6 +1399,378 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
       explanation: 'The atlatl increased the range and force of thrown spears, making hunting more effective.',
       tags: ['atlatl', 'hunting', 'technology']
     }
+  ],
+
+  // Easy Pack - Elementary School Level (100% Easy Questions)
+  difficulty_pack_easy: [
+    {
+      id: 'easy-1',
+      question: 'What did early humans use to make fire?',
+      options: ['Matches', 'Flint stones', 'Candles', 'Electricity'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Technology',
+      region: 'Global',
+      period: 'Prehistoric',
+      explanation: 'Early humans learned to make fire by striking flint stones together to create sparks.',
+      tags: ['fire', 'flint', 'prehistoric']
+    },
+    {
+      id: 'easy-2',
+      question: 'Bronze is made by mixing copper with:',
+      options: ['Iron', 'Gold', 'Tin', 'Silver'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Technology',
+      region: 'Global',
+      period: 'Bronze Age',
+      explanation: 'Bronze is an alloy made by mixing copper with tin, creating a stronger metal.',
+      tags: ['bronze', 'copper', 'tin']
+    },
+    {
+      id: 'easy-3',
+      question: 'What metal came after bronze in human history?',
+      options: ['Gold', 'Silver', 'Iron', 'Aluminum'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Technology',
+      region: 'Global',
+      period: 'Iron Age',
+      explanation: 'The Iron Age followed the Bronze Age when humans learned to work with iron.',
+      tags: ['iron', 'metal', 'iron age']
+    },
+    {
+      id: 'easy-4',
+      question: 'Ancient Greece was famous for its:',
+      options: ['Pyramids', 'Great Wall', 'Olympic Games', 'Hanging Gardens'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Culture',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'The Olympic Games began in ancient Greece and were held every four years.',
+      tags: ['olympics', 'greece', 'games']
+    },
+    {
+      id: 'easy-5',
+      question: 'The ancient Romans built long straight:',
+      options: ['Rivers', 'Mountains', 'Roads', 'Forests'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Engineering',
+      region: 'Rome',
+      period: 'Classical',
+      explanation: 'Romans were famous for building straight, well-constructed roads throughout their empire.',
+      tags: ['roads', 'romans', 'engineering']
+    },
+    {
+      id: 'easy-6',
+      question: 'Pyramids were built in ancient:',
+      options: ['Greece', 'Rome', 'Egypt', 'China'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Architecture',
+      region: 'Egypt',
+      period: 'Classical',
+      explanation: 'The ancient Egyptians built pyramids as tombs for their pharaohs.',
+      tags: ['pyramids', 'egypt', 'pharaohs']
+    },
+    {
+      id: 'easy-7',
+      question: 'Cave paintings were made by:',
+      options: ['Modern artists', 'Prehistoric people', 'Romans', 'Greeks'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Art',
+      region: 'Global',
+      period: 'Prehistoric',
+      explanation: 'Prehistoric people painted on cave walls to record their lives and experiences.',
+      tags: ['cave paintings', 'prehistoric', 'art']
+    },
+    {
+      id: 'easy-8',
+      question: 'The first tools were made of:',
+      options: ['Plastic', 'Metal', 'Stone', 'Wood'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Technology',
+      region: 'Global',
+      period: 'Prehistoric',
+      explanation: 'The earliest human tools were made from stone, which is why we call it the Stone Age.',
+      tags: ['stone tools', 'prehistoric', 'stone age']
+    },
+    {
+      id: 'easy-9',
+      question: 'Ancient people learned to grow:',
+      options: ['Cars', 'Computers', 'Crops', 'Houses'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Agriculture',
+      region: 'Global',
+      period: 'Neolithic',
+      explanation: 'Learning to grow crops (agriculture) was a major step in human development.',
+      tags: ['agriculture', 'farming', 'crops']
+    },
+    {
+      id: 'easy-10',
+      question: 'Writing was first invented by:',
+      options: ['Americans', 'Europeans', 'Mesopotamians', 'Africans'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Writing',
+      region: 'Mesopotamia',
+      period: 'Classical',
+      explanation: 'The first known writing system was created by the Sumerians in Mesopotamia.',
+      tags: ['writing', 'mesopotamia', 'sumerians']
+    }
+  ],
+
+  // Medium Pack - Middle School Level (100% Medium Questions)
+  difficulty_pack_medium: [
+    {
+      id: 'medium-1',
+      question: 'The Neolithic Revolution marked the transition from hunting-gathering to:',
+      options: ['Metalworking', 'Agriculture', 'Writing', 'City-building'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Revolution',
+      region: 'Global',
+      period: 'Neolithic',
+      explanation: 'The Neolithic Revolution was the transition from nomadic hunting-gathering to settled agriculture.',
+      tags: ['neolithic', 'agriculture', 'revolution']
+    },
+    {
+      id: 'medium-2',
+      question: 'Which Bronze Age civilization developed Linear B script?',
+      options: ['Egyptians', 'Mycenaeans', 'Hittites', 'Babylonians'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Writing',
+      region: 'Greece',
+      period: 'Bronze Age',
+      explanation: 'The Mycenaean civilization used Linear B script, an early form of Greek writing.',
+      tags: ['linear b', 'mycenaeans', 'writing']
+    },
+    {
+      id: 'medium-3',
+      question: 'The Hallstatt culture is associated with which period?',
+      options: ['Bronze Age', 'Early Iron Age', 'Late Iron Age', 'Roman Period'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Culture',
+      region: 'Europe',
+      period: 'Iron Age',
+      explanation: 'The Hallstatt culture represents the early Iron Age in central Europe.',
+      tags: ['hallstatt', 'iron age', 'europe']
+    },
+    {
+      id: 'medium-4',
+      question: 'Which Greek city-state was known for its military society?',
+      options: ['Athens', 'Sparta', 'Corinth', 'Thebes'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Military',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'Sparta was famous for its warrior culture and military-focused society.',
+      tags: ['sparta', 'military', 'greece']
+    },
+    {
+      id: 'medium-5',
+      question: 'The Roman Republic was established after overthrowing:',
+      options: ['The Greek kings', 'The Etruscan kings', 'The Gallic tribes', 'The Carthaginians'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Politics',
+      region: 'Rome',
+      period: 'Classical',
+      explanation: 'Romans established their republic after expelling the last Etruscan king in 509 BCE.',
+      tags: ['roman republic', 'etruscans', 'monarchy']
+    },
+    {
+      id: 'medium-6',
+      question: 'The Egyptian pharaoh who built the Great Pyramid was:',
+      options: ['Tutankhamun', 'Khufu', 'Ramesses II', 'Cleopatra'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Architecture',
+      region: 'Egypt',
+      period: 'Classical',
+      explanation: 'Pharaoh Khufu commissioned the Great Pyramid of Giza around 2580 BCE.',
+      tags: ['khufu', 'great pyramid', 'giza']
+    },
+    {
+      id: 'medium-7',
+      question: 'Çatalhöyük is significant as one of the first:',
+      options: ['Metal workshops', 'Urban settlements', 'Writing systems', 'Trade routes'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Settlement',
+      region: 'Turkey',
+      period: 'Neolithic',
+      explanation: 'Çatalhöyük was one of the earliest large permanent settlements, dating to 7500 BCE.',
+      tags: ['catalhoyuk', 'settlement', 'neolithic']
+    },
+    {
+      id: 'medium-8',
+      question: 'The technique of smelting copper first developed during which period?',
+      options: ['Paleolithic', 'Mesolithic', 'Neolithic', 'Bronze Age'],
+      correctAnswer: 2,
+      difficulty: 'medium',
+      category: 'Technology',
+      region: 'Middle East',
+      period: 'Neolithic',
+      explanation: 'Copper smelting began during the Neolithic period, leading to the Bronze Age.',
+      tags: ['copper', 'smelting', 'technology']
+    },
+    {
+      id: 'medium-9',
+      question: 'Which irrigation system was crucial to Mesopotamian agriculture?',
+      options: ['Terracing', 'Canal systems', 'Crop rotation', 'Greenhouse farming'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Agriculture',
+      region: 'Mesopotamia',
+      period: 'Classical',
+      explanation: 'Complex canal systems allowed Mesopotamians to irrigate their crops in the desert.',
+      tags: ['irrigation', 'canals', 'mesopotamia']
+    },
+    {
+      id: 'medium-10',
+      question: 'The first known law code was created by:',
+      options: ['Solon', 'Hammurabi', 'Draco', 'Justinian'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Law',
+      region: 'Mesopotamia',
+      period: 'Classical',
+      explanation: 'The Code of Hammurabi (c. 1754 BCE) is one of the earliest known legal codes.',
+      tags: ['hammurabi', 'law code', 'babylon']
+    }
+  ],
+
+  // Hard Pack - High School Level (100% Hard Questions)
+  difficulty_pack_hard: [
+    {
+      id: 'hard-1',
+      question: 'The Aurignacian culture is associated with which major prehistoric development?',
+      options: ['First agriculture', 'Earliest modern human art in Europe', 'Bronze working', 'Urban civilization'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Culture',
+      region: 'Europe',
+      period: 'Prehistoric',
+      explanation: 'The Aurignacian culture (43,000-28,000 years ago) produced the earliest modern human art in Europe.',
+      tags: ['aurignacian', 'prehistoric art', 'modern humans']
+    },
+    {
+      id: 'hard-2',
+      question: 'The Nebra sky disc represents advanced Bronze Age knowledge of:',
+      options: ['Metallurgy techniques', 'Astronomical observations', 'Trade networks', 'Military strategy'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Astronomy',
+      region: 'Europe',
+      period: 'Bronze Age',
+      explanation: 'The Nebra sky disc shows sophisticated Bronze Age understanding of celestial movements.',
+      tags: ['nebra disc', 'astronomy', 'bronze age']
+    },
+    {
+      id: 'hard-3',
+      question: 'The La Tène culture primarily influenced which later European peoples?',
+      options: ['Germanic tribes', 'Celtic peoples', 'Slavic groups', 'Roman citizens'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Culture',
+      region: 'Europe',
+      period: 'Iron Age',
+      explanation: 'La Tène culture (5th-1st century BCE) was a major Celtic cultural development.',
+      tags: ['la tene', 'celts', 'iron age']
+    },
+    {
+      id: 'hard-4',
+      question: 'The Athenian strategoi were:',
+      options: ['Religious priests', 'Elected military commanders', 'Slave overseers', 'Trade guild leaders'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Politics',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'Strategoi were the ten elected military commanders who led Athens\' armed forces.',
+      tags: ['strategoi', 'athens', 'military commanders']
+    },
+    {
+      id: 'hard-5',
+      question: 'The Roman Principate established by Augustus represented:',
+      options: ['Pure democracy', 'Military dictatorship', 'Constitutional monarchy', 'Disguised autocracy'],
+      correctAnswer: 3,
+      difficulty: 'hard',
+      category: 'Politics',
+      region: 'Rome',
+      period: 'Classical',
+      explanation: 'The Principate maintained republican forms while concentrating power in the emperor.',
+      tags: ['principate', 'augustus', 'roman government']
+    },
+    {
+      id: 'hard-6',
+      question: 'The Egyptian Amarna Period was characterized by:',
+      options: ['Military expansion', 'Religious revolution', 'Economic collapse', 'Foreign invasion'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Religion',
+      region: 'Egypt',
+      period: 'Classical',
+      explanation: 'Akhenaten\'s reign brought revolutionary changes to Egyptian religion and art.',
+      tags: ['amarna', 'akhenaten', 'religious reform']
+    },
+    {
+      id: 'hard-7',
+      question: 'The PPNB (Pre-Pottery Neolithic B) period is significant for:',
+      options: ['First pottery', 'Domestication of wheat and barley', 'Bronze working', 'Urban planning'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Agriculture',
+      region: 'Middle East',
+      period: 'Neolithic',
+      explanation: 'PPNB (8800-6500 BCE) saw the domestication of major cereal crops.',
+      tags: ['ppnb', 'domestication', 'agriculture']
+    },
+    {
+      id: 'hard-8',
+      question: 'The Oxus Civilization (BMAC) was contemporary with:',
+      options: ['Early Dynastic Mesopotamia', 'Indus Valley Civilization', 'Shang Dynasty China', 'Mycenaean Greece'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Civilization',
+      region: 'Central Asia',
+      period: 'Bronze Age',
+      explanation: 'The Bactria-Margiana Archaeological Complex flourished alongside the Indus Valley Civilization.',
+      tags: ['bmac', 'oxus', 'bronze age']
+    },
+    {
+      id: 'hard-9',
+      question: 'The concept of ostracism in ancient Athens served to:',
+      options: ['Punish criminals', 'Prevent tyranny', 'Collect taxes', 'Organize military service'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Politics',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'Ostracism allowed Athenians to exile prominent citizens who might threaten democracy.',
+      tags: ['ostracism', 'athens', 'democracy']
+    },
+    {
+      id: 'hard-10',
+      question: 'The Roman cursus honorum established:',
+      options: ['Military ranks', 'Sequential political offices', 'Religious hierarchy', 'Social classes'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Politics',
+      region: 'Rome',
+      period: 'Classical',
+      explanation: 'The cursus honorum was the sequential order of public offices in Roman politics.',
+      tags: ['cursus honorum', 'roman politics', 'offices']
+    }
   ]
 };
 

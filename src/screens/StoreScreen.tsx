@@ -105,14 +105,15 @@ const StoreScreen: React.FC = () => {
       ['Roman', 'Egyptian', 'Greek', 'Mesopotamian', 'Chinese', 'Indian', 'American', 'European'].includes(bundle.subcategory)
     );
 
-    // Difficulty Packs (everything else - mainly difficulty-based bundles)
-    const difficultyBundles = bundleList.filter(bundle => {
-      const isAge = bundle.category === 'historical_age' && ['Prehistoric', 'Bronze Age', 'Iron Age'].includes(bundle.subcategory);
-      const isFormat = bundle.category === 'format' && ['Multiple Choice', 'True/False', 'Fill-in-the-Blank'].includes(bundle.subcategory);
-      const isRegion = bundle.category === 'region' && ['Roman', 'Egyptian', 'Greek', 'Mesopotamian', 'Chinese', 'Indian', 'American', 'European'].includes(bundle.subcategory);
-      
-      return !isAge && !isFormat && !isRegion;
-    });
+    // Difficulty Packs (specifically difficulty category bundles in Easy, Medium, Hard order)
+    const difficultyBundles = bundleList
+      .filter(bundle => bundle.category === 'difficulty')
+      .sort((a, b) => {
+        const order = ['Easy', 'Medium', 'Hard'];
+        const aIndex = order.indexOf(a.subcategory);
+        const bIndex = order.indexOf(b.subcategory);
+        return aIndex - bIndex;
+      });
 
     return {
       'Age Bundle Packs': ageBundles,

@@ -492,11 +492,11 @@ const RAW_BUNDLES = [
 
   // Difficulty Packs
   {
-    id: 'difficulty_pack_beginner',
-    name: 'Beginner Pack',
-    description: '100 Beginner questions. Perfect for newcomers to ancient history.',
+    id: 'difficulty_pack_easy',
+    name: 'Easy Pack',
+    description: '100 easy questions covering prehistoric, bronze age, iron age, and classical antiquity. Perfect for elementary school level.',
     category: 'difficulty',
-    subcategory: 'Beginner',
+    subcategory: 'Easy',
     price: PRICING.pack,
     questionCount: 100,
     questions: [],
@@ -504,9 +504,9 @@ const RAW_BUNDLES = [
     isOwned: false,
     difficulty: 'easy',
     difficultyBreakdown: {
-      easy: 25,
-      medium: 50,
-      hard: 25
+      easy: 100,
+      medium: 0,
+      hard: 0
     },
     format: 'Mixed',
     releaseDate: '2025-05-02',
@@ -520,11 +520,39 @@ const RAW_BUNDLES = [
     }
   },
   {
-    id: 'difficulty_pack_advanced',
-    name: 'Advanced Pack',
-    description: '100 Advanced questions. For experts and serious historians only.',
+    id: 'difficulty_pack_medium',
+    name: 'Medium Pack',
+    description: '100 medium questions covering prehistoric, bronze age, iron age, and classical antiquity. Perfect for middle school level.',
     category: 'difficulty',
-    subcategory: 'Advanced',
+    subcategory: 'Medium',
+    price: PRICING.pack,
+    questionCount: 100,
+    questions: [],
+    isPremium: true,
+    isOwned: false,
+    difficulty: 'medium',
+    difficultyBreakdown: {
+      easy: 0,
+      medium: 100,
+      hard: 0
+    },
+    format: 'Mixed',
+    releaseDate: '2025-05-02',
+    version: 'v1',
+    bpType: 'DifficultyPackType',
+    iconName: 'book-open',
+    themeColors: {
+      primary: '#F59E0B',
+      background: '#FEF3C7',
+      text: '#FFFFFF'
+    }
+  },
+  {
+    id: 'difficulty_pack_hard',
+    name: 'Hard Pack',
+    description: '100 hard questions covering prehistoric, bronze age, iron age, and classical antiquity. Perfect for high school level.',
+    category: 'difficulty',
+    subcategory: 'Hard',
     price: PRICING.pack,
     questionCount: 100,
     questions: [],
@@ -532,9 +560,9 @@ const RAW_BUNDLES = [
     isOwned: false,
     difficulty: 'hard',
     difficultyBreakdown: {
-      easy: 25,
-      medium: 50,
-      hard: 25
+      easy: 0,
+      medium: 0,
+      hard: 100
     },
     format: 'Mixed',
     releaseDate: '2025-05-02',
@@ -542,8 +570,8 @@ const RAW_BUNDLES = [
     bpType: 'DifficultyPackType',
     iconName: 'trophy',
     themeColors: {
-      primary: '#7C3AED',
-      background: '#EDE9FE',
+      primary: '#EF4444',
+      background: '#FEE2E2',
       text: '#FFFFFF'
     }
   }
