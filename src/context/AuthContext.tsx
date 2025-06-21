@@ -9,6 +9,9 @@ import {
   updateProfile,
   signInAnonymously,
   sendPasswordResetEmail,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
   GoogleAuthProvider,
   FacebookAuthProvider,
   OAuthProvider
@@ -26,6 +29,8 @@ interface AuthContextType {
   signInWithApple: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
+  sendSignInLink: (email: string) => Promise<void>;
+  signInWithLink: (email: string, emailLink: string) => Promise<void>;
   signInAnonymously: () => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -218,6 +223,61 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  // Send sign-in link to email
+  const sendSignInLink = async (email: string) => {
+    try {
+      setError(null);
+      const actionCodeSettings = {
+        // URL where user will be redirected after clicking the link
+        url: window.location.origin + '/auth/signin',
+        handleCodeInApp: true,
+        // For web-only deployment, we don't need iOS/Android configs yet
+        // When you're ready for mobile apps, uncomment and configure these:
+        // iOS: {
+        //   bundleId: 'com.creativequemedia.ancienthistorytrivia'
+        // },
+        // android: {
+        //   packageName: 'com.creativequemedia.ancienthistorytrivia',
+        //   installApp: true,
+        //   minimumVersion: '1'
+        // },
+        // dynamicLinkDomain: 'ancienthistorytrivia.page.link' // Set up in Firebase Console when needed
+      };
+      
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      // Save email in localStorage for verification
+      localStorage.setItem('emailForSignIn', email);
+    } catch (error: any) {
+      setError(error.message);
+      console.error('Send sign-in link error:', error);
+      throw error;
+    }
+  };
+
+  // Sign in with email link
+  const signInWithLink = async (email: string, emailLink: string) => {
+    try {
+      setError(null);
+      setLoading(true);
+      
+      if (isSignInWithEmailLink(auth, emailLink)) {
+        const result = await signInWithEmailLink(auth, email, emailLink);
+        const profile = await createUserProfile(result.user, 'email');
+        setUserProfile(profile);
+        // Clear email from localStorage
+        localStorage.removeItem('emailForSignIn');
+      } else {
+        throw new Error('Invalid sign-in link');
+      }
+    } catch (error: any) {
+      setError(error.message);
+      console.error('Sign in with link error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Logout
   const logout = async () => {
     try {
@@ -320,6 +380,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signInWithApple,
     signInWithEmail,
     signUpWithEmail,
+    sendSignInLink,
+    signInWithLink,
     signInAnonymously: signInAnonymouslyHandler,
     logout,
     resetPassword,

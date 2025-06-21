@@ -2,83 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- FAVICON LINKS - Local development paths -->
-    <link rel="icon" type="image/svg+xml" href="/ancient-history-trivia-pwa/logos/logo_64.svg" />
-    <link rel="shortcut icon" type="image/svg+xml" href="/ancient-history-trivia-pwa/logos/logo_64.svg" />
-    <link rel="icon" sizes="64x64" href="/ancient-history-trivia-pwa/logos/logo_64.svg" />
-    <link rel="icon" sizes="128x128" href="/ancient-history-trivia-pwa/logos/logo_128.svg" />
-    <link rel="icon" sizes="192x192" href="/ancient-history-trivia-pwa/logos/logo_192.svg" />
-    <link rel="apple-touch-icon" sizes="192x192" href="/ancient-history-trivia-pwa/logos/logo_192.svg" />
-    <link rel="apple-touch-icon-precomposed" href="/ancient-history-trivia-pwa/logos/logo_192.svg" />
+    <!-- FAVICON LINKS - Firebase Hosting paths -->
+    <link rel="icon" type="image/svg+xml" href="/logos/logo_64.svg" />
+    <link rel="shortcut icon" type="image/svg+xml" href="/logos/logo_64.svg" />
+    <link rel="icon" sizes="64x64" href="/logos/logo_64.svg" />
+    <link rel="icon" sizes="128x128" href="/logos/logo_128.svg" />
+    <link rel="icon" sizes="192x192" href="/logos/logo_192.svg" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/logos/logo_192.svg" />
+    <link rel="apple-touch-icon-precomposed" href="/logos/logo_192.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Test your knowledge of ancient civilizations and historical events with our comprehensive trivia app." />
     <meta name="theme-color" content="#1f2937" />
     <!-- Manifest -->
-    <link rel="manifest" href="/ancient-history-trivia-pwa/manifest.webmanifest" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <!-- Force no-cache headers -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>Ancient History Trivia</title>
-    <script>
-      // Aggressively clear all caches and force reload
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister();
-          }
-        });
-      }
-      
-      // Clear all caches
-      if ('caches' in window) {
-        caches.keys().then(function(names) {
-          names.forEach(function(name) {
-            caches.delete(name);
-          });
-        });
-      }
-      
-      // NUCLEAR OPTION: Force favicon refresh multiple times
-      setTimeout(function() {
-        // Remove all existing favicon links
-        var existingLinks = document.querySelectorAll("link[rel*='icon']");
-        existingLinks.forEach(function(link) {
-          link.parentNode.removeChild(link);
-        });
-        
-        // Add new favicon with current timestamp - using GitHub Pages base path
-        var newFavicon = document.createElement('link');
-        newFavicon.rel = 'icon';
-        newFavicon.type = 'image/svg+xml';
-        newFavicon.href = '/ancient-history-trivia-pwa/logos/logo_64.svg?nuclear=' + Date.now();
-        document.head.appendChild(newFavicon);
-        
-        // Also add shortcut icon
-        var newShortcut = document.createElement('link');
-        newShortcut.rel = 'shortcut icon';
-        newShortcut.type = 'image/svg+xml';
-        newShortcut.href = '/ancient-history-trivia-pwa/logos/logo_64.svg?nuclear=' + Date.now();
-        document.head.appendChild(newShortcut);
-      }, 100);
-    </script>
-    <script>
-      // Single Page Apps for GitHub Pages
-      // https://github.com/rafgraph/spa-github-pages
-      // This script checks to see if a redirect is present in the query string,
-      // converts it back into the correct url and adds it to the
-      // browser's history using window.history.replaceState(...)
-      (function(l) {
-        if (l.search[1] === '/' ) {
-          var decoded = l.search.slice(1).split('&').map(function(s) { 
-            return s.replace(/~and~/g, '&')
-          }).join('?');
-          window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded + l.hash
-          );
-        }
-      }(window.location))
-    </script>
   </head>
   <body>
     <div id="root"></div>

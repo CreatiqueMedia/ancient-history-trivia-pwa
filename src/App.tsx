@@ -17,6 +17,7 @@ import AchievementsScreen from './screens/AchievementsScreen.tsx';
 import SubscriptionScreen from './screens/SubscriptionScreen.tsx';
 import UserProfileScreen from './screens/UserProfileScreen.tsx';
 import AboutScreen from './screens/AboutScreen.tsx';
+import EmailLinkHandler from './screens/EmailLinkHandler.tsx';
 import Layout from './components/Layout.tsx';
 import LoadingSpinner from './components/LoadingSpinner.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
@@ -47,6 +48,7 @@ const AppContent = () => {
         <Route path="/subscription" element={<SubscriptionScreen />} />
         <Route path="/profile" element={<UserProfileScreen />} />
         <Route path="/about" element={<AboutScreen />} />
+        <Route path="/auth/signin" element={<EmailLinkHandler />} />
       </Routes>
     </Layout>
   );
