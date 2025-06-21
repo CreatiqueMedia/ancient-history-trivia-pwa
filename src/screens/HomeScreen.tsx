@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { PlayIcon, ChartBarIcon, TrophyIcon } from '@heroicons/react/24/solid';
 import { questionBundles } from '../data/questions';
 import { useStats } from '../context/StatsContext';
-import { useAuth } from '../context/MockAuthContext';
+import { useAuth } from '../context/AuthContext';
 import { Logo } from '../components/Logo';
 
 const HomeScreen = () => {
