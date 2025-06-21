@@ -34,9 +34,12 @@ const AboutScreen: React.FC = () => {
         {/* Introduction Card */}
         <div className="card p-8 mb-8">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Hello, I am Ron Ratzlaff, born Ron Alan Curtis (aka The Awakened Hybrid)
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+              Hello, I am Ron Ratzlaff, born Ron Alan Curtis
             </h2>
+            <p className="text-lg font-semibold text-primary-600 dark:text-primary-400 mb-4 text-center">
+              Also Known As: The Awakened Hybrid
+            </p>
           </div>
 
           <div className="prose prose-lg max-w-none dark:prose-invert">
