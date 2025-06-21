@@ -28,7 +28,7 @@ const HomeScreen = () => {
     },
     {
       id: 'roman-empire',
-      title: 'Roman Empire',
+      title: 'Ancient Rome',
       description: 'From Republic to Empire - the rise and fall of Rome',
       icon: '🏛️',
       gradient: 'from-red-400 to-red-600',
