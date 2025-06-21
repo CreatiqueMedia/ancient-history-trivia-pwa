@@ -19,6 +19,7 @@ import UserProfileScreen from './screens/UserProfileScreen.tsx';
 import AboutScreen from './screens/AboutScreen.tsx';
 import Layout from './components/Layout.tsx';
 import LoadingSpinner from './components/LoadingSpinner.tsx';
+import ProtectedRoute from './components/ProtectedRoute.tsx';
 import { analyticsService } from './services/AnalyticsService';
 import { notificationService } from './services/NotificationService';
 import { errorHandler } from './services/ErrorHandlingService';
@@ -32,9 +33,17 @@ const AppContent = () => {
         <Route path="/quiz/:bundleId?" element={<QuizScreen />} />
         <Route path="/results" element={<ResultsScreen />} />
         <Route path="/store" element={<StoreScreen />} />
-        <Route path="/stats" element={<StatsScreen />} />
+        <Route path="/stats" element={
+          <ProtectedRoute>
+            <StatsScreen />
+          </ProtectedRoute>
+        } />
         <Route path="/settings" element={<SettingsScreen />} />
-        <Route path="/achievements" element={<AchievementsScreen />} />
+        <Route path="/achievements" element={
+          <ProtectedRoute>
+            <AchievementsScreen />
+          </ProtectedRoute>
+        } />
         <Route path="/subscription" element={<SubscriptionScreen />} />
         <Route path="/profile" element={<UserProfileScreen />} />
         <Route path="/about" element={<AboutScreen />} />

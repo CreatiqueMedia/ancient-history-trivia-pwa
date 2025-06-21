@@ -41,24 +41,28 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       icon: HomeIcon, 
       iconSolid: HomeIconSolid 
     },
-    { 
-      path: '/stats', 
-      label: 'Stats', 
-      icon: ChartBarIcon, 
-      iconSolid: ChartBarIconSolid 
-    },
+    ...(user ? [
+      { 
+        path: '/stats', 
+        label: 'Stats', 
+        icon: ChartBarIcon, 
+        iconSolid: ChartBarIconSolid 
+      }
+    ] : []),
     { 
       path: '/store', 
       label: 'Store', 
       icon: ShoppingBagIcon, 
       iconSolid: ShoppingBagIconSolid 
     },
-    { 
-      path: '/achievements', 
-      label: 'Awards', 
-      icon: TrophyIcon, 
-      iconSolid: TrophyIconSolid
-    },
+    ...(user ? [
+      { 
+        path: '/achievements', 
+        label: 'Awards', 
+        icon: TrophyIcon, 
+        iconSolid: TrophyIconSolid
+      }
+    ] : []),
     { 
       path: '/about', 
       label: 'About', 
