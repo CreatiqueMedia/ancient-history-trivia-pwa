@@ -4,15 +4,15 @@ import { getAuth, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, conne
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 
-// Development Firebase config - Replace with your actual Firebase config for production
+// Firebase Configuration for Ancient History Trivia PWA
 const firebaseConfig = {
-  apiKey: "demo-api-key",
-  authDomain: "ancient-history-demo.firebaseapp.com",
-  projectId: "ancient-history-demo",
-  storageBucket: "ancient-history-demo.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:demo",
-  measurementId: "G-DEMO"
+  apiKey: "***REMOVED***",
+  authDomain: "ancient-history-trivia.firebaseapp.com",
+  projectId: "ancient-history-trivia",
+  storageBucket: "ancient-history-trivia.firebasestorage.app",
+  messagingSenderId: "778256162112",
+  appId: "1:778256162112:web:ee31ff85689d2fe722aea5",
+  measurementId: "G-P9L2L1ZGEM"
 };
 
 // Initialize Firebase
@@ -21,7 +21,7 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const analytics = typeof window !== 'undefined' && firebaseConfig.apiKey !== 'demo-api-key' ? getAnalytics(app) : null;
+export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 
 // For development, you can uncomment these lines to use Firebase emulators
 // if (process.env.NODE_ENV === 'development') {

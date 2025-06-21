@@ -5,8 +5,8 @@ import { StatsProvider } from './context/StatsContext';
 import { QuizProvider } from './context/QuizContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { PurchaseProvider } from './context/PurchaseContext';
-// Use MockAuthContext for development, switch to AuthContext for production
-import { AuthProvider } from './context/MockAuthContext';
+// Use AuthContext for production with real Firebase auth, MockAuthContext for development
+import { AuthProvider } from './context/AuthContext';
 import HomeScreen from './screens/HomeScreen.tsx';
 import QuizScreen from './screens/QuizScreen.tsx';
 import ResultsScreen from './screens/ResultsScreen.tsx';
