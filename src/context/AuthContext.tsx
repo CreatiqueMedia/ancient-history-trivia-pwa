@@ -128,12 +128,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setError(null);
       setLoading(true);
+      console.log('🔄 Starting Google sign-in...');
       const result = await signInWithPopup(auth, googleProvider);
+      console.log('✅ Google sign-in successful:', result.user.email);
       const profile = await createUserProfile(result.user, 'google');
       setUserProfile(profile);
     } catch (error: any) {
-      setError(error.message);
-      console.error('Google sign in error:', error);
+      console.error('❌ Google sign in error:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      
+      // Provide user-friendly error messages
+      let userError = error.message;
+      if (error.code === 'auth/popup-closed-by-user') {
+        userError = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/popup-blocked') {
+        userError = 'Pop-up blocked. Please allow pop-ups for this site and try again.';
+      } else if (error.code === 'auth/operation-not-allowed') {
+        userError = 'Google sign-in is not enabled. Please contact support.';
+      } else if (error.code === 'auth/invalid-api-key') {
+        userError = 'Authentication configuration error. Please contact support.';
+      }
+      
+      setError(userError);
     } finally {
       setLoading(false);
     }
