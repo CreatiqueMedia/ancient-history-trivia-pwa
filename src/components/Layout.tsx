@@ -9,14 +9,16 @@ import {
   Bars3Icon,
   XMarkIcon,
   UserIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  InformationCircleIcon
 } from '@heroicons/react/24/outline';
 import { 
   HomeIcon as HomeIconSolid,
   ChartBarIcon as ChartBarIconSolid,
   CogIcon as CogIconSolid,
   TrophyIcon as TrophyIconSolid,
-  ShoppingBagIcon as ShoppingBagIconSolid
+  ShoppingBagIcon as ShoppingBagIconSolid,
+  InformationCircleIcon as InformationCircleIconSolid
 } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/MockAuthContext';
 import AuthModal from './AuthModal';
@@ -56,6 +58,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       label: 'Awards', 
       icon: TrophyIcon, 
       iconSolid: TrophyIconSolid
+    },
+    { 
+      path: '/about', 
+      label: 'About', 
+      icon: InformationCircleIcon, 
+      iconSolid: InformationCircleIconSolid
     },
     { 
       path: '/settings', 
