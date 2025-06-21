@@ -61,15 +61,85 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Create or update user profile in Firestore
   const createUserProfile = async (user: User, provider: AuthProvider): Promise<UserProfile> => {
-    const userDoc = doc(db, 'users', user.uid);
-    const userSnap = await getDoc(userDoc);
+    try {
+      const userDoc = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userDoc);
 
-    if (!userSnap.exists()) {
-      // Create new user profile
-      const newProfile: UserProfile = {
+      if (!userSnap.exists()) {
+        // Create new user profile
+        const newProfile: UserProfile = {
+          id: user.uid,
+          email: user.email || '',
+          displayName: user.displayName || 'Anonymous User',
+          photoURL: user.photoURL || undefined,
+          provider,
+          subscription: 'free',
+          preferences: {
+            theme: 'system',
+            soundEnabled: true,
+            vibrationEnabled: true,
+            autoAdvance: false,
+            showExplanations: true,
+            questionTimeLimit: null,
+            language: 'en',
+            accessibilityEnabled: false,
+            fontSize: 'medium',
+            notifications: {
+              dailyReminders: true,
+              achievementUpdates: true,
+              newContentAlerts: true,
+              friendActivity: false,
+              reminderTime: '19:00'
+            }
+          },
+          createdAt: new Date(),
+          lastActive: new Date(),
+          isAnonymous: user.isAnonymous
+        };
+
+        try {
+          await setDoc(userDoc, {
+            ...newProfile,
+            createdAt: serverTimestamp(),
+            lastActive: serverTimestamp()
+          });
+        } catch (firestoreError) {
+          console.warn('Could not save profile to Firestore:', firestoreError);
+          // Continue with local profile even if Firestore save fails
+        }
+
+        return newProfile;
+      } else {
+        // Update existing user profile
+        const existingProfile = userSnap.data() as UserProfile;
+        const updatedProfile = {
+          ...existingProfile,
+          lastActive: new Date(),
+          photoURL: user.photoURL || existingProfile.photoURL,
+          displayName: user.displayName || existingProfile.displayName
+        };
+
+        try {
+          await updateDoc(userDoc, {
+            lastActive: serverTimestamp(),
+            photoURL: user.photoURL,
+            displayName: user.displayName
+          });
+        } catch (firestoreError) {
+          console.warn('Could not update profile in Firestore:', firestoreError);
+          // Continue with local profile even if Firestore update fails
+        }
+
+        return updatedProfile;
+      }
+    } catch (error: any) {
+      console.warn('Firestore error in createUserProfile, creating fallback profile:', error);
+      
+      // If Firestore is completely unavailable, create a basic profile from auth data
+      return {
         id: user.uid,
         email: user.email || '',
-        displayName: user.displayName || 'Anonymous User',
+        displayName: user.displayName || user.email?.split('@')[0] || 'User',
         photoURL: user.photoURL || undefined,
         provider,
         subscription: 'free',
@@ -95,31 +165,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         lastActive: new Date(),
         isAnonymous: user.isAnonymous
       };
-
-      await setDoc(userDoc, {
-        ...newProfile,
-        createdAt: serverTimestamp(),
-        lastActive: serverTimestamp()
-      });
-
-      return newProfile;
-    } else {
-      // Update existing user profile
-      const existingProfile = userSnap.data() as UserProfile;
-      const updatedProfile = {
-        ...existingProfile,
-        lastActive: new Date(),
-        photoURL: user.photoURL || existingProfile.photoURL,
-        displayName: user.displayName || existingProfile.displayName
-      };
-
-      await updateDoc(userDoc, {
-        lastActive: serverTimestamp(),
-        photoURL: user.photoURL,
-        displayName: user.displayName
-      });
-
-      return updatedProfile;
     }
   };
 
@@ -396,8 +441,58 @@ export function AuthProvider({ children }: AuthProviderProps) {
             const profile = await createUserProfile(user, provider);
             setUserProfile(profile);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error loading user profile:', error);
+          
+          // Handle Firestore offline errors by creating a temporary profile
+          if (error.code === 'unavailable' || error.message?.includes('offline') || error.message?.includes('Failed to get document')) {
+            console.log('Firestore offline, creating temporary profile from auth data');
+            
+            // Create a temporary profile from auth user data
+            const tempProfile: UserProfile = {
+              id: user.uid,
+              email: user.email || '',
+              displayName: user.displayName || user.email?.split('@')[0] || 'User',
+              photoURL: user.photoURL || undefined,
+              provider: user.providerData[0]?.providerId.includes('google') ? 'google' :
+                       user.providerData[0]?.providerId.includes('facebook') ? 'facebook' :
+                       user.providerData[0]?.providerId.includes('apple') ? 'apple' :
+                       user.isAnonymous ? 'anonymous' : 'email',
+              subscription: 'free',
+              preferences: {
+                theme: 'system',
+                soundEnabled: true,
+                vibrationEnabled: true,
+                autoAdvance: false,
+                showExplanations: true,
+                questionTimeLimit: null,
+                language: 'en',
+                accessibilityEnabled: false,
+                fontSize: 'medium',
+                notifications: {
+                  dailyReminders: true,
+                  achievementUpdates: true,
+                  newContentAlerts: true,
+                  friendActivity: false,
+                  reminderTime: '19:00'
+                }
+              },
+              createdAt: new Date(),
+              lastActive: new Date(),
+              isAnonymous: user.isAnonymous
+            };
+            
+            setUserProfile(tempProfile);
+            
+            // Try to sync to Firestore in the background
+            setTimeout(async () => {
+              try {
+                await createUserProfile(user, tempProfile.provider);
+              } catch (syncError) {
+                console.warn('Could not sync profile to Firestore:', syncError);
+              }
+            }, 2000);
+          }
         }
       } else {
         setUserProfile(null);

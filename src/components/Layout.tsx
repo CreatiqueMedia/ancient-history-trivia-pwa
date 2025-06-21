@@ -121,6 +121,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-3">
+                {/* Debug indicator */}
+                <div className="text-xs text-green-500 font-mono">
+                  ✅ Authenticated
+                </div>
+                
                 {/* Subscription Badge */}
                 {userProfile?.subscription && userProfile.subscription !== 'free' && (
                   <Link
@@ -147,14 +152,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
                   )}
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {userProfile?.displayName || 'User'}
+                    {userProfile?.displayName || user?.displayName || user?.email || 'User'}
                   </span>
                 </Link>
 
                 {/* Logout Button */}
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors bg-red-100 hover:bg-red-200 rounded"
                   title="Sign Out"
                 >
                   <ArrowRightOnRectangleIcon className="w-5 h-5" />
@@ -162,6 +167,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </div>
             ) : (
               <div className="flex items-center space-x-3">
+                {/* Debug indicator */}
+                <div className="text-xs text-red-500 font-mono">
+                  ❌ Not Authenticated
+                </div>
+                
                 <button
                   onClick={() => setAuthModalOpen(true)}
                   className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
