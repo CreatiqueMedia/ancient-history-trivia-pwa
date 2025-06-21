@@ -99,22 +99,22 @@ const HomeScreen = () => {
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
         <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
           <div className="text-center">
+            {/* Brought to you by text */}
+            <div className="mb-6">
+              <p className="text-primary-200 text-sm md:text-base font-medium tracking-wide">
+                Brought to you by, 
+                <span className="text-white font-bold ml-1 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                  "The Awakened Hybrid and CreatiqueMedia LLC"
+                </span>
+              </p>
+            </div>
+            
             {/* Eye of Ra Brand Logo */}
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-4">
               <Logo 
                 size={80} 
                 className="drop-shadow-lg"
               />
-            </div>
-            
-            {/* Brought to you by text */}
-            <div className="mb-4">
-              <p className="text-primary-200 text-sm md:text-base font-medium tracking-wide">
-                Brought to you by, 
-                <span className="text-white font-bold ml-1 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                  "The Awakened Hybrid"
-                </span>
-              </p>
             </div>
             
             {user && userProfile ? (
