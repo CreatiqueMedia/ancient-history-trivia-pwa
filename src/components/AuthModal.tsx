@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 import EmailLinkSignIn from './EmailLinkSignIn';
@@ -33,8 +33,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
     signUpWithEmail,
     signInAnonymously,
     resetPassword,
-    error
+    error,
+    user
   } = useAuth();
+
+  // Auto-close modal if user is already authenticated
+  useEffect(() => {
+    if (user && isOpen) {
+      onClose();
+    }
+  }, [user, isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -61,9 +69,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
   };
 
   const handleSocialAuth = async (provider: 'google' | 'facebook' | 'apple' | 'anonymous') => {
-    setLoadingStates(prev => ({ ...prev, [provider]: true }));
-
     try {
+      setLoadingStates(prev => ({ ...prev, [provider]: true }));
+
       switch (provider) {
         case 'google':
           await signInWithGoogle();
@@ -78,10 +86,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
           await signInAnonymously();
           break;
       }
+      
+      // Close modal on successful authentication
       onClose();
     } catch (error) {
       console.error('Social auth error:', error);
+      // Error is already handled by the individual auth functions
     } finally {
+      // Always reset loading state
       setLoadingStates(prev => ({ ...prev, [provider]: false }));
     }
   };
