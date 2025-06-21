@@ -8,9 +8,9 @@ export const PRICING = {
   allDiscount: 0.7,   // 30% off
   subscription: {
     pro: {
-      monthly: 2.99,
-      annual: 29.99,
-      biennial: 49.99
+      monthly: 4.99,
+      annual: 39.99,
+      biennial: 69.99
     }
   }
 };
@@ -57,7 +57,7 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
       'Offline access',
       'No advertisements'
     ],
-    savings: 'Save 15%',
+    savings: 'Save 33%',
     isPopular: true
   },
   {
@@ -74,7 +74,7 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
       'Offline access',
       'No advertisements'
     ],
-    savings: 'Save 20%'
+    savings: 'Save 42%'
   }
 ];
 
