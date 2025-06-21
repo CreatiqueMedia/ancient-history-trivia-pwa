@@ -200,7 +200,7 @@ export interface UserStats {
   streakCurrent: number;
   streakBest: number;
   timeSpent: number; // Changed from totalTimeSpent
-  lastPlayed: Date;
+  lastPlayed: Date | null;
   achievements: AchievementType[];
   categoryStats: { [key: string]: CategoryStats };
   difficultyStats: { [key: string]: DifficultyStats };

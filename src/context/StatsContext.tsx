@@ -262,7 +262,7 @@ const defaultStats: UserStats = {
   streakCurrent: 0,
   streakBest: 0,
   timeSpent: 0,
-  lastPlayed: new Date(),
+  lastPlayed: null,
   achievements: [],
   categoryStats: {},
   difficultyStats: {}
