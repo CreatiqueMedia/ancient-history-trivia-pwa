@@ -128,15 +128,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setError(null);
       setLoading(true);
-      console.log('🔄 Starting Google sign-in...');
       const result = await signInWithPopup(auth, googleProvider);
-      console.log('✅ Google sign-in successful:', result.user.email);
       const profile = await createUserProfile(result.user, 'google');
       setUserProfile(profile);
     } catch (error: any) {
       console.error('❌ Google sign in error:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
       
       // Provide user-friendly error messages
       let userError = error.message;
@@ -148,9 +144,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         userError = 'Google sign-in is not enabled. Please contact support.';
       } else if (error.code === 'auth/invalid-api-key') {
         userError = 'Authentication configuration error. Please contact support.';
+      } else if (error.code === 'auth/unauthorized-domain') {
+        userError = 'This domain is not authorized for authentication. Please contact support or try the Firebase Hosting version at ancient-history-trivia.web.app';
+      } else if (error.code === 'auth/account-exists-with-different-credential') {
+        userError = 'An account already exists with this email address using a different sign-in method.';
       }
       
       setError(userError);
+      throw error; // Re-throw so the modal can handle it
     } finally {
       setLoading(false);
     }
@@ -165,8 +166,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const profile = await createUserProfile(result.user, 'facebook');
       setUserProfile(profile);
     } catch (error: any) {
-      setError(error.message);
       console.error('Facebook sign in error:', error);
+      
+      let userError = error.message;
+      if (error.code === 'auth/unauthorized-domain') {
+        userError = 'This domain is not authorized for authentication. Please contact support or try the Firebase Hosting version at ancient-history-trivia.web.app';
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        userError = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/popup-blocked') {
+        userError = 'Pop-up blocked. Please allow pop-ups for this site and try again.';
+      }
+      
+      setError(userError);
     } finally {
       setLoading(false);
     }
@@ -181,8 +192,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const profile = await createUserProfile(result.user, 'apple');
       setUserProfile(profile);
     } catch (error: any) {
-      setError(error.message);
       console.error('Apple sign in error:', error);
+      
+      let userError = error.message;
+      if (error.code === 'auth/unauthorized-domain') {
+        userError = 'This domain is not authorized for authentication. Please contact support or try the Firebase Hosting version at ancient-history-trivia.web.app';
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        userError = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/popup-blocked') {
+        userError = 'Pop-up blocked. Please allow pop-ups for this site and try again.';
+      }
+      
+      setError(userError);
     } finally {
       setLoading(false);
     }

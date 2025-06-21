@@ -34,7 +34,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
     signInAnonymously,
     resetPassword,
     error,
-    user
+    user,
+    logout
   } = useAuth();
 
   // Auto-close modal if user is already authenticated
@@ -127,6 +128,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
           {error && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
               {error}
+              {error.includes('unauthorized-domain') && (
+                <div className="mt-2 text-sm">
+                  <strong>Quick Fix:</strong> Try the Firebase Hosting version:{' '}
+                  <a 
+                    href="https://ancient-history-trivia.web.app" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline hover:text-blue-800"
+                  >
+                    ancient-history-trivia.web.app
+                  </a>
+                </div>
+              )}
             </div>
           )}
 

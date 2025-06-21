@@ -263,6 +263,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </Link>
             );
           })}
+          
+          {/* Mobile Auth/Logout Button */}
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="flex flex-col items-center py-2 px-3 min-w-0 flex-1 text-gray-500 dark:text-gray-400"
+              title="Sign Out"
+            >
+              <ArrowRightOnRectangleIcon className="w-6 h-6 mb-1" />
+              <span className="text-xs font-medium truncate">Logout</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => setAuthModalOpen(true)}
+              className="flex flex-col items-center py-2 px-3 min-w-0 flex-1 text-gray-500 dark:text-gray-400"
+            >
+              <UserIcon className="w-6 h-6 mb-1" />
+              <span className="text-xs font-medium truncate">Sign In</span>
+            </button>
+          )}
         </div>
       </nav>
 

@@ -13,7 +13,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "deploy": "yarn build && yarn gh-pages -d dist",
+    "build:github": "tsc && vite build --base=/ancient-history-trivia-pwa/",
+    "deploy": "yarn build && firebase deploy --only hosting",
+    "deploy:github": "yarn build:github && yarn gh-pages -d dist",
+    "deploy:firebase": "yarn build && firebase deploy --only hosting",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
