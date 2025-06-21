@@ -570,7 +570,7 @@ const StoreScreen: React.FC = () => {
                   Choose Your Plan
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Unlock all premium features and question bundles
+                  Unlock all premium features and question bundles, and future releases
                 </p>
               </div>
 
