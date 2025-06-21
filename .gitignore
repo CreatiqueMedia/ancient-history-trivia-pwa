@@ -109,3 +109,5 @@ Desktop.ini
 # PWA files
 sw.js
 workbox-*.js
+auth-config.json
+.vite/
