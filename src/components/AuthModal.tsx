@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
+import EmailLinkSignIn from './EmailLinkSignIn';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -9,7 +10,7 @@ interface AuthModalProps {
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'login' }) => {
-  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>(initialMode);
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot' | 'emaillink'>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -159,6 +160,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
                 Continue with Apple
               </button>
 
+              <button
+                onClick={() => setMode('emaillink')}
+                disabled={isLoading}
+                className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Sign in with Email Link
+              </button>
+
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300 dark:border-gray-600" />
@@ -172,8 +184,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
             </div>
           )}
 
-          {/* Email Form */}
-          <form onSubmit={handleEmailAuth} className="space-y-4">
+          {/* Email Form or Email Link Component */}
+          {mode === 'emaillink' ? (
+            <EmailLinkSignIn onBack={() => setMode('login')} />
+          ) : (
+            <form onSubmit={handleEmailAuth} className="space-y-4">
             {mode === 'signup' && (
               <div>
                 <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -229,9 +244,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
               {isLoading ? 'Loading...' : 
                mode === 'login' ? 'Sign In' :
                mode === 'signup' ? 'Create Account' :
-               'Send Reset Email'}
-            </button>
-          </form>
+               'Send Reset Email'}              </button>
+            </form>
+          )}
 
           {/* Mode Switcher */}
           <div className="mt-6 text-center">
