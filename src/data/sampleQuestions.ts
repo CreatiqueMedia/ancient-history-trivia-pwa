@@ -1771,6 +1771,378 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
       explanation: 'The cursus honorum was the sequential order of public offices in Roman politics.',
       tags: ['cursus honorum', 'roman politics', 'offices']
     }
+  ],
+
+  // Multiple Choice Pack - Pure multiple choice format questions
+  format_pack_multiple_choice: [
+    {
+      id: 'mc-1',
+      question: 'Which river valley civilization is known as the "cradle of civilization"?',
+      options: ['Nile Valley', 'Mesopotamia', 'Indus Valley', 'Yellow River'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Civilization',
+      region: 'Mesopotamia',
+      period: 'Classical',
+      explanation: 'Mesopotamia, between the Tigris and Euphrates rivers, is often called the cradle of civilization.',
+      tags: ['mesopotamia', 'civilization', 'rivers']
+    },
+    {
+      id: 'mc-2',
+      question: 'The ancient Egyptian practice of mummification was primarily for:',
+      options: ['Medical research', 'Religious beliefs', 'Artistic expression', 'Trade purposes'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Religion',
+      region: 'Egypt',
+      period: 'Classical',
+      explanation: 'Mummification was done to preserve the body for the afterlife, reflecting Egyptian religious beliefs.',
+      tags: ['mummification', 'religion', 'afterlife']
+    },
+    {
+      id: 'mc-3',
+      question: 'Which ancient Greek philosopher founded the Academy in Athens?',
+      options: ['Socrates', 'Plato', 'Aristotle', 'Pythagoras'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Philosophy',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'Plato founded the Academy in Athens around 387 BCE, one of the first institutions of higher learning.',
+      tags: ['plato', 'academy', 'philosophy']
+    },
+    {
+      id: 'mc-4',
+      question: 'The Roman engineering achievement that transported water to cities was called:',
+      options: ['Amphitheaters', 'Aqueducts', 'Basilicas', 'Forums'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Engineering',
+      region: 'Rome',
+      period: 'Classical',
+      explanation: 'Aqueducts were sophisticated engineering systems that carried water from distant sources to Roman cities.',
+      tags: ['aqueducts', 'engineering', 'water']
+    },
+    {
+      id: 'mc-5',
+      question: 'Which Bronze Age civilization dominated the eastern Mediterranean before the Greeks?',
+      options: ['Minoans', 'Mycenaeans', 'Phoenicians', 'Hittites'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Civilization',
+      region: 'Mediterranean',
+      period: 'Bronze Age',
+      explanation: 'The Minoans of Crete were a major Bronze Age civilization that influenced the region before Greek dominance.',
+      tags: ['minoans', 'bronze age', 'mediterranean']
+    },
+    {
+      id: 'mc-6',
+      question: 'The ancient Persian empire was founded by:',
+      options: ['Darius I', 'Xerxes', 'Cyrus the Great', 'Cambyses II'],
+      correctAnswer: 2,
+      difficulty: 'medium',
+      category: 'Politics',
+      region: 'Persia',
+      period: 'Classical',
+      explanation: 'Cyrus the Great founded the Persian Empire around 550 BCE and established many of its governing principles.',
+      tags: ['cyrus', 'persian empire', 'founder']
+    },
+    {
+      id: 'mc-7',
+      question: 'The ancient Indus Valley cities were notable for their:',
+      options: ['Pyramids', 'Urban planning', 'Cave paintings', 'Metalworking'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Civilization',
+      region: 'India',
+      period: 'Bronze Age',
+      explanation: 'Indus Valley cities like Harappa and Mohenjo-daro featured sophisticated urban planning with grid systems and drainage.',
+      tags: ['indus valley', 'urban planning', 'harappa']
+    },
+    {
+      id: 'mc-8',
+      question: 'The Rosetta Stone was crucial for deciphering which ancient script?',
+      options: ['Cuneiform', 'Linear B', 'Egyptian hieroglyphs', 'Sanskrit'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Writing',
+      region: 'Egypt',
+      period: 'Classical',
+      explanation: 'The Rosetta Stone provided the key to understanding Egyptian hieroglyphs through its trilingual inscription.',
+      tags: ['rosetta stone', 'hieroglyphs', 'decipherment']
+    },
+    {
+      id: 'mc-9',
+      question: 'Which ancient Chinese dynasty is famous for the Terracotta Army?',
+      options: ['Han Dynasty', 'Tang Dynasty', 'Qin Dynasty', 'Ming Dynasty'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Art',
+      region: 'China',
+      period: 'Classical',
+      explanation: 'The Terracotta Army was created during the Qin Dynasty to guard Emperor Qin Shi Huang\'s tomb.',
+      tags: ['qin dynasty', 'terracotta army', 'emperor']
+    },
+    {
+      id: 'mc-10',
+      question: 'The ancient Olympic Games were held in honor of which Greek god?',
+      options: ['Apollo', 'Zeus', 'Ares', 'Poseidon'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Religion',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'The Olympic Games were held at Olympia in honor of Zeus, king of the Greek gods.',
+      tags: ['olympics', 'zeus', 'greek gods']
+    }
+  ],
+
+  // True/False Pack - Pure true/false format questions
+  format_pack_true_false: [
+    {
+      id: 'tf-1',
+      question: 'The Great Wall of China was built entirely during the Ming Dynasty.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Architecture',
+      region: 'China',
+      period: 'Classical',
+      explanation: 'False. While the Ming Dynasty rebuilt and extended much of the Great Wall, construction began during earlier dynasties, including the Qin.',
+      tags: ['great wall', 'ming dynasty', 'construction']
+    },
+    {
+      id: 'tf-2',
+      question: 'Ancient Sparta had a democratic government similar to Athens.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Politics',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'False. Sparta had a dual monarchy and military-focused oligarchy, very different from Athenian democracy.',
+      tags: ['sparta', 'government', 'democracy']
+    },
+    {
+      id: 'tf-3',
+      question: 'The ancient Egyptians believed the heart was the center of intelligence.',
+      options: ['True', 'False'],
+      correctAnswer: 0,
+      difficulty: 'medium',
+      category: 'Medicine',
+      region: 'Egypt',
+      period: 'Classical',
+      explanation: 'True. Ancient Egyptians believed the heart was the seat of intelligence and emotion, not the brain.',
+      tags: ['egyptian medicine', 'heart', 'intelligence']
+    },
+    {
+      id: 'tf-4',
+      question: 'Julius Caesar was the first Roman Emperor.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Politics',
+      region: 'Rome',
+      period: 'Classical',
+      explanation: 'False. Augustus (Octavian) was the first Roman Emperor. Julius Caesar was a dictator during the Roman Republic.',
+      tags: ['julius caesar', 'augustus', 'roman emperor']
+    },
+    {
+      id: 'tf-5',
+      question: 'The ancient city of Babylon was located in modern-day Iraq.',
+      options: ['True', 'False'],
+      correctAnswer: 0,
+      difficulty: 'easy',
+      category: 'Geography',
+      region: 'Mesopotamia',
+      period: 'Classical',
+      explanation: 'True. Babylon was located in Mesopotamia, in what is now modern-day Iraq, south of Baghdad.',
+      tags: ['babylon', 'iraq', 'mesopotamia']
+    },
+    {
+      id: 'tf-6',
+      question: 'Iron tools were used before bronze tools in human history.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Technology',
+      region: 'Global',
+      period: 'Prehistoric',
+      explanation: 'False. The Bronze Age came before the Iron Age. Bronze tools were developed first, then iron technology followed.',
+      tags: ['bronze age', 'iron age', 'technology']
+    },
+    {
+      id: 'tf-7',
+      question: 'The ancient Phoenicians invented the first alphabet.',
+      options: ['True', 'False'],
+      correctAnswer: 0,
+      difficulty: 'medium',
+      category: 'Writing',
+      region: 'Mediterranean',
+      period: 'Classical',
+      explanation: 'True. The Phoenicians developed one of the first alphabetic writing systems, which influenced later alphabets including Greek and Latin.',
+      tags: ['phoenicians', 'alphabet', 'writing']
+    },
+    {
+      id: 'tf-8',
+      question: 'Cleopatra VII was ethnically Egyptian.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Politics',
+      region: 'Egypt',
+      period: 'Classical',
+      explanation: 'False. Cleopatra VII was of Macedonian Greek descent, a member of the Ptolemaic dynasty established after Alexander\'s conquest.',
+      tags: ['cleopatra', 'ptolemaic', 'macedonian']
+    },
+    {
+      id: 'tf-9',
+      question: 'The ancient Romans invented concrete.',
+      options: ['True', 'False'],
+      correctAnswer: 0,
+      difficulty: 'medium',
+      category: 'Engineering',
+      region: 'Rome',
+      period: 'Classical',
+      explanation: 'True. Romans developed a form of concrete using volcanic ash (pozzolan) that was remarkably durable and revolutionary for construction.',
+      tags: ['roman concrete', 'engineering', 'volcanic ash']
+    },
+    {
+      id: 'tf-10',
+      question: 'The ancient Library of Alexandria was destroyed in a single fire.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Culture',
+      region: 'Egypt',
+      period: 'Classical',
+      explanation: 'False. The Library of Alexandria declined gradually over centuries due to various factors including funding cuts, political instability, and multiple incidents.',
+      tags: ['library alexandria', 'destruction', 'decline']
+    }
+  ],
+
+  // Fill-in-the-Blank Pack - Questions testing specific knowledge recall
+  format_pack_fill_blank: [
+    {
+      id: 'fib-1',
+      question: 'The ancient wonder of the world, the Colossus of _____, was a giant statue located on a Greek island.',
+      options: ['Rhodes', 'Crete', 'Cyprus', 'Delos'],
+      correctAnswer: 0,
+      difficulty: 'medium',
+      category: 'Architecture',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'The Colossus of Rhodes was a giant statue of the god Helios erected on the Greek island of Rhodes.',
+      tags: ['colossus', 'rhodes', 'wonder']
+    },
+    {
+      id: 'fib-2',
+      question: 'The ancient Mesopotamian king _____ is famous for his law code, one of the earliest known legal documents.',
+      options: ['Hammurabi', 'Nebuchadnezzar', 'Sargon', 'Gilgamesh'],
+      correctAnswer: 0,
+      difficulty: 'easy',
+      category: 'Law',
+      region: 'Mesopotamia',
+      period: 'Classical',
+      explanation: 'King Hammurabi of Babylon created the Code of Hammurabi, one of the earliest and most complete legal documents.',
+      tags: ['hammurabi', 'law code', 'babylon']
+    },
+    {
+      id: 'fib-3',
+      question: 'The ancient Egyptian pharaoh _____ built the largest pyramid at Giza.',
+      options: ['Khufu', 'Khafre', 'Menkaure', 'Sneferu'],
+      correctAnswer: 0,
+      difficulty: 'easy',
+      category: 'Architecture',
+      region: 'Egypt',
+      period: 'Classical',
+      explanation: 'Pharaoh Khufu (also known as Cheops) built the Great Pyramid of Giza, the largest of the three pyramids.',
+      tags: ['khufu', 'great pyramid', 'giza']
+    },
+    {
+      id: 'fib-4',
+      question: 'The ancient Greek epic poems, the Iliad and the Odyssey, are attributed to the poet _____.',
+      options: ['Homer', 'Hesiod', 'Pindar', 'Sappho'],
+      correctAnswer: 0,
+      difficulty: 'easy',
+      category: 'Literature',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'Homer is traditionally credited as the author of the Iliad and the Odyssey, foundational works of Western literature.',
+      tags: ['homer', 'iliad', 'odyssey']
+    },
+    {
+      id: 'fib-5',
+      question: 'The ancient Roman road system was famous for the saying "All roads lead to _____."',
+      options: ['Rome', 'Athens', 'Constantinople', 'Alexandria'],
+      correctAnswer: 0,
+      difficulty: 'easy',
+      category: 'Engineering',
+      region: 'Rome',
+      period: 'Classical',
+      explanation: 'The phrase "All roads lead to Rome" reflects the extensive Roman road network that connected the empire to its capital.',
+      tags: ['roman roads', 'rome', 'engineering']
+    },
+    {
+      id: 'fib-6',
+      question: 'The ancient philosophy school founded by Zeno was called _____.',
+      options: ['Stoicism', 'Epicureanism', 'Cynicism', 'Skepticism'],
+      correctAnswer: 0,
+      difficulty: 'medium',
+      category: 'Philosophy',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'Zeno of Citium founded Stoicism, a philosophy emphasizing virtue, wisdom, and emotional control.',
+      tags: ['zeno', 'stoicism', 'philosophy']
+    },
+    {
+      id: 'fib-7',
+      question: 'The ancient Persian religion founded by Zoroaster is called _____.',
+      options: ['Zoroastrianism', 'Mithraism', 'Manichaeism', 'Zurvanism'],
+      correctAnswer: 0,
+      difficulty: 'medium',
+      category: 'Religion',
+      region: 'Persia',
+      period: 'Classical',
+      explanation: 'Zoroastrianism, founded by the prophet Zoroaster, was the dominant religion of the Persian Empire.',
+      tags: ['zoroaster', 'zoroastrianism', 'persia']
+    },
+    {
+      id: 'fib-8',
+      question: 'The ancient Chinese philosopher _____ is considered the founder of Confucianism.',
+      options: ['Confucius', 'Laozi', 'Mencius', 'Xunzi'],
+      correctAnswer: 0,
+      difficulty: 'easy',
+      category: 'Philosophy',
+      region: 'China',
+      period: 'Classical',
+      explanation: 'Confucius (Kong Qiu) founded Confucianism, emphasizing ethics, morality, and social harmony.',
+      tags: ['confucius', 'confucianism', 'philosophy']
+    },
+    {
+      id: 'fib-9',
+      question: 'The ancient Celtic priests and scholars were called _____.',
+      options: ['Druids', 'Bards', 'Shamans', 'Augurs'],
+      correctAnswer: 0,
+      difficulty: 'medium',
+      category: 'Religion',
+      region: 'Europe',
+      period: 'Iron Age',
+      explanation: 'Druids were the educated priest class among the Celtic peoples, serving as judges, teachers, and healers.',
+      tags: ['druids', 'celts', 'priests']
+    },
+    {
+      id: 'fib-10',
+      question: 'The ancient Maya developed one of the most accurate _____ systems in the ancient world.',
+      options: ['Calendar', 'Writing', 'Mathematical', 'Astronomical'],
+      correctAnswer: 0,
+      difficulty: 'medium',
+      category: 'Astronomy',
+      region: 'Americas',
+      period: 'Classical',
+      explanation: 'The Maya developed sophisticated calendar systems that were remarkably accurate and complex.',
+      tags: ['maya', 'calendar', 'astronomy']
+    }
   ]
 };
 
