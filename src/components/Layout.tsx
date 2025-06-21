@@ -219,11 +219,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* New Desktop Footer */}
       <footer className="hidden md:block bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-center">
-          <Logo size={64} className="mr-2" />
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            &copy; {new Date().getFullYear()} Ancient History Trivia. All rights reserved.
-          </p>
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center">
+            <Logo size={48} className="mr-2" />
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              &copy; {new Date().getFullYear()} Ancient History Trivia. All rights reserved.
+            </p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Link
+              to="/about"
+              className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+            >
+              About
+            </Link>
+          </div>
         </div>
       </footer>
 

@@ -16,6 +16,7 @@ import SettingsScreen from './screens/SettingsScreen.tsx';
 import AchievementsScreen from './screens/AchievementsScreen.tsx';
 import SubscriptionScreen from './screens/SubscriptionScreen.tsx';
 import UserProfileScreen from './screens/UserProfileScreen.tsx';
+import AboutScreen from './screens/AboutScreen.tsx';
 import Layout from './components/Layout.tsx';
 import LoadingSpinner from './components/LoadingSpinner.tsx';
 import { analyticsService } from './services/AnalyticsService';
@@ -36,6 +37,7 @@ const AppContent = () => {
         <Route path="/achievements" element={<AchievementsScreen />} />
         <Route path="/subscription" element={<SubscriptionScreen />} />
         <Route path="/profile" element={<UserProfileScreen />} />
+        <Route path="/about" element={<AboutScreen />} />
       </Routes>
     </Layout>
   );
