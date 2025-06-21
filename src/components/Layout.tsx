@@ -34,6 +34,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { user, userProfile, logout } = useAuth();
   
+  // Debug logging to check auth state
+  console.log('[Layout] Current user state:', user ? 'LOGGED IN' : 'NOT LOGGED IN');
+  console.log('[Layout] User object:', user);
+  
   const navItems = [
     { 
       path: '/', 
