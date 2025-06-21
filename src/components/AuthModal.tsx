@@ -16,6 +16,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
   const [displayName, setDisplayName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
+  // Individual loading states for each authentication method
+  const [loadingStates, setLoadingStates] = useState({
+    google: false,
+    facebook: false,
+    apple: false,
+    anonymous: false,
+    email: false
+  });
+  
   const {
     signInWithGoogle,
     signInWithFacebook,
@@ -31,7 +40,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setLoadingStates(prev => ({ ...prev, email: true }));
 
     try {
       if (mode === 'login') {
@@ -47,12 +56,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
     } catch (error) {
       console.error('Auth error:', error);
     } finally {
-      setIsLoading(false);
+      setLoadingStates(prev => ({ ...prev, email: false }));
     }
   };
 
   const handleSocialAuth = async (provider: 'google' | 'facebook' | 'apple' | 'anonymous') => {
-    setIsLoading(true);
+    setLoadingStates(prev => ({ ...prev, [provider]: true }));
 
     try {
       switch (provider) {
@@ -73,7 +82,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
     } catch (error) {
       console.error('Social auth error:', error);
     } finally {
-      setIsLoading(false);
+      setLoadingStates(prev => ({ ...prev, [provider]: false }));
     }
   };
 
@@ -114,10 +123,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
             <div className="space-y-3 mb-6">
               <button
                 onClick={() => handleSocialAuth('google')}
-                disabled={isLoading}
+                disabled={loadingStates.google}
                 className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md"
               >
-                {isLoading ? (
+                {loadingStates.google ? (
                   <div className="w-5 h-5 mr-2 animate-spin border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
                 ) : (
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -132,10 +141,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
 
               <button
                 onClick={() => handleSocialAuth('facebook')}
-                disabled={isLoading}
+                disabled={loadingStates.facebook}
                 className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md"
               >
-                {isLoading ? (
+                {loadingStates.facebook ? (
                   <div className="w-5 h-5 mr-2 animate-spin border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
                 ) : (
                   <svg className="w-5 h-5 mr-2" fill="#1877F2" viewBox="0 0 24 24">
@@ -147,10 +156,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
 
               <button
                 onClick={() => handleSocialAuth('apple')}
-                disabled={isLoading}
+                disabled={loadingStates.apple}
                 className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md"
               >
-                {isLoading ? (
+                {loadingStates.apple ? (
                   <div className="w-5 h-5 mr-2 animate-spin border-2 border-gray-300 border-t-gray-600 rounded-full"></div>
                 ) : (
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -162,7 +171,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
 
               <button
                 onClick={() => setMode('emaillink')}
-                disabled={isLoading}
+                disabled={false}
                 className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,10 +247,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={loadingStates.email}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Loading...' : 
+              {loadingStates.email ? 'Loading...' : 
                mode === 'login' ? 'Sign In' :
                mode === 'signup' ? 'Create Account' :
                'Send Reset Email'}              </button>
@@ -302,10 +311,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
             <div className="mt-4 text-center">
               <button
                 onClick={() => handleSocialAuth('anonymous')}
-                disabled={isLoading}
+                disabled={loadingStates.anonymous}
                 className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-50"
               >
-                Continue as Guest
+                {loadingStates.anonymous ? 'Loading...' : 'Continue as Guest'}
               </button>
             </div>
           )}
