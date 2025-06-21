@@ -18,22 +18,12 @@ export const Logo: React.FC<LogoProps> = ({
   const normalizedBasePath = basePath.endsWith('/') ? basePath : `${basePath}/`;
   const logoSrc = `${normalizedBasePath}logos/logo_192.svg`;
 
-  // Debug logging
-  console.log('🔍 Logo Debug Info:');
-  console.log('  - BASE_URL:', import.meta.env.BASE_URL);
-  console.log('  - MODE:', import.meta.env.MODE);
-  console.log('  - Normalized base path:', normalizedBasePath);
-  console.log('  - Final logo src:', logoSrc);
-
   const handleImageLoad = () => {
     setImageLoaded(true);
-    console.log('✅ Logo loaded successfully from:', logoSrc);
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error('❌ Logo failed to load from:', logoSrc);
-    console.error('Base URL:', import.meta.env.BASE_URL);
-    console.error('Mode:', import.meta.env.MODE);
     console.error('Error details:', e);
   };
 
