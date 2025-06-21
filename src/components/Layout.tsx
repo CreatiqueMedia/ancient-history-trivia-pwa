@@ -20,7 +20,7 @@ import {
   ShoppingBagIcon as ShoppingBagIconSolid,
   InformationCircleIcon as InformationCircleIconSolid
 } from '@heroicons/react/24/solid';
-import { useAuth } from '../context/MockAuthContext';
+import { useAuth } from '../context/AuthContext';
 import AuthModal from './AuthModal';
 import { Logo } from './Logo';
 
@@ -33,10 +33,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { user, userProfile, logout } = useAuth();
-  
-  // Debug logging to check auth state
-  console.log('[Layout] Current user state:', user ? 'LOGGED IN' : 'NOT LOGGED IN');
-  console.log('[Layout] User object:', user);
   
   const navItems = [
     { 

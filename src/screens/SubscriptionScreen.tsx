@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CheckIcon, StarIcon } from '@heroicons/react/24/outline';
-import { useAuth } from '../context/MockAuthContext';
+import { useAuth } from '../context/AuthContext';
 import { SUBSCRIPTION_PLANS, YEARLY_PLANS } from '../data/pricing';
 import { analyticsService } from '../services/AnalyticsService';
 import { errorHandler } from '../services/ErrorHandlingService';

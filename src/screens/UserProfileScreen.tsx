@@ -9,7 +9,7 @@ import {
   ArrowRightOnRectangleIcon,
   PencilIcon
 } from '@heroicons/react/24/outline';
-import { useAuth } from '../context/MockAuthContext';
+import { useAuth } from '../context/AuthContext';
 import { useStats } from '../context/StatsContext';
 
 const UserProfileScreen: React.FC = () => {
