@@ -35,7 +35,7 @@ const AboutScreen: React.FC = () => {
         <div className="card p-8 mb-8">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Hello, I am Ron Ratzlaff (aka The Awakened Hybrid)
+              Hello, I am Ron Ratzlaff, born Ron Alan Curtis (aka The Awakened Hybrid)
             </h2>
           </div>
 
@@ -151,12 +151,12 @@ const AboutScreen: React.FC = () => {
 
           <div className="prose prose-lg max-w-none dark:prose-invert">
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-              By profession, I am a Web Developer and I own my own web development business in Edmond, Oklahoma. 
-              Hey, I built this site myself, so if anyone is interested in having a website, let me know, I am very affordable. 
-              If you are, please check out my business site at: 
+              By profession, I am a Web and App Developer and I own my own web development business in Edmond, Oklahoma. 
+              Hey, I built this app myself, so if anyone is interested in having something cool, like this for your business, 
+              or even personal needs, let me know. If you are, please check out my business site at: 
               <a href="https://creatiquemedia.com/" target="_blank" rel="noopener noreferrer" 
                  className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 ml-1">
-                CreatiqueMedia.com
+                https://CreatiqueMedia.com
               </a>.
             </p>
 
