@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diagnostic Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 40px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .test { 
+            background: rgba(255,255,255,0.1); 
+            padding: 20px; 
+            margin: 10px 0; 
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Firebase Hosting Diagnostic Test</h1>
+    <div class="test">
+        <h2>✅ Basic HTML Loading</h2>
+        <p>If you can see this page, the basic HTML is working correctly.</p>
+    </div>
+    
+    <div class="test">
+        <h2>📅 Cache Check</h2>
+        <p>Current Time: <span id="time"></span></p>
+        <p>This should show the current timestamp to verify caching isn't an issue.</p>
+    </div>
+    
+    <div class="test">
+        <h2>🎯 Instructions</h2>
+        <p>1. Clear your browser cache completely</p>
+        <p>2. Try private/incognito mode</p>
+        <p>3. If this page works but the main site doesn't, there's a caching issue</p>
+        <p>4. <a href="/" style="color: yellow;">← Go back to main site</a></p>
+    </div>
+
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>
