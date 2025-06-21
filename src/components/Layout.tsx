@@ -234,14 +234,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               &copy; {new Date().getFullYear()} Ancient History Trivia. All rights reserved.
             </p>
           </div>
-          <div className="flex items-center space-x-4">
-            <Link
-              to="/about"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-            >
-              About
-            </Link>
-          </div>
         </div>
       </footer>
 
