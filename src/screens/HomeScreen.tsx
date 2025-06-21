@@ -16,6 +16,74 @@ const HomeScreen = () => {
     { label: 'Average Score', value: `${Math.round(stats.averageScore)}%`, icon: '📊' }
   ];
 
+  // Decorative topic showcase data
+  const topicShowcase = [
+    {
+      id: 'ancient-egypt',
+      title: 'Ancient Egypt',
+      description: 'Explore the mysteries of pharaohs, pyramids, and the Nile civilization',
+      icon: '🏺',
+      gradient: 'from-yellow-400 to-orange-500',
+      textColor: 'text-yellow-900'
+    },
+    {
+      id: 'roman-empire',
+      title: 'Roman Empire',
+      description: 'From Republic to Empire - the rise and fall of Rome',
+      icon: '🏛️',
+      gradient: 'from-red-400 to-red-600',
+      textColor: 'text-red-900'
+    },
+    {
+      id: 'ancient-greece',
+      title: 'Ancient Greece',
+      description: 'Philosophy, democracy, and the birthplace of Western civilization',
+      icon: '⚱️',
+      gradient: 'from-blue-400 to-blue-600',
+      textColor: 'text-blue-900'
+    },
+    {
+      id: 'mesopotamia',
+      title: 'Ancient Mesopotamia',
+      description: 'The cradle of civilization, home to Sumer, Babylon, and Assyria',
+      icon: '🏛️',
+      gradient: 'from-green-400 to-green-600',
+      textColor: 'text-green-900'
+    },
+    {
+      id: 'ancient-china',
+      title: 'Ancient China',
+      description: 'Dynasties, inventions, philosophy, and the Great Wall',
+      icon: '🏮',
+      gradient: 'from-red-400 to-pink-500',
+      textColor: 'text-red-900'
+    },
+    {
+      id: 'ancient-india',
+      title: 'Ancient India',
+      description: 'Vedic period, empires, religion, and cultural achievements',
+      icon: '🕌',
+      gradient: 'from-orange-400 to-orange-600',
+      textColor: 'text-orange-900'
+    },
+    {
+      id: 'bronze-age',
+      title: 'Bronze Age',
+      description: 'Early civilizations, technology, and cultural developments',
+      icon: '⚔️',
+      gradient: 'from-amber-400 to-amber-600',
+      textColor: 'text-amber-900'
+    },
+    {
+      id: 'iron-age',
+      title: 'Iron Age',
+      description: 'Advanced civilizations, warfare, and technological progress',
+      icon: '🛡️',
+      gradient: 'from-gray-400 to-gray-600',
+      textColor: 'text-gray-900'
+    }
+  ];
+
   const featuredBundles = questionBundles.filter(bundle => !bundle.isPremium).slice(0, 3);
 
   const getGreeting = () => {
@@ -162,52 +230,63 @@ const HomeScreen = () => {
           )}
         </div>
 
-        {/* Featured Question Bundles */}
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Featured Topics
+        {/* Decorative Topics Showcase Slider */}
+        <section className="mb-8 overflow-hidden">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Journey Through Ancient History
             </h2>
-            <Link
-              to="/store"
-              className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
-            >
-              View All →
-            </Link>
+            <p className="text-gray-600 dark:text-gray-400">
+              Discover the civilizations and eras that shaped our world
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredBundles.map((bundle) => (
-              <Link
-                key={bundle.id}
-                to={`/quiz/${bundle.id}`}
-                className="card p-6 hover:shadow-xl transition-shadow duration-200 group"
-              >
-                <div className="text-center">
-                  <div className="text-4xl mb-4">{bundle.icon}</div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    {bundle.name}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                    {bundle.description}
-                  </p>
-                  <div className="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
-                    <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded mr-2">
-                      {bundle.questions.length} questions
-                    </span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      bundle.difficulty === 'easy' 
-                        ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
-                        : bundle.difficulty === 'medium'
-                        ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300'
-                        : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
-                    }`}>
-                      {bundle.difficulty}
-                    </span>
+          <div className="relative">
+            {/* Sliding container */}
+            <div className="flex animate-scroll">
+              {/* First set of topics */}
+              {topicShowcase.map((topic) => (
+                <div
+                  key={topic.id}
+                  className="flex-shrink-0 w-80 mx-4"
+                >
+                  <div className={`card p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
+                    <div className="text-center">
+                      <div className="text-5xl mb-4 filter drop-shadow-lg">{topic.icon}</div>
+                      <h3 className="text-xl font-bold mb-3 text-white drop-shadow-md">
+                        {topic.title}
+                      </h3>
+                      <p className="text-white/90 text-sm leading-relaxed">
+                        {topic.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </Link>
-            ))}
+              ))}
+              {/* Duplicate set for seamless loop */}
+              {topicShowcase.map((topic) => (
+                <div
+                  key={`${topic.id}-duplicate`}
+                  className="flex-shrink-0 w-80 mx-4"
+                >
+                  <div className={`card p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
+                    <div className="text-center">
+                      <div className="text-5xl mb-4 filter drop-shadow-lg">{topic.icon}</div>
+                      <h3 className="text-xl font-bold mb-3 text-white drop-shadow-md">
+                        {topic.title}
+                      </h3>
+                      <p className="text-white/90 text-sm leading-relaxed">
+                        {topic.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Gradient fade edges */}
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-50 dark:from-gray-900 to-transparent pointer-events-none z-10"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-50 dark:from-gray-900 to-transparent pointer-events-none z-10"></div>
           </div>
         </section>
 
