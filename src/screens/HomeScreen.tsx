@@ -120,24 +120,46 @@ const HomeScreen = () => {
             </div>
           </Link>
 
-          <Link
-            to="/stats"
-            className="card p-6 hover:shadow-xl transition-shadow duration-200 group"
-          >
-            <div className="flex items-center">
-              <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full mr-4 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
-                <ChartBarIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
+          {/* Show different second action based on user state */}
+          {user && userProfile ? (
+            <Link
+              to="/stats"
+              className="card p-6 hover:shadow-xl transition-shadow duration-200 group"
+            >
+              <div className="flex items-center">
+                <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full mr-4 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
+                  <ChartBarIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    View Stats
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Check your progress and achievements
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  View Stats
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Check your progress and achievements
-                </p>
+            </Link>
+          ) : (
+            <Link
+              to="/store"
+              className="card p-6 hover:shadow-xl transition-shadow duration-200 group"
+            >
+              <div className="flex items-center">
+                <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full mr-4 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
+                  <TrophyIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Browse Topics
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Explore our question bundles and plans
+                  </p>
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          )}
         </div>
 
         {/* Featured Question Bundles */}

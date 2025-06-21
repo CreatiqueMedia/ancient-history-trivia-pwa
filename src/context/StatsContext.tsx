@@ -8,6 +8,7 @@ interface StatsContextType {
   resetStats: () => void;
   unlockAchievement: (achievementId: string) => void;
   updateAchievementProgress: (achievementId: string, progress: number) => void;
+  clearUserData: () => void;
 }
 
 // Daily Challenge Achievements
@@ -452,15 +453,26 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
     setAchievements(defaultAchievements);
   };
 
+  const clearUserData = () => {
+    // Clear localStorage data for non-authenticated users
+    localStorage.removeItem('userStats');
+    localStorage.removeItem('achievements');
+    setStats(defaultStats);
+    setAchievements(defaultAchievements);
+  };
+
+  const value: StatsContextType = {
+    stats,
+    achievements,
+    updateStats,
+    resetStats,
+    unlockAchievement,
+    updateAchievementProgress,
+    clearUserData
+  };
+
   return (
-    <StatsContext.Provider value={{ 
-      stats, 
-      achievements, 
-      updateStats, 
-      resetStats, 
-      unlockAchievement, 
-      updateAchievementProgress 
-    }}>
+    <StatsContext.Provider value={value}>
       {children}
     </StatsContext.Provider>
   );
