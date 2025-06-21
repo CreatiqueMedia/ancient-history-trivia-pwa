@@ -1,7 +1,7 @@
 // Firebase Configuration
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator, enableNetwork, disableNetwork } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 
 // Firebase Configuration for Ancient History Trivia PWA
@@ -22,6 +22,17 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+
+// Configure Firestore settings for better offline handling
+
+// Add a function to ensure network connectivity
+export const ensureFirestoreConnected = async () => {
+  try {
+    await enableNetwork(db);
+  } catch (error) {
+    console.warn('Could not ensure Firestore network connection:', error);
+  }
+};
 
 // For development, you can uncomment these lines to use Firebase emulators
 // if (process.env.NODE_ENV === 'development') {
