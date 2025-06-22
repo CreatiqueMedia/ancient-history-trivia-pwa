@@ -140,7 +140,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // In a real app, this would contact the payment provider to restore purchases
-      console.log('Purchases restored');
+      // Purchases restored successfully
     } catch (error) {
       console.error('Restore purchases failed:', error);
     } finally {

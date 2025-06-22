@@ -57,7 +57,7 @@ const ResultsScreen: React.FC = () => {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        console.log('Error sharing:', err);
+        // Error sharing - ignore silently
       }
     } else {
       // Fallback to clipboard
