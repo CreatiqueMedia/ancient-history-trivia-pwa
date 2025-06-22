@@ -3,11 +3,11 @@ export const isGitHubPages = window.location.hostname.includes('github.io');
 export const isFirebaseHosting = window.location.hostname.includes('web.app') || window.location.hostname.includes('firebaseapp.com');
 export const isLocalhost = window.location.hostname === 'localhost';
 
-// Determine if Firebase Auth should be used
-export const useFirebaseAuth = isFirebaseHosting || isLocalhost;
+// Now that creatiquemedia.github.io is authorized in Firebase, we can use Firebase Auth everywhere
+export const useFirebaseAuth = true; // Always use Firebase auth now that domain is authorized
 
-// GitHub Pages fallback mode
-export const isGitHubPagesMode = isGitHubPages && !useFirebaseAuth;
+// No longer need GitHub Pages fallback mode
+export const isGitHubPagesMode = false;
 
 console.log('[Environment] Detection:', {
   isGitHubPages,
@@ -15,5 +15,6 @@ console.log('[Environment] Detection:', {
   isLocalhost,
   useFirebaseAuth,
   isGitHubPagesMode,
-  hostname: window.location.hostname
+  hostname: window.location.hostname,
+  note: 'GitHub Pages domain now authorized in Firebase Console'
 });
