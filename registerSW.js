@@ -1,1 +1,0 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/ancient-history-trivia-pwa/sw.js', { scope: '/ancient-history-trivia-pwa/' })})}
