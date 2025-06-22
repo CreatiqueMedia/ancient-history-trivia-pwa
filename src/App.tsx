@@ -6,7 +6,7 @@ import { QuizProvider } from './context/QuizContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { PurchaseProvider } from './context/PurchaseContext';
 // Use real Firebase authentication for production
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import HomeScreen from './screens/HomeScreen.tsx';
 import QuizScreen from './screens/QuizScreen.tsx';
 import ResultsScreen from './screens/ResultsScreen.tsx';
@@ -27,6 +27,20 @@ import { errorHandler } from './services/ErrorHandlingService';
 
 // AppContent component to handle auth loading state
 const AppContent = () => {
+  const { loading } = useAuth();
+
+  // Show loading spinner only for the initial auth check
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Layout>
       <Routes>
