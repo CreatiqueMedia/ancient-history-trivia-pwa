@@ -96,7 +96,7 @@ export interface SubscriptionPlan {
   id: SubscriptionTier;
   name: string;
   price: number;
-  period: 'monthly' | 'yearly' | 'lifetime';
+  period: 'monthly' | 'yearly' | 'biennial' | 'lifetime';
   features: string[];
   trialDays?: number;
   popular?: boolean;
