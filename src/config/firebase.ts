@@ -46,11 +46,7 @@ export const facebookProvider = new FacebookAuthProvider();
 export const appleProvider = new OAuthProvider('apple.com');
 
 // Configure providers
-googleProvider.setCustomParameters({
-  prompt: 'select_account' // This forces the account selection screen
-});
-
-// Add scope for additional user info
+// Simplified Google provider configuration to avoid redirect issues
 googleProvider.addScope('profile');
 googleProvider.addScope('email');
 

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Auth Test</title>
+    <script src="https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js"></script>
+</head>
+<body>
+    <h1>Firebase Auth Test</h1>
+    <button id="signInBtn">Sign In with Google</button>
+    <div id="result"></div>
+
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "***REMOVED***",
+            authDomain: "ancient-history-trivia.firebaseapp.com",
+            projectId: "ancient-history-trivia",
+            storageBucket: "ancient-history-trivia.firebasestorage.app",
+            messagingSenderId: "778256162112",
+            appId: "1:778256162112:web:ee31ff85689d2fe722aea5"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Google provider
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('profile');
+        provider.addScope('email');
+
+        document.getElementById('signInBtn').addEventListener('click', () => {
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    document.getElementById('result').innerHTML = `
+                        <h2>Success!</h2>
+                        <p>User: ${result.user.displayName}</p>
+                        <p>Email: ${result.user.email}</p>
+                    `;
+                })
+                .catch((error) => {
+                    document.getElementById('result').innerHTML = `
+                        <h2>Error:</h2>
+                        <p>${error.code}: ${error.message}</p>
+                    `;
+                });
+        });
+    </script>
+</body>
+</html>

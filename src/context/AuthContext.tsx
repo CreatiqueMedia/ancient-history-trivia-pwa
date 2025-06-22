@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import {
   User,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
@@ -173,24 +175,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setError(null);
       setLoading(true);
-      const result = await signInWithPopup(auth, googleProvider);
-      const profile = await createUserProfile(result.user, 'google');
-      setUserProfile(profile);
+      
+      // Create a fresh provider instance to avoid any caching issues
+      const freshGoogleProvider = new GoogleAuthProvider();
+      freshGoogleProvider.addScope('profile');
+      freshGoogleProvider.addScope('email');
+      
+      // Force account selection to ensure fresh authentication
+      freshGoogleProvider.setCustomParameters({
+        prompt: 'select_account'
+      });
+      
+      // Try popup first, then fallback to redirect
+      try {
+        const result = await signInWithPopup(auth, freshGoogleProvider);
+        const profile = await createUserProfile(result.user, 'google');
+        setUserProfile(profile);
+        return; // Success, exit early
+      } catch (popupError: any) {
+        // If popup fails due to blocking, try redirect
+        if (popupError.code === 'auth/popup-blocked' || 
+            popupError.code === 'auth/popup-closed-by-user' ||
+            popupError.code === 'auth/cancelled-popup-request') {
+          await signInWithRedirect(auth, freshGoogleProvider);
+          return; // Redirect initiated, page will reload
+        } else {
+          // For other errors, throw them to be handled below
+          throw popupError;
+        }
+      }
+      
     } catch (error: any) {
-      console.error('❌ Google sign in error:', error);
+      console.error('Google sign in error:', error);
       
       // Provide user-friendly error messages
       let userError = error.message;
       if (error.code === 'auth/popup-closed-by-user') {
         userError = 'Sign-in was cancelled. Please try again.';
       } else if (error.code === 'auth/popup-blocked') {
-        userError = 'Pop-up blocked. Please allow pop-ups for this site and try again.';
+        userError = 'Pop-up blocked. Please allow pop-ups and try again.';
       } else if (error.code === 'auth/operation-not-allowed') {
         userError = 'Google sign-in is not enabled. Please contact support.';
       } else if (error.code === 'auth/invalid-api-key') {
         userError = 'Authentication configuration error. Please contact support.';
       } else if (error.code === 'auth/unauthorized-domain') {
-        userError = 'This domain is not authorized for authentication. Please contact support or try the Firebase Hosting version at ancient-history-trivia.web.app';
+        userError = 'This domain is not authorized for authentication. Please contact support.';
       } else if (error.code === 'auth/account-exists-with-different-credential') {
         userError = 'An account already exists with this email address using a different sign-in method.';
       }
@@ -419,24 +448,49 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Listen for auth state changes
   useEffect(() => {
-    console.log('[AuthContext] Setting up auth state listener');
+    // Check for redirect result first
+    const checkRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        
+        if (result && result.user) {
+          try {
+            const profile = await createUserProfile(result.user, 'google');
+            setUserProfile(profile);
+          } catch (profileError) {
+            console.error('Error creating profile from redirect:', profileError);
+          }
+        }
+      } catch (error: any) {
+        // Don't set error for these specific cases as they're expected
+        if (error.code !== 'auth/no-auth-event' && error.code !== 'auth/invalid-auth-event') {
+          setError(error.message);
+        }
+      }
+    };
+    
+    // Small delay to ensure Firebase is fully initialized
+    setTimeout(checkRedirectResult, 100);
     
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('[AuthContext] Auth state changed:', user ? 'User found' : 'No user');
       setUser(user);
       
       if (user) {
         setLoading(true);
-        console.log('[AuthContext] Loading user profile for:', user.uid);
         
         try {
           const userDoc = doc(db, 'users', user.uid);
-          const userSnap = await getDoc(userDoc);
+          
+          // Add timeout to prevent hanging indefinitely
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => reject(new Error('Firestore operation timed out')), 10000); // 10 second timeout
+          });
+          
+          const userSnap = await Promise.race([getDoc(userDoc), timeoutPromise]);
           
           if (userSnap.exists()) {
             const profile = userSnap.data() as UserProfile;
             setUserProfile(profile);
-            console.log('[AuthContext] User profile loaded from Firestore');
           } else {
             // Create profile for existing user without one
             const provider = user.providerData[0]?.providerId.includes('google') ? 'google' :
@@ -444,7 +498,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                             user.providerData[0]?.providerId.includes('apple') ? 'apple' :
                             user.isAnonymous ? 'anonymous' : 'email';
             
-            console.log('[AuthContext] Creating new user profile with provider:', provider);
             const profile = await createUserProfile(user, provider);
             setUserProfile(profile);
           }
@@ -453,8 +506,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
           
           // Handle Firestore offline errors by creating a temporary profile
           if (error.code === 'unavailable' || error.message?.includes('offline') || error.message?.includes('Failed to get document')) {
-            console.log('[AuthContext] Firestore offline, creating temporary profile from auth data');
-            
             // Create a temporary profile from auth user data
             const tempProfile: UserProfile = {
               id: user.uid,
@@ -499,14 +550,48 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 console.warn('Could not sync profile to Firestore:', syncError);
               }
             }, 2000);
+          } else {
+            // For any other errors, still create a temporary profile to prevent blank profile screen
+            const tempProfile: UserProfile = {
+              id: user.uid,
+              email: user.email || '',
+              displayName: user.displayName || user.email?.split('@')[0] || 'User',
+              photoURL: user.photoURL || undefined,
+              provider: user.providerData[0]?.providerId.includes('google') ? 'google' :
+                       user.providerData[0]?.providerId.includes('facebook') ? 'facebook' :
+                       user.providerData[0]?.providerId.includes('apple') ? 'apple' :
+                       user.isAnonymous ? 'anonymous' : 'email',
+              subscription: 'free',
+              preferences: {
+                theme: 'system',
+                soundEnabled: true,
+                vibrationEnabled: true,
+                autoAdvance: false,
+                showExplanations: true,
+                questionTimeLimit: null,
+                language: 'en',
+                accessibilityEnabled: false,
+                fontSize: 'medium',
+                notifications: {
+                  dailyReminders: true,
+                  achievementUpdates: true,
+                  newContentAlerts: true,
+                  friendActivity: false,
+                  reminderTime: '19:00'
+                }
+              },
+              createdAt: new Date(),
+              lastActive: new Date(),
+              isAnonymous: user.isAnonymous
+            };
+            
+            setUserProfile(tempProfile);
           }
         }
       } else {
-        console.log('[AuthContext] No user authenticated, setting profile to null');
         setUserProfile(null);
       }
       
-      console.log('[AuthContext] Setting loading to false');
       setLoading(false);
     });
 

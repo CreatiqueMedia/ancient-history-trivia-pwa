@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Auth Debug</title>
+    <script src="https://www.gstatic.com/firebasejs/11.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.9.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <h1>Firebase Authentication Debug</h1>
+    <button id="signInBtn">Sign In with Google</button>
+    <div id="result"></div>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "***REMOVED***",
+            authDomain: "ancient-history-trivia.firebaseapp.com",
+            projectId: "ancient-history-trivia",
+            storageBucket: "ancient-history-trivia.firebasestorage.app",
+            messagingSenderId: "778256162112",
+            appId: "1:778256162112:web:ee31ff85689d2fe722aea5",
+            measurementId: "G-P9L2L1ZGEM"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        
+        // Google provider
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('profile');
+        provider.addScope('email');
+        
+        document.getElementById('signInBtn').addEventListener('click', () => {
+            console.log('Attempting Google sign-in...');
+            document.getElementById('result').innerHTML = 'Attempting sign-in...';
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    console.log('Success:', result);
+                    document.getElementById('result').innerHTML = `
+                        <h3>Success!</h3>
+                        <p>User: ${result.user.displayName}</p>
+                        <p>Email: ${result.user.email}</p>
+                    `;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    document.getElementById('result').innerHTML = `
+                        <h3>Error:</h3>
+                        <p>Code: ${error.code}</p>
+                        <p>Message: ${error.message}</p>
+                    `;
+                });
+        });
+        
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log('User is signed in:', user);
+            } else {
+                console.log('User is signed out');
+            }
+        });
+    </script>
+</body>
+</html>

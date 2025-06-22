@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Auth Test - Simplified</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #3367d6;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Firebase Auth Debug Test - Simplified</h1>
+        <p>Testing Google authentication with minimal setup</p>
+        
+        <button onclick="testPopupAuth()">Test Popup Auth</button>
+        <button onclick="testRedirectAuth()">Test Redirect Auth</button>
+        <button onclick="checkRedirectResult()">Check Redirect Result</button>
+        <button onclick="checkCurrentUser()">Check Current User</button>
+        <button onclick="signOut()">Sign Out</button>
+        
+        <div id="output"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            signInWithRedirect,
+            getRedirectResult,
+            signOut as firebaseSignOut,
+            onAuthStateChanged
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "***REMOVED***",
+            authDomain: "ancient-history-trivia.firebaseapp.com",
+            projectId: "ancient-history-trivia",
+            storageBucket: "ancient-history-trivia.firebasestorage.app",
+            messagingSenderId: "778256162112",
+            appId: "1:778256162112:web:ee31ff85689d2fe722aea5",
+            measurementId: "G-P9L2L1ZGEM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        provider.addScope('profile');
+        provider.addScope('email');
+
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            output.appendChild(div);
+            console.log(message);
+        }
+
+        // Test popup authentication
+        window.testPopupAuth = async function() {
+            try {
+                log('🔍 Testing popup authentication...');
+                const result = await signInWithPopup(auth, provider);
+                log(`✅ Popup auth successful! User: ${result.user.email}`, 'success');
+                log(`✅ User display name: ${result.user.displayName}`, 'success');
+                log(`✅ User UID: ${result.user.uid}`, 'success');
+            } catch (error) {
+                log(`❌ Popup auth failed: ${error.code} - ${error.message}`, 'error');
+            }
+        };
+
+        // Test redirect authentication
+        window.testRedirectAuth = async function() {
+            try {
+                log('🔍 Starting redirect authentication...');
+                await signInWithRedirect(auth, provider);
+                log('🔄 Redirect initiated...', 'info');
+            } catch (error) {
+                log(`❌ Redirect auth failed: ${error.code} - ${error.message}`, 'error');
+            }
+        };
+
+        // Check redirect result
+        window.checkRedirectResult = async function() {
+            try {
+                log('🔍 Checking redirect result...');
+                const result = await getRedirectResult(auth);
+                if (result) {
+                    log(`✅ Redirect result found! User: ${result.user.email}`, 'success');
+                    log(`✅ User display name: ${result.user.displayName}`, 'success');
+                    log(`✅ User UID: ${result.user.uid}`, 'success');
+                } else {
+                    log('ℹ️ No redirect result (normal if not after redirect)', 'info');
+                }
+            } catch (error) {
+                log(`❌ Redirect result error: ${error.code} - ${error.message}`, 'error');
+            }
+        };
+
+        // Check current user
+        window.checkCurrentUser = function() {
+            const user = auth.currentUser;
+            if (user) {
+                log(`✅ Current user: ${user.email}`, 'success');
+                log(`✅ User display name: ${user.displayName}`, 'success');
+                log(`✅ User UID: ${user.uid}`, 'success');
+                log(`✅ Provider data: ${JSON.stringify(user.providerData)}`, 'info');
+            } else {
+                log('ℹ️ No current user', 'info');
+            }
+        };
+
+        // Sign out
+        window.signOut = async function() {
+            try {
+                await firebaseSignOut(auth);
+                log('✅ Signed out successfully', 'success');
+            } catch (error) {
+                log(`❌ Sign out error: ${error.message}`, 'error');
+            }
+        };
+
+        // Listen for auth state changes
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                log(`🔍 Auth state changed: User signed in - ${user.email}`, 'success');
+            } else {
+                log('🔍 Auth state changed: User signed out', 'info');
+            }
+        });
+
+        // Check redirect result on page load
+        window.addEventListener('load', () => {
+            log('🔍 Page loaded, checking for redirect result...');
+            checkRedirectResult();
+            checkCurrentUser();
+        });
+    </script>
+</body>
+</html>

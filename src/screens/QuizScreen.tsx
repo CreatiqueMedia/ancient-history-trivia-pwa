@@ -56,7 +56,7 @@ const QuizScreen: React.FC = () => {
       quizQuestions = sampleQuiz.questions;
       bundle = QUESTION_BUNDLES.find(b => b.id === sampleQuiz.bundleId);
       setCurrentBundle(bundle);
-      console.log('Loading sample quiz for:', sampleQuiz.bundleName, 'with', quizQuestions.length, 'questions');
+      // Loading sample quiz questions
     } else if (bundleId) {
       // Find the bundle for UI display
       bundle = QUESTION_BUNDLES.find(b => b.id === bundleId);

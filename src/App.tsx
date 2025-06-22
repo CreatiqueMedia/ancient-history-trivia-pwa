@@ -6,9 +6,9 @@ import { StatsProvider } from './context/StatsContext';
 import { QuizProvider } from './context/QuizContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { PurchaseProvider } from './context/PurchaseContext';
-// Use real Firebase authentication for production
+// Use Firebase authentication everywhere now that GitHub Pages domain is authorized
 import { AuthProvider } from './context/AuthContext';
-import { isGitHubPagesMode } from './config/environment';
+import { useFirebaseAuth, getServiceWorkerPath } from './config/environment';
 import HomeScreen from './screens/HomeScreen.tsx';
 import QuizScreen from './screens/QuizScreen.tsx';
 import ResultsScreen from './screens/ResultsScreen.tsx';
@@ -29,8 +29,62 @@ import { errorHandler } from './services/ErrorHandlingService';
 
 // AppContent component to handle auth loading state
 const AppContent = () => {
-  // Temporarily bypass auth loading check to see if HomeScreen renders
-  console.log('[App] Rendering AppContent - bypassing auth loading check for debugging');
+  // Add error boundary and debugging for GitHub Pages
+  const [hasError, setHasError] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
+
+  React.useEffect(() => {
+    // Handle Firebase auth redirect if stuck on auth handler page
+    if (window.location.pathname.includes('/__/auth/handler')) {
+      // Wait a moment for Firebase to handle the redirect automatically
+      setTimeout(() => {
+        // If still on the auth handler page after 3 seconds, manually redirect
+        if (window.location.pathname.includes('/__/auth/handler')) {
+          window.location.href = '/';
+        }
+      }, 3000);
+    }
+
+    // Add global error handler
+    const handleError = (event: ErrorEvent) => {
+      console.error('[App] Global error:', event.error);
+      setHasError(true);
+      setErrorMessage(event.error?.message || 'Unknown error');
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('[App] Unhandled promise rejection:', event.reason);
+      setHasError(true);
+      setErrorMessage(event.reason?.message || 'Promise rejection');
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
+  // Check for errors before rendering
+
+  if (hasError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center p-8">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h1>
+          <p className="text-gray-600 mb-4">{errorMessage}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Layout>
@@ -54,19 +108,21 @@ const AppContent = () => {
         <Route path="/profile" element={<UserProfileScreen />} />
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/auth/signin" element={<EmailLinkHandler />} />
+        {/* Catch-all route to redirect auth handlers back to home */}
+        <Route path="*" element={<HomeScreen />} />
       </Routes>
     </Layout>
   );
 };
 
 function App() {
-  // Now that GitHub Pages domain is authorized, always use Firebase AuthProvider
-  console.log('[App] Using Firebase AuthProvider on all platforms');
+  // Now using Firebase Auth everywhere since GitHub Pages domain is authorized
+  // Using Firebase AuthProvider on all platforms
 
   // Initialize services on app startup
   useEffect(() => {
     const initializeServices = async () => {
-      console.log('[App] Initializing services...');
+      // Initialize services
       
       try {
         // Initialize analytics
@@ -76,11 +132,16 @@ function App() {
         // Initialize notifications
         await notificationService.initialize();
         
+        // Temporarily disable service worker for GitHub Pages to fix the loading issue
+        // TODO: Fix PWA service worker configuration for GitHub Pages
+        /*
         // Register service worker for PWA features
         if ('serviceWorker' in navigator) {
           try {
-            const registration = await navigator.serviceWorker.register('/sw.js');
-            console.log('[App] Service worker registered:', registration.scope);
+            const swPath = getServiceWorkerPath();
+            // Register service worker
+            const registration = await navigator.serviceWorker.register(swPath);
+            // Service worker registered successfully
             
             // Listen for service worker messages
             navigator.serviceWorker.addEventListener('message', (event) => {
@@ -93,10 +154,11 @@ function App() {
             errorHandler.handleGenericError(error, 'service-worker-registration');
           }
         }
+        */
         
         // Track app initialization success
         analyticsService.trackFeatureUsage('app_initialization', 'success');
-        console.log('[App] All services initialized successfully');
+        // All services initialized successfully
         
       } catch (error) {
         console.error('[App] Service initialization failed:', error);

@@ -121,11 +121,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-3">
-                {/* Debug indicator */}
-                <div className="text-xs text-green-500 font-mono">
-                  ✅ Authenticated
-                </div>
-                
                 {/* Subscription Badge */}
                 {userProfile?.subscription && userProfile.subscription !== 'free' && (
                   <Link
@@ -167,11 +162,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </div>
             ) : (
               <div className="flex items-center space-x-3">
-                {/* Debug indicator */}
-                <div className="text-xs text-red-500 font-mono">
-                  ❌ Not Authenticated
-                </div>
-                
                 <button
                   onClick={() => setAuthModalOpen(true)}
                   className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"

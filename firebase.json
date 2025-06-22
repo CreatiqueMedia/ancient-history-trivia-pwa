@@ -8,11 +8,20 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "!debug-auth-simple.html",
         "destination": "/index.html"
       }
     ],
     "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Content-Security-Policy",
+            "value": "frame-ancestors 'self' https://accounts.google.com https://accounts.youtube.com https://*.google.com https://*.googleapis.com; frame-src 'self' https://accounts.google.com https://accounts.youtube.com https://*.google.com https://*.googleapis.com"
+          }
+        ]
+      },
       {
         "source": "/manifest.webmanifest",
         "headers": [
