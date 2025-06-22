@@ -1,3 +1,4 @@
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import { SettingsProvider } from './context/SettingsContext';
@@ -5,8 +6,10 @@ import { StatsProvider } from './context/StatsContext';
 import { QuizProvider } from './context/QuizContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { PurchaseProvider } from './context/PurchaseContext';
-// Use real Firebase authentication for production
-import { AuthProvider, useAuth } from './context/AuthContext';
+// Use real Firebase authentication for production or mock for GitHub Pages
+import { AuthProvider as FirebaseAuthProvider } from './context/AuthContext';
+import { AuthProvider as MockAuthProvider } from './context/MockAuthContext';
+import { isGitHubPagesMode } from './config/environment';
 import HomeScreen from './screens/HomeScreen.tsx';
 import QuizScreen from './screens/QuizScreen.tsx';
 import ResultsScreen from './screens/ResultsScreen.tsx';
@@ -27,19 +30,8 @@ import { errorHandler } from './services/ErrorHandlingService';
 
 // AppContent component to handle auth loading state
 const AppContent = () => {
-  const { loading } = useAuth();
-
-  // Show loading spinner only for the initial auth check
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // Temporarily bypass auth loading check to see if HomeScreen renders
+  console.log('[App] Rendering AppContent - bypassing auth loading check for debugging');
 
   return (
     <Layout>
@@ -69,6 +61,11 @@ const AppContent = () => {
 };
 
 function App() {
+  // Choose the appropriate AuthProvider based on environment
+  const AuthProvider = isGitHubPagesMode ? MockAuthProvider : FirebaseAuthProvider;
+  
+  console.log('[App] Using AuthProvider:', isGitHubPagesMode ? 'Mock (GitHub Pages)' : 'Firebase');
+
   // Initialize services on app startup
   useEffect(() => {
     const initializeServices = async () => {
