@@ -419,11 +419,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Listen for auth state changes
   useEffect(() => {
+    console.log('[AuthContext] Setting up auth state listener');
+    
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('[AuthContext] Auth state changed:', user ? 'User found' : 'No user');
       setUser(user);
-      setLoading(true);
-
+      
       if (user) {
+        setLoading(true);
+        console.log('[AuthContext] Loading user profile for:', user.uid);
+        
         try {
           const userDoc = doc(db, 'users', user.uid);
           const userSnap = await getDoc(userDoc);
@@ -431,6 +436,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           if (userSnap.exists()) {
             const profile = userSnap.data() as UserProfile;
             setUserProfile(profile);
+            console.log('[AuthContext] User profile loaded from Firestore');
           } else {
             // Create profile for existing user without one
             const provider = user.providerData[0]?.providerId.includes('google') ? 'google' :
@@ -438,15 +444,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
                             user.providerData[0]?.providerId.includes('apple') ? 'apple' :
                             user.isAnonymous ? 'anonymous' : 'email';
             
+            console.log('[AuthContext] Creating new user profile with provider:', provider);
             const profile = await createUserProfile(user, provider);
             setUserProfile(profile);
           }
         } catch (error: any) {
-          console.error('Error loading user profile:', error);
+          console.error('[AuthContext] Error loading user profile:', error);
           
           // Handle Firestore offline errors by creating a temporary profile
           if (error.code === 'unavailable' || error.message?.includes('offline') || error.message?.includes('Failed to get document')) {
-            console.log('Firestore offline, creating temporary profile from auth data');
+            console.log('[AuthContext] Firestore offline, creating temporary profile from auth data');
             
             // Create a temporary profile from auth user data
             const tempProfile: UserProfile = {
@@ -495,9 +502,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
         }
       } else {
+        console.log('[AuthContext] No user authenticated, setting profile to null');
         setUserProfile(null);
       }
       
+      console.log('[AuthContext] Setting loading to false');
       setLoading(false);
     });
 
