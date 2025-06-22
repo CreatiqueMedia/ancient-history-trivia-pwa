@@ -6,9 +6,8 @@ import { StatsProvider } from './context/StatsContext';
 import { QuizProvider } from './context/QuizContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { PurchaseProvider } from './context/PurchaseContext';
-// Use real Firebase authentication for production or mock for GitHub Pages
-import { AuthProvider as FirebaseAuthProvider } from './context/AuthContext';
-import { AuthProvider as MockAuthProvider } from './context/MockAuthContext';
+// Use real Firebase authentication for production
+import { AuthProvider } from './context/AuthContext';
 import { isGitHubPagesMode } from './config/environment';
 import HomeScreen from './screens/HomeScreen.tsx';
 import QuizScreen from './screens/QuizScreen.tsx';
@@ -61,10 +60,8 @@ const AppContent = () => {
 };
 
 function App() {
-  // Choose the appropriate AuthProvider based on environment
-  const AuthProvider = isGitHubPagesMode ? MockAuthProvider : FirebaseAuthProvider;
-  
-  console.log('[App] Using AuthProvider:', isGitHubPagesMode ? 'Mock (GitHub Pages)' : 'Firebase');
+  // Now that GitHub Pages domain is authorized, always use Firebase AuthProvider
+  console.log('[App] Using Firebase AuthProvider on all platforms');
 
   // Initialize services on app startup
   useEffect(() => {
