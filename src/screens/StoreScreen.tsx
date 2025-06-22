@@ -39,6 +39,17 @@ import { getSampleQuestionsForBundle } from '../data/sampleQuestions';
 import { usePurchase } from '../context/PurchaseContext';
 import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles';
 
+// Helper function to format subscription period display
+const formatPeriod = (period: string): string => {
+  switch (period) {
+    case 'monthly': return 'month';
+    case 'yearly': return 'year';
+    case 'biennial': return '2 years';
+    case 'lifetime': return 'lifetime';
+    default: return period;
+  }
+};
+
 const StoreScreen: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'bundles' | 'subscription' | 'legacy'>('bundles');
@@ -385,7 +396,7 @@ const StoreScreen: React.FC = () => {
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">{tier.name}</h3>
           <div className="mt-2">
             <span className="text-3xl font-bold text-gray-900 dark:text-white">${tier.price}</span>
-            <span className="text-gray-500 dark:text-gray-400">/{tier.period}</span>
+            <span className="text-gray-500 dark:text-gray-400">/{formatPeriod(tier.period)}</span>
           </div>
           {tier.savings && (
             <span className="inline-block mt-2 bg-green-100 text-green-800 px-2 py-1 rounded text-sm">

@@ -51,19 +51,19 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   },
   {
     id: 'academy',
-    name: 'Academy Lifetime',
-    price: 79.99,
-    period: 'lifetime',
-    savings: 'Save 75%',
+    name: 'Academy Biennial',
+    price: 139.99,
+    period: 'biennial',
+    savings: 'Save 35%',
     features: [
       'Everything in Historian',
-      'Lifetime updates',
+      '2-year commitment savings',
       'Educational institution features',
-      'Bulk user management',
+      'Priority customer success manager',
       'Custom branding options',
-      'API access',
+      'Advanced analytics dashboard',
       'Content creation tools',
-      'White-label licensing'
+      'Quarterly feature previews'
     ]
   }
 ];
