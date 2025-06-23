@@ -18,12 +18,15 @@ export const getServiceWorkerPath = () => {
   return isGitHubPages ? '/ancient-history-trivia-pwa/sw.js' : '/sw.js';
 };
 
-console.log('[Environment] Detection:', {
-  isGitHubPages,
-  isFirebaseHosting,
-  isLocalhost,
-  useFirebaseAuth,
-  isGitHubPagesMode,
-  hostname: window.location.hostname,
-  note: 'GitHub Pages domain now authorized in Firebase Console'
-});
+// Environment detection for debugging (only shown in development)
+if (import.meta.env.DEV) {
+  console.log('[Environment] Detection:', {
+    isGitHubPages,
+    isFirebaseHosting,
+    isLocalhost,
+    useFirebaseAuth,
+    isGitHubPagesMode,
+    hostname: window.location.hostname,
+    note: 'GitHub Pages domain now authorized in Firebase Console'
+  });
+}

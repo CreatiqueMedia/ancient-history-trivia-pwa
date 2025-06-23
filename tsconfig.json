@@ -18,9 +18,20 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo"
   },
   "include": ["src"],
-  "exclude": ["src/data/bundles-backup.ts"],
+  "exclude": [
+    "src/data/bundles-backup.ts",
+    "src/data/sampleQuestions.ts",
+    "node_modules",
+    "dist",
+    ".firebase",
+    "coverage",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

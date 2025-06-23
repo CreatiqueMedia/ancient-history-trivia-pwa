@@ -19,14 +19,14 @@ import {
   OAuthProvider
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db, googleProvider, facebookProvider, appleProvider } from '../config/firebase';
+import { auth, db, googleProvider, facebookProvider, appleProvider, ensureFirestoreConnected, shouldRetryFirestore, recordFirestoreError, resetFirestoreErrors } from '../config/firebase';
 import type { UserProfile, AuthProvider, SubscriptionTier } from '../types';
 
 interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: () => Promise<any>;
   signInWithFacebook: () => Promise<void>;
   signInWithApple: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
@@ -61,11 +61,60 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Utility function for retrying Firestore operations with exponential backoff
+  function retryFirestoreOperation<T>(
+    operation: () => Promise<T>,
+    maxRetries: number = 3,
+    baseDelay: number = 1000
+  ): Promise<T> {
+    return new Promise(async (resolve, reject) => {
+      let lastError: any;
+      
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          if (attempt > 0) {
+            // Ensure network connection before retry
+            await ensureFirestoreConnected();
+          }
+          const result = await operation();
+          resolve(result);
+          return;
+        } catch (error: any) {
+          lastError = error;
+          
+          // Don't retry for certain errors
+          if (error.code === 'permission-denied' || 
+              error.code === 'not-found' ||
+              error.code === 'invalid-argument') {
+            reject(error);
+            return;
+          }
+          
+          // For the last attempt, throw the error
+          if (attempt === maxRetries - 1) {
+            reject(error);
+            return;
+          }
+          
+          // Wait before retrying with exponential backoff
+          const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+      
+      reject(lastError);
+    });
+  }
+
   // Create or update user profile in Firestore
   const createUserProfile = async (user: User, provider: AuthProvider): Promise<UserProfile> => {
     try {
       const userDoc = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userDoc);
+      
+      // Use retry mechanism for getting user document
+      const userSnap = await retryFirestoreOperation(async () => {
+        return await getDoc(userDoc);
+      }, 2, 300);
 
       if (!userSnap.exists()) {
         // Create new user profile
@@ -100,11 +149,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         };
 
         try {
-          await setDoc(userDoc, {
-            ...newProfile,
-            createdAt: serverTimestamp(),
-            lastActive: serverTimestamp()
-          });
+          await retryFirestoreOperation(async () => {
+            await setDoc(userDoc, {
+              ...newProfile,
+              createdAt: serverTimestamp(),
+              lastActive: serverTimestamp()
+            });
+          }, 2, 300);
         } catch (firestoreError) {
           console.warn('Could not save profile to Firestore:', firestoreError);
           // Continue with local profile even if Firestore save fails
@@ -122,11 +173,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         };
 
         try {
-          await updateDoc(userDoc, {
-            lastActive: serverTimestamp(),
-            photoURL: user.photoURL,
-            displayName: user.displayName
-          });
+          await retryFirestoreOperation(async () => {
+            await updateDoc(userDoc, {
+              lastActive: serverTimestamp(),
+              photoURL: user.photoURL,
+              displayName: user.displayName
+            });
+          }, 2, 300);
         } catch (firestoreError) {
           console.warn('Could not update profile in Firestore:', firestoreError);
           // Continue with local profile even if Firestore update fails
@@ -175,51 +228,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setError(null);
       setLoading(true);
-      
-      // Create a fresh provider instance to avoid any caching issues
-      const freshGoogleProvider = new GoogleAuthProvider();
-      freshGoogleProvider.addScope('profile');
-      freshGoogleProvider.addScope('email');
-      
-      // Force account selection to ensure fresh authentication
-      freshGoogleProvider.setCustomParameters({
-        prompt: 'select_account'
-      });
-      
-      // Try popup first, then fallback to redirect
-      try {
-        const result = await signInWithPopup(auth, freshGoogleProvider);
-        const profile = await createUserProfile(result.user, 'google');
-        setUserProfile(profile);
-        return; // Success, exit early
-      } catch (popupError: any) {
-        // If popup fails due to blocking, try redirect
-        if (popupError.code === 'auth/popup-blocked' || 
-            popupError.code === 'auth/popup-closed-by-user' ||
-            popupError.code === 'auth/cancelled-popup-request') {
-          await signInWithRedirect(auth, freshGoogleProvider);
-          return; // Redirect initiated, page will reload
-        } else {
-          // For other errors, throw them to be handled below
-          throw popupError;
-        }
-      }
-      
+      const result = await signInWithPopup(auth, googleProvider);
+      const profile = await createUserProfile(result.user, 'google');
+      setUserProfile(profile);
     } catch (error: any) {
-      console.error('Google sign in error:', error);
+      console.error('❌ Google sign in error:', error);
       
       // Provide user-friendly error messages
       let userError = error.message;
       if (error.code === 'auth/popup-closed-by-user') {
         userError = 'Sign-in was cancelled. Please try again.';
       } else if (error.code === 'auth/popup-blocked') {
-        userError = 'Pop-up blocked. Please allow pop-ups and try again.';
+        userError = 'Pop-up blocked. Please allow pop-ups for this site and try again.';
       } else if (error.code === 'auth/operation-not-allowed') {
         userError = 'Google sign-in is not enabled. Please contact support.';
       } else if (error.code === 'auth/invalid-api-key') {
         userError = 'Authentication configuration error. Please contact support.';
       } else if (error.code === 'auth/unauthorized-domain') {
-        userError = 'This domain is not authorized for authentication. Please contact support.';
+        userError = 'This domain is not authorized for authentication. Please contact support or try the Firebase Hosting version at ancient-history-trivia.web.app';
       } else if (error.code === 'auth/account-exists-with-different-credential') {
         userError = 'An account already exists with this email address using a different sign-in method.';
       }
@@ -448,6 +474,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Listen for auth state changes
   useEffect(() => {
+    
     // Check for redirect result first
     const checkRedirectResult = async () => {
       try {
@@ -469,8 +496,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     };
     
-    // Small delay to ensure Firebase is fully initialized
-    setTimeout(checkRedirectResult, 100);
+    // Check for redirect result immediately
+    checkRedirectResult();
     
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
@@ -481,12 +508,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         try {
           const userDoc = doc(db, 'users', user.uid);
           
-          // Add timeout to prevent hanging indefinitely
-          const timeoutPromise = new Promise<never>((_, reject) => {
-            setTimeout(() => reject(new Error('Firestore operation timed out')), 10000); // 10 second timeout
-          });
-          
-          const userSnap = await Promise.race([getDoc(userDoc), timeoutPromise]);
+          // Use retry mechanism with timeout for more reliable fetching
+          const userSnap = await retryFirestoreOperation(async () => {
+            const timeoutPromise = new Promise<never>((_, reject) => {
+              setTimeout(() => reject(new Error('Firestore operation timed out')), 3000); // 3 second timeout per attempt
+            });
+            
+            return await Promise.race([getDoc(userDoc), timeoutPromise]);
+          }, 2, 500); // 2 retries with 500ms base delay
           
           if (userSnap.exists()) {
             const profile = userSnap.data() as UserProfile;
@@ -504,8 +533,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         } catch (error: any) {
           console.error('[AuthContext] Error loading user profile:', error);
           
-          // Handle Firestore offline errors by creating a temporary profile
-          if (error.code === 'unavailable' || error.message?.includes('offline') || error.message?.includes('Failed to get document')) {
+          // Handle various Firestore errors by creating a temporary profile
+          if (error.code === 'unavailable' || 
+              error.code === 'permission-denied' ||
+              error.code === 'failed-precondition' ||
+              error.message?.includes('offline') || 
+              error.message?.includes('Failed to get document') ||
+              error.message?.includes('timed out') ||
+              error.message?.includes('400') ||
+              error.name === 'FirebaseError') {
+            
+            console.warn('[AuthContext] Creating offline profile due to Firestore error');
+            
             // Create a temporary profile from auth user data
             const tempProfile: UserProfile = {
               id: user.uid,

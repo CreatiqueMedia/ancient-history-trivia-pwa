@@ -32,7 +32,7 @@ class AnalyticsService {
     this.userProperties = { ...this.userProperties, ...properties };
     
     // In production, send to analytics service
-    if (this.isEnabled) {
+    if (this.isEnabled && import.meta.env.DEV) {
       console.log('[Analytics] User Properties:', this.userProperties);
     }
   }
@@ -164,8 +164,10 @@ class AnalyticsService {
       }
     };
 
-    // Console logging for development
-    console.log(`[Analytics] ${eventName}:`, event.parameters);
+    // Console logging for development only
+    if (import.meta.env.DEV) {
+      console.log(`[Analytics] ${eventName}:`, event.parameters);
+    }
 
     // In production, integrate with your analytics service:
     // - Google Analytics 4: gtag('event', eventName, parameters)
