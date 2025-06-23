@@ -1,7 +1,7 @@
 // Firebase Configuration
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, connectAuthEmulator } from 'firebase/auth';
-import { connectFirestoreEmulator, enableNetwork, disableNetwork, initializeFirestore, memoryLocalCache, persistentLocalCache } from 'firebase/firestore';
+import { connectFirestoreEmulator, enableNetwork, disableNetwork, initializeFirestore, memoryLocalCache, persistentLocalCache, Firestore } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 
 // Firebase Configuration for Ancient History Trivia PWA
@@ -21,25 +21,95 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase services
 export const auth = getAuth(app);
 
-// Initialize Firestore with new cache settings (replaces deprecated enableIndexedDbPersistence)
-export const db = typeof window !== 'undefined' 
-  ? initializeFirestore(app, {
-      localCache: persistentLocalCache({ 
-        cacheSizeBytes: 50 * 1024 * 1024 // 50MB cache size
-      }),
-      // Add experimental settings to reduce connection issues
-      experimentalForceLongPolling: true, // Force long polling to avoid WebSocket issues
-      ignoreUndefinedProperties: true, // Ignore undefined properties to prevent errors
-      // Add settings to prevent automatic listeners
-      experimentalAutoDetectLongPolling: false
-    })
-  : initializeFirestore(app, {
-      localCache: memoryLocalCache(), // Use memory cache for server-side
-      ignoreUndefinedProperties: true,
-      experimentalForceLongPolling: true
-    });
+// Enhanced circuit breaker for Firestore operations
+let firestoreErrorCount = 0;
+let lastErrorTime = 0;
+let isCircuitOpen = false;
+let isFirestoreBlocked = false;
+const MAX_ERRORS = 2; // Further reduced from 3 to 2
+const ERROR_WINDOW = 60000; // 1 minute
+const CIRCUIT_OPEN_TIME = 120000; // Increased to 2 minutes
+
+let firestoreInstance: Firestore | null = null;
+let isFirestoreInitialized = false;
+
+// Function to check if Firestore should be blocked
+const shouldBlockFirestore = (): boolean => {
+  const now = Date.now();
+  
+  // Reset error count if enough time has passed
+  if (now - lastErrorTime > ERROR_WINDOW) {
+    firestoreErrorCount = 0;
+    isCircuitOpen = false;
+    isFirestoreBlocked = false;
+  }
+  
+  // If circuit is open, check if we should try again
+  if (isCircuitOpen && now - lastErrorTime > CIRCUIT_OPEN_TIME) {
+    isCircuitOpen = false;
+    isFirestoreBlocked = false;
+    firestoreErrorCount = Math.max(0, firestoreErrorCount - 1); // Gradually reduce error count
+  }
+  
+  return isFirestoreBlocked || isCircuitOpen || firestoreErrorCount >= MAX_ERRORS;
+};
+
+// Safe Firestore getter that returns null when blocked
+const getFirestoreInstance = (): Firestore | null => {
+  if (shouldBlockFirestore()) {
+    return null;
+  }
+  
+  if (!isFirestoreInitialized && typeof window !== 'undefined') {
+    try {
+      firestoreInstance = initializeFirestore(app, {
+        localCache: persistentLocalCache({ 
+          cacheSizeBytes: 50 * 1024 * 1024 // 50MB cache size
+        }),
+        // Add experimental settings to reduce connection issues
+        experimentalForceLongPolling: true, // Force long polling to avoid WebSocket issues
+        ignoreUndefinedProperties: true, // Ignore undefined properties to prevent errors
+        // Add settings to prevent automatic listeners
+        experimentalAutoDetectLongPolling: false
+      });
+      isFirestoreInitialized = true;
+    } catch (error: any) {
+      console.warn('Failed to initialize Firestore:', error);
+      recordFirestoreError(error);
+      return null;
+    }
+  } else if (!isFirestoreInitialized && typeof window === 'undefined') {
+    try {
+      firestoreInstance = initializeFirestore(app, {
+        localCache: memoryLocalCache(), // Use memory cache for server-side
+        ignoreUndefinedProperties: true,
+        experimentalForceLongPolling: true
+      });
+      isFirestoreInitialized = true;
+    } catch (error: any) {
+      console.warn('Failed to initialize server-side Firestore:', error);
+      return null;
+    }
+  }
+  
+  return firestoreInstance;
+};
+
+// Export db as a getter to control access (DEPRECATED - use getFirestore() instead)
+// This maintains backward compatibility but may return null when circuit breaker is open
+export const db = getFirestoreInstance();
 
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+
+// Function to safely get Firestore instance
+export const getFirestore = (): Firestore | null => {
+  return getFirestoreInstance();
+};
+
+// Function to check if Firestore is available
+export const isFirestoreAvailable = (): boolean => {
+  return !shouldBlockFirestore() && getFirestoreInstance() !== null;
+};
 
 // Add global error handler for Firestore connection issues
 if (typeof window !== 'undefined') {
@@ -50,7 +120,9 @@ if (typeof window !== 'undefined') {
       if (error.message && (
         error.message.includes('firestore') || 
         error.message.includes('transport') ||
-        error.message.includes('400')
+        error.message.includes('400') ||
+        error.message.includes('Listen') ||
+        error.message.includes('UNAUTHENTICATED')
       )) {
         recordFirestoreError(error);
         // Prevent console noise in production
@@ -67,7 +139,10 @@ if (typeof window !== 'undefined') {
 // Add a function to ensure network connectivity
 export const ensureFirestoreConnected = async () => {
   try {
-    await enableNetwork(db);
+    const firestore = getFirestoreInstance();
+    if (firestore) {
+      await enableNetwork(firestore);
+    }
   } catch (error: any) {
     // Only log in development to avoid console noise in production
     if (process.env.NODE_ENV === 'development') {
@@ -79,7 +154,12 @@ export const ensureFirestoreConnected = async () => {
 // Enhanced function to handle network reconnection with timeout
 export const reconnectFirestore = async (timeoutMs: number = 5000): Promise<boolean> => {
   try {
-    const reconnectPromise = enableNetwork(db);
+    const firestore = getFirestoreInstance();
+    if (!firestore) {
+      return false;
+    }
+    
+    const reconnectPromise = enableNetwork(firestore);
     const timeoutPromise = new Promise((_, reject) => 
       setTimeout(() => reject(new Error('Firestore reconnection timeout')), timeoutMs)
     );
@@ -97,7 +177,10 @@ export const reconnectFirestore = async (timeoutMs: number = 5000): Promise<bool
 // Function to gracefully disconnect Firestore
 export const disconnectFirestore = async () => {
   try {
-    await disableNetwork(db);
+    const firestore = getFirestoreInstance();
+    if (firestore) {
+      await disableNetwork(firestore);
+    }
   } catch (error: any) {
     if (process.env.NODE_ENV === 'development') {
       console.warn('Could not disconnect Firestore:', error);
@@ -105,30 +188,8 @@ export const disconnectFirestore = async () => {
   }
 };
 
-// Enhanced circuit breaker for Firestore operations
-let firestoreErrorCount = 0;
-let lastErrorTime = 0;
-let isCircuitOpen = false;
-const MAX_ERRORS = 3; // Reduced from 5 to 3
-const ERROR_WINDOW = 60000; // 1 minute
-const CIRCUIT_OPEN_TIME = 60000; // Increased from 30 to 60 seconds
-
 export const shouldRetryFirestore = (): boolean => {
-  const now = Date.now();
-  
-  // Reset error count if enough time has passed
-  if (now - lastErrorTime > ERROR_WINDOW) {
-    firestoreErrorCount = 0;
-    isCircuitOpen = false;
-  }
-  
-  // If circuit is open, check if we should try again
-  if (isCircuitOpen && now - lastErrorTime > CIRCUIT_OPEN_TIME) {
-    isCircuitOpen = false;
-    firestoreErrorCount = Math.floor(firestoreErrorCount / 2); // Gradually reduce error count
-  }
-  
-  return !isCircuitOpen && firestoreErrorCount < MAX_ERRORS;
+  return !shouldBlockFirestore();
 };
 
 export const recordFirestoreError = (error?: any): void => {
@@ -138,6 +199,7 @@ export const recordFirestoreError = (error?: any): void => {
   // Open circuit if too many errors
   if (firestoreErrorCount >= MAX_ERRORS) {
     isCircuitOpen = true;
+    isFirestoreBlocked = true;
     if (process.env.NODE_ENV === 'development') {
       console.warn('Firestore circuit breaker opened due to repeated errors');
     }
@@ -159,11 +221,13 @@ export const resetFirestoreErrors = (): void => {
   firestoreErrorCount = 0;
   lastErrorTime = 0;
   isCircuitOpen = false;
+  isFirestoreBlocked = false;
 };
 
 export const getFirestoreStatus = () => ({
   errorCount: firestoreErrorCount,
   isCircuitOpen,
+  isBlocked: isFirestoreBlocked,
   lastErrorTime,
   canRetry: shouldRetryFirestore()
 });
@@ -171,8 +235,12 @@ export const getFirestoreStatus = () => ({
 // Add a function to test Firestore connectivity
 export const testFirestoreConnection = async (): Promise<boolean> => {
   try {
+    const firestore = getFirestoreInstance();
+    if (!firestore) {
+      return false;
+    }
     // Try a lightweight operation to test connection
-    await enableNetwork(db);
+    await enableNetwork(firestore);
     return true;
   } catch (error: any) {
     if (process.env.NODE_ENV === 'development') {
