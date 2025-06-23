@@ -27,9 +27,11 @@
     "@heroicons/react": "^2.0.18",
     "clsx": "^2.0.0",
     "firebase": "^11.9.1",
+    "firebaseui": "^6.1.0",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-firebaseui": "^6.0.0",
     "react-router-dom": "^6.20.1",
     "tailwind-merge": "^2.0.0"
   },

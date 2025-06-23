@@ -20,6 +20,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+*.log
 
 # Runtime data
 pids
@@ -49,6 +50,19 @@ jspm_packages/
 # Optional stylelint cache
 .stylelintcache
 
+# VS Code performance optimizations
+.DS_Store
+.vscode/settings.json.backup
+*.tmp
+*.swp
+*.swo
+*~
+
+# Cache directories
+.cache/
+node_modules/.cache/
+.firebase/hosting.*.cache
+
 # Microbundle cache
 .rpt2_cache/
 .rts2_cache_cjs/
@@ -65,7 +79,6 @@ jspm_packages/
 .yarn-integrity
 
 # parcel-bundler cache (https://parceljs.org/)
-.cache
 .parcel-cache
 
 # Next.js build output

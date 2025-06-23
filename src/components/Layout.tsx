@@ -33,6 +33,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { user, userProfile, logout } = useAuth();
+
+  // Close auth modal when user becomes authenticated
+  React.useEffect(() => {
+    if (user && authModalOpen) {
+      setAuthModalOpen(false);
+    }
+  }, [user, authModalOpen]);
   
   const navItems = [
     { 
@@ -163,13 +170,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             ) : (
               <div className="flex items-center space-x-3">
                 <button
-                  onClick={() => setAuthModalOpen(true)}
+                  onClick={() => {
+                    if (!user) {
+                      setAuthModalOpen(true);
+                    }
+                  }}
                   className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
                   Sign In
                 </button>
                 <button
-                  onClick={() => setAuthModalOpen(true)}
+                  onClick={() => {
+                    if (!user) {
+                      setAuthModalOpen(true);
+                    }
+                  }}
                   className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                   Sign Up
@@ -276,7 +291,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </button>
           ) : (
             <button
-              onClick={() => setAuthModalOpen(true)}
+              onClick={() => {
+                if (!user) {
+                  setAuthModalOpen(true);
+                }
+              }}
               className="flex flex-col items-center py-2 px-3 min-w-0 flex-1 text-gray-500 dark:text-gray-400"
             >
               <UserIcon className="w-6 h-6 mb-1" />

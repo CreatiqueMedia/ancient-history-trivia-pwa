@@ -38,7 +38,9 @@ class NotificationService {
     if ('serviceWorker' in navigator) {
       try {
         this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js');
-        console.log('Service Worker registered for notifications');
+        if (import.meta.env.DEV) {
+          console.log('Service Worker registered for notifications');
+        }
       } catch (error) {
         console.error('Service Worker registration failed:', error);
       }
@@ -222,8 +224,10 @@ class NotificationService {
     // In production, this would integrate with your email service
     // For development, we'll log the email that would be sent
     
-    console.log(`[Email Service] Sending ${notification.type} email to ${notification.recipient.email}`);
-    console.log('Email data:', notification.data);
+    if (import.meta.env.DEV) {
+      console.log(`[Email Service] Sending ${notification.type} email to ${notification.recipient.email}`);
+      console.log('Email data:', notification.data);
+    }
 
     // Example integration with email service API
     try {
@@ -239,7 +243,9 @@ class NotificationService {
         throw new Error('Failed to send email');
       }
 
-      console.log(`Email sent successfully: ${notification.type}`);
+      if (import.meta.env.DEV) {
+        console.log(`Email sent successfully: ${notification.type}`);
+      }
     } catch (error) {
       console.error('Email sending failed:', error);
       
