@@ -26,9 +26,9 @@ let firestoreErrorCount = 0;
 let lastErrorTime = 0;
 let isCircuitOpen = false;
 let isFirestoreBlocked = false;
-const MAX_ERRORS = 2; // Further reduced from 3 to 2
-const ERROR_WINDOW = 60000; // 1 minute
-const CIRCUIT_OPEN_TIME = 120000; // Increased to 2 minutes
+const MAX_ERRORS = 1; // Extremely aggressive - just 1 error triggers circuit breaker
+const ERROR_WINDOW = 30000; // 30 seconds
+const CIRCUIT_OPEN_TIME = 300000; // 5 minutes - much longer block time
 
 let firestoreInstance: Firestore | null = null;
 let isFirestoreInitialized = false;
@@ -57,6 +57,16 @@ const shouldBlockFirestore = (): boolean => {
 // Safe Firestore getter that returns null when blocked
 const getFirestoreInstance = (): Firestore | null => {
   if (shouldBlockFirestore()) {
+    // Force disconnect any existing instance when circuit breaker is open
+    if (firestoreInstance) {
+      try {
+        disableNetwork(firestoreInstance).catch(() => {
+          // Ignore errors when disabling network
+        });
+      } catch (error) {
+        // Ignore errors
+      }
+    }
     return null;
   }
   
@@ -95,9 +105,9 @@ const getFirestoreInstance = (): Firestore | null => {
   return firestoreInstance;
 };
 
-// Export db as a getter to control access (DEPRECATED - use getFirestore() instead)
+// Export db as a dynamic getter to control access (DEPRECATED - use getFirestore() instead)
 // This maintains backward compatibility but may return null when circuit breaker is open
-export const db = getFirestoreInstance();
+export const db = null; // Force null to prevent automatic initialization
 
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 
@@ -117,21 +127,55 @@ if (typeof window !== 'undefined') {
   window.addEventListener('unhandledrejection', (event) => {
     if (event.reason && typeof event.reason === 'object') {
       const error = event.reason;
-      if (error.message && (
-        error.message.includes('firestore') || 
-        error.message.includes('transport') ||
-        error.message.includes('400') ||
-        error.message.includes('Listen') ||
-        error.message.includes('UNAUTHENTICATED')
-      )) {
+      const errorMessage = error.message || '';
+      const errorString = String(error);
+      
+      if (errorMessage.includes('firestore') || 
+          errorMessage.includes('transport') ||
+          errorMessage.includes('400') ||
+          errorMessage.includes('Listen') ||
+          errorMessage.includes('UNAUTHENTICATED') ||
+          errorMessage.includes('WebChannelConnection') ||
+          errorString.includes('firestore') ||
+          errorString.includes('Listen') ||
+          errorString.includes('400')) {
+        
+        console.warn('[Circuit Breaker] Firestore error detected, triggering circuit breaker:', errorMessage);
         recordFirestoreError(error);
-        // Prevent console noise in production
-        if (process.env.NODE_ENV !== 'development') {
-          event.preventDefault();
-        }
+        
+        // Prevent console noise and network spam
+        event.preventDefault();
       }
     }
   });
+
+  // Also intercept console errors that might be related to Firestore
+  const originalConsoleError = console.error;
+  console.error = (...args: any[]) => {
+    const errorString = args.join(' ');
+    if (errorString.includes('firestore') || 
+        errorString.includes('Listen') || 
+        errorString.includes('WebChannelConnection') ||
+        errorString.includes('transport errored')) {
+      console.warn('[Circuit Breaker] Firestore console error detected:', errorString);
+      recordFirestoreError(new Error(errorString));
+      return; // Suppress the error
+    }
+    originalConsoleError.apply(console, args);
+  };
+
+  // Intercept fetch requests to Firestore APIs
+  const originalFetch = window.fetch;
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input.toString();
+    if (url.includes('firestore.googleapis.com')) {
+      if (shouldBlockFirestore()) {
+        console.warn('[Circuit Breaker] Blocking Firestore fetch request due to circuit breaker');
+        throw new Error('Firestore circuit breaker is open');
+      }
+    }
+    return originalFetch.call(window, input, init);
+  };
 }
 
 // Configure Firestore settings for better offline handling
@@ -196,17 +240,21 @@ export const recordFirestoreError = (error?: any): void => {
   firestoreErrorCount++;
   lastErrorTime = Date.now();
   
-  // Open circuit if too many errors
-  if (firestoreErrorCount >= MAX_ERRORS) {
-    isCircuitOpen = true;
-    isFirestoreBlocked = true;
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('Firestore circuit breaker opened due to repeated errors');
-    }
-    // Aggressively disconnect Firestore to prevent more attempts
-    disconnectFirestore().catch(() => {
+  // Open circuit immediately on first error
+  isCircuitOpen = true;
+  isFirestoreBlocked = true;
+  
+  console.warn('[Circuit Breaker] Firestore circuit breaker opened immediately due to error. Errors:', firestoreErrorCount);
+  
+  // Aggressively disconnect Firestore to prevent more attempts
+  if (firestoreInstance) {
+    try {
+      disableNetwork(firestoreInstance).catch(() => {
+        // Ignore disconnection errors
+      });
+    } catch (disconnectError) {
       // Ignore disconnection errors
-    });
+    }
   }
   
   // Log specific error patterns in development
