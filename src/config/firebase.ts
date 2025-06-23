@@ -28,15 +28,39 @@ export const db = typeof window !== 'undefined'
         cacheSizeBytes: 50 * 1024 * 1024 // 50MB cache size
       }),
       // Add experimental settings to reduce connection issues
-      experimentalForceLongPolling: false, // Use WebSockets when available
-      ignoreUndefinedProperties: true // Ignore undefined properties to prevent errors
+      experimentalForceLongPolling: true, // Force long polling to avoid WebSocket issues
+      ignoreUndefinedProperties: true, // Ignore undefined properties to prevent errors
+      // Add settings to prevent automatic listeners
+      experimentalAutoDetectLongPolling: false
     })
   : initializeFirestore(app, {
       localCache: memoryLocalCache(), // Use memory cache for server-side
-      ignoreUndefinedProperties: true
+      ignoreUndefinedProperties: true,
+      experimentalForceLongPolling: true
     });
 
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+
+// Add global error handler for Firestore connection issues
+if (typeof window !== 'undefined') {
+  // Intercept and handle Firestore connection errors
+  window.addEventListener('unhandledrejection', (event) => {
+    if (event.reason && typeof event.reason === 'object') {
+      const error = event.reason;
+      if (error.message && (
+        error.message.includes('firestore') || 
+        error.message.includes('transport') ||
+        error.message.includes('400')
+      )) {
+        recordFirestoreError(error);
+        // Prevent console noise in production
+        if (process.env.NODE_ENV !== 'development') {
+          event.preventDefault();
+        }
+      }
+    }
+  });
+}
 
 // Configure Firestore settings for better offline handling
 
@@ -85,9 +109,9 @@ export const disconnectFirestore = async () => {
 let firestoreErrorCount = 0;
 let lastErrorTime = 0;
 let isCircuitOpen = false;
-const MAX_ERRORS = 5;
+const MAX_ERRORS = 3; // Reduced from 5 to 3
 const ERROR_WINDOW = 60000; // 1 minute
-const CIRCUIT_OPEN_TIME = 30000; // 30 seconds
+const CIRCUIT_OPEN_TIME = 60000; // Increased from 30 to 60 seconds
 
 export const shouldRetryFirestore = (): boolean => {
   const now = Date.now();
@@ -117,6 +141,10 @@ export const recordFirestoreError = (error?: any): void => {
     if (process.env.NODE_ENV === 'development') {
       console.warn('Firestore circuit breaker opened due to repeated errors');
     }
+    // Aggressively disconnect Firestore to prevent more attempts
+    disconnectFirestore().catch(() => {
+      // Ignore disconnection errors
+    });
   }
   
   // Log specific error patterns in development
