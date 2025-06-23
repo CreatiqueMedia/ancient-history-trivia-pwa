@@ -18,8 +18,9 @@ import {
   FacebookAuthProvider,
   OAuthProvider
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db, googleProvider, facebookProvider, appleProvider, ensureFirestoreConnected, shouldRetryFirestore, recordFirestoreError, resetFirestoreErrors, reconnectFirestore } from '../config/firebase';
+import { serverTimestamp } from 'firebase/firestore';
+import { auth, googleProvider, facebookProvider, appleProvider, ensureFirestoreConnected, shouldRetryFirestore, recordFirestoreError, resetFirestoreErrors, reconnectFirestore, isFirestoreAvailable } from '../config/firebase';
+import { safeDoc, safeGetDoc, safeSetDoc, safeUpdateDoc, shouldAttemptFirestoreOperation } from '../utils/firestoreWrapper';
 import type { UserProfile, AuthProvider, SubscriptionTier } from '../types';
 
 interface AuthContextType {
@@ -135,14 +136,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Create or update user profile in Firestore
   const createUserProfile = async (user: User, provider: AuthProvider): Promise<UserProfile> => {
     try {
-      const userDoc = doc(db, 'users', user.uid);
+      // Check if Firestore operations should be attempted
+      if (!shouldAttemptFirestoreOperation()) {
+        throw new Error('Firestore is currently blocked due to connection issues');
+      }
+
+      const userDoc = safeDoc('users', user.uid);
       
       // Use retry mechanism for getting user document (reduced retries)
       const userSnap = await retryFirestoreOperation(async () => {
-        return await getDoc(userDoc);
+        return await safeGetDoc(userDoc);
       }, 1, 200); // Only 1 retry with short delay
 
-      if (!userSnap.exists()) {
+      if (!userSnap || !userSnap.exists()) {
         // Create new user profile
         const newProfile: UserProfile = {
           id: user.uid,
@@ -176,7 +182,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         try {
           await retryFirestoreOperation(async () => {
-            await setDoc(userDoc, {
+            await safeSetDoc(userDoc, {
               ...newProfile,
               createdAt: serverTimestamp(),
               lastActive: serverTimestamp()
@@ -203,7 +209,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         try {
           await retryFirestoreOperation(async () => {
-            await updateDoc(userDoc, {
+            await safeUpdateDoc(userDoc, {
               lastActive: serverTimestamp(),
               photoURL: user.photoURL,
               displayName: user.displayName
@@ -482,18 +488,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       setError(null);
-      const userDoc = doc(db, 'users', user.uid);
+      
+      // Check if Firestore operations should be attempted
+      if (!shouldAttemptFirestoreOperation()) {
+        // Just update local state if Firestore is blocked
+        const updatedProfile = { ...userProfile, ...updates };
+        setUserProfile(updatedProfile);
+        return;
+      }
+
+      const userDoc = safeDoc('users', user.uid);
       const updatedProfile = { ...userProfile, ...updates };
       
-      await updateDoc(userDoc, {
+      await safeUpdateDoc(userDoc, {
         ...updates,
         lastActive: serverTimestamp()
       });
       
       setUserProfile(updatedProfile);
     } catch (error: any) {
-      setError(error.message);
-      console.error('Profile update error:', error);
+      // Still update local state even if Firestore fails
+      const updatedProfile = { ...userProfile, ...updates };
+      setUserProfile(updatedProfile);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Profile update error (using local update):', error);
+      }
     }
   };
 
@@ -543,11 +563,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         
         try {
           // Check circuit breaker before attempting Firestore operations
-          if (!shouldRetryFirestore()) {
+          if (!shouldRetryFirestore() || !isFirestoreAvailable()) {
             throw new Error('Firestore circuit breaker is open, using fallback profile');
           }
           
-          const userDoc = doc(db, 'users', user.uid);
+          const userDocRef = safeDoc('users', user.uid);
+          if (!userDocRef) {
+            throw new Error('Firestore is not available, using fallback profile');
+          }
           
           // Use retry mechanism with shorter timeout for auth context
           const userSnap = await retryFirestoreOperation(async () => {
@@ -555,10 +578,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
               setTimeout(() => reject(new Error('Firestore operation timed out')), 2000); // Reduced to 2 second timeout
             });
             
-            return await Promise.race([getDoc(userDoc), timeoutPromise]);
+            return await Promise.race([safeGetDoc(userDocRef), timeoutPromise]);
           }, 1, 300); // Reduced to 1 retry with 300ms base delay for auth context
           
-          if (userSnap.exists()) {
+          if (userSnap && userSnap.exists()) {
             const profile = userSnap.data() as UserProfile;
             setUserProfile(profile);
           } else {
