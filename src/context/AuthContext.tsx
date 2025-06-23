@@ -19,7 +19,7 @@ import {
   OAuthProvider
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db, googleProvider, facebookProvider, appleProvider, ensureFirestoreConnected, shouldRetryFirestore, recordFirestoreError, resetFirestoreErrors } from '../config/firebase';
+import { auth, db, googleProvider, facebookProvider, appleProvider, ensureFirestoreConnected, shouldRetryFirestore, recordFirestoreError, resetFirestoreErrors, reconnectFirestore } from '../config/firebase';
 import type { UserProfile, AuthProvider, SubscriptionTier } from '../types';
 
 interface AuthContextType {
@@ -64,28 +64,54 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Utility function for retrying Firestore operations with exponential backoff
   function retryFirestoreOperation<T>(
     operation: () => Promise<T>,
-    maxRetries: number = 3,
-    baseDelay: number = 1000
+    maxRetries: number = 2, // Reduced retries to avoid spam
+    baseDelay: number = 500 // Reduced initial delay
   ): Promise<T> {
     return new Promise(async (resolve, reject) => {
       let lastError: any;
       
+      // Check circuit breaker first
+      if (!shouldRetryFirestore()) {
+        reject(new Error('Firestore circuit breaker is open, skipping operation'));
+        return;
+      }
+      
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
           if (attempt > 0) {
-            // Ensure network connection before retry
-            await ensureFirestoreConnected();
+            // Try to reconnect with timeout
+            const reconnected = await reconnectFirestore(3000);
+            if (!reconnected && attempt === maxRetries - 1) {
+              reject(new Error('Could not reconnect to Firestore'));
+              return;
+            }
           }
+          
           const result = await operation();
+          // Reset errors on success
+          if (attempt > 0) {
+            resetFirestoreErrors();
+          }
           resolve(result);
           return;
         } catch (error: any) {
           lastError = error;
           
+          // Record error for circuit breaker
+          recordFirestoreError(error);
+          
           // Don't retry for certain errors
           if (error.code === 'permission-denied' || 
               error.code === 'not-found' ||
-              error.code === 'invalid-argument') {
+              error.code === 'invalid-argument' ||
+              error.code === 'unauthenticated' ||
+              error.code === 'failed-precondition') {
+            reject(error);
+            return;
+          }
+          
+          // Don't retry 400-level errors that indicate client issues
+          if (error.message?.includes('400') || error.code === 'invalid-argument') {
             reject(error);
             return;
           }
@@ -96,8 +122,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
             return;
           }
           
-          // Wait before retrying with exponential backoff
-          const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000;
+          // Wait before retrying with exponential backoff + jitter
+          const delay = baseDelay * Math.pow(1.5, attempt) + Math.random() * 500;
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
@@ -111,10 +137,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const userDoc = doc(db, 'users', user.uid);
       
-      // Use retry mechanism for getting user document
+      // Use retry mechanism for getting user document (reduced retries)
       const userSnap = await retryFirestoreOperation(async () => {
         return await getDoc(userDoc);
-      }, 2, 300);
+      }, 1, 200); // Only 1 retry with short delay
 
       if (!userSnap.exists()) {
         // Create new user profile
@@ -155,9 +181,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
               createdAt: serverTimestamp(),
               lastActive: serverTimestamp()
             });
-          }, 2, 300);
-        } catch (firestoreError) {
-          console.warn('Could not save profile to Firestore:', firestoreError);
+          }, 1, 200); // Reduced retries for writes
+        } catch (firestoreError: any) {
+          // Only log detailed errors in development
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Could not save profile to Firestore:', firestoreError);
+          }
           // Continue with local profile even if Firestore save fails
         }
 
@@ -179,16 +208,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
               photoURL: user.photoURL,
               displayName: user.displayName
             });
-          }, 2, 300);
-        } catch (firestoreError) {
-          console.warn('Could not update profile in Firestore:', firestoreError);
+          }, 1, 200); // Reduced retries for updates
+        } catch (firestoreError: any) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Could not update profile in Firestore:', firestoreError);
+          }
           // Continue with local profile even if Firestore update fails
         }
 
         return updatedProfile;
       }
     } catch (error: any) {
-      console.warn('Firestore error in createUserProfile, creating fallback profile:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Firestore error in createUserProfile, creating fallback profile:', error);
+      }
+      
+      // Record the error for circuit breaker
+      recordFirestoreError(error);
       
       // If Firestore is completely unavailable, create a basic profile from auth data
       return {
@@ -506,16 +542,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setLoading(true);
         
         try {
+          // Check circuit breaker before attempting Firestore operations
+          if (!shouldRetryFirestore()) {
+            throw new Error('Firestore circuit breaker is open, using fallback profile');
+          }
+          
           const userDoc = doc(db, 'users', user.uid);
           
-          // Use retry mechanism with timeout for more reliable fetching
+          // Use retry mechanism with shorter timeout for auth context
           const userSnap = await retryFirestoreOperation(async () => {
             const timeoutPromise = new Promise<never>((_, reject) => {
-              setTimeout(() => reject(new Error('Firestore operation timed out')), 3000); // 3 second timeout per attempt
+              setTimeout(() => reject(new Error('Firestore operation timed out')), 2000); // Reduced to 2 second timeout
             });
             
             return await Promise.race([getDoc(userDoc), timeoutPromise]);
-          }, 2, 500); // 2 retries with 500ms base delay
+          }, 1, 300); // Reduced to 1 retry with 300ms base delay for auth context
           
           if (userSnap.exists()) {
             const profile = userSnap.data() as UserProfile;
@@ -531,7 +572,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setUserProfile(profile);
           }
         } catch (error: any) {
-          console.error('[AuthContext] Error loading user profile:', error);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[AuthContext] Error loading user profile:', error);
+          }
           
           // Handle various Firestore errors by creating a temporary profile
           if (error.code === 'unavailable' || 
@@ -541,6 +584,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
               error.message?.includes('Failed to get document') ||
               error.message?.includes('timed out') ||
               error.message?.includes('400') ||
+              error.message?.includes('circuit breaker') ||
               error.name === 'FirebaseError') {
             
             console.warn('[AuthContext] Creating offline profile due to Firestore error');
