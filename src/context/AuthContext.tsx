@@ -123,9 +123,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setError(null);
       setLoading(true);
-      const result = await signInWithPopup(auth, googleProvider);
-      const profile = await createUserProfile(result.user, 'google');
-      setUserProfile(profile);
+      
+      try {
+        // Try popup first
+        const result = await signInWithPopup(auth, googleProvider);
+        const profile = await createUserProfile(result.user, 'google');
+        setUserProfile(profile);
+        return result;
+      } catch (popupError: any) {
+        // If popup fails due to COOP or similar issues, fall back to redirect
+        if (popupError.code === 'auth/popup-blocked' || 
+            popupError.message?.includes('Cross-Origin-Opener-Policy') ||
+            popupError.message?.includes('window.close')) {
+          console.log('🔄 Popup blocked or COOP issue, falling back to redirect...');
+          await signInWithRedirect(auth, googleProvider);
+          return; // Redirect will handle the rest
+        }
+        throw popupError; // Re-throw other popup errors
+      }
     } catch (error: any) {
       console.error('❌ Google sign in error:', error);
       
@@ -134,7 +149,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (error.code === 'auth/popup-closed-by-user') {
         userError = 'Sign-in was cancelled. Please try again.';
       } else if (error.code === 'auth/popup-blocked') {
-        userError = 'Pop-up blocked. Please allow pop-ups for this site and try again.';
+        userError = 'Pop-up blocked. Trying redirect method...';
       } else if (error.code === 'auth/operation-not-allowed') {
         userError = 'Google sign-in is not enabled. Please contact support.';
       } else if (error.code === 'auth/invalid-api-key') {
@@ -143,6 +158,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         userError = 'This domain is not authorized for authentication. Please contact support or try the Firebase Hosting version at ancient-history-trivia.web.app';
       } else if (error.code === 'auth/account-exists-with-different-credential') {
         userError = 'An account already exists with this email address using a different sign-in method.';
+      } else if (error.message?.includes('Cross-Origin-Opener-Policy')) {
+        userError = 'Browser security settings are preventing sign-in. Trying alternative method...';
       }
       
       setError(userError);
