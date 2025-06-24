@@ -18,9 +18,8 @@ import {
   FacebookAuthProvider,
   OAuthProvider
 } from 'firebase/auth';
-import { serverTimestamp } from 'firebase/firestore';
-import { auth, googleProvider, facebookProvider, appleProvider, ensureFirestoreConnected, shouldRetryFirestore, recordFirestoreError, resetFirestoreErrors, reconnectFirestore, isFirestoreAvailable } from '../config/firebase';
-import { safeDoc, safeGetDoc, safeSetDoc, safeUpdateDoc, shouldAttemptFirestoreOperation } from '../utils/firestoreWrapper';
+// FIRESTORE IMPORTS REMOVED - App now operates in pure offline mode
+import { auth, googleProvider, facebookProvider, appleProvider } from '../config/firebase';
 import type { UserProfile, AuthProvider, SubscriptionTier } from '../types';
 
 interface AuthContextType {
@@ -62,207 +61,61 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Utility function for retrying Firestore operations with exponential backoff
-  function retryFirestoreOperation<T>(
-    operation: () => Promise<T>,
-    maxRetries: number = 2, // Reduced retries to avoid spam
-    baseDelay: number = 500 // Reduced initial delay
-  ): Promise<T> {
-    return new Promise(async (resolve, reject) => {
-      let lastError: any;
-      
-      // Check circuit breaker first
-      if (!shouldRetryFirestore()) {
-        reject(new Error('Firestore circuit breaker is open, skipping operation'));
-        return;
-      }
-      
-      for (let attempt = 0; attempt < maxRetries; attempt++) {
-        try {
-          if (attempt > 0) {
-            // Try to reconnect with timeout
-            const reconnected = await reconnectFirestore(3000);
-            if (!reconnected && attempt === maxRetries - 1) {
-              reject(new Error('Could not reconnect to Firestore'));
-              return;
-            }
-          }
-          
-          const result = await operation();
-          // Reset errors on success
-          if (attempt > 0) {
-            resetFirestoreErrors();
-          }
-          resolve(result);
-          return;
-        } catch (error: any) {
-          lastError = error;
-          
-          // Record error for circuit breaker
-          recordFirestoreError(error);
-          
-          // Don't retry for certain errors
-          if (error.code === 'permission-denied' || 
-              error.code === 'not-found' ||
-              error.code === 'invalid-argument' ||
-              error.code === 'unauthenticated' ||
-              error.code === 'failed-precondition') {
-            reject(error);
-            return;
-          }
-          
-          // Don't retry 400-level errors that indicate client issues
-          if (error.message?.includes('400') || error.code === 'invalid-argument') {
-            reject(error);
-            return;
-          }
-          
-          // For the last attempt, throw the error
-          if (attempt === maxRetries - 1) {
-            reject(error);
-            return;
-          }
-          
-          // Wait before retrying with exponential backoff + jitter
-          const delay = baseDelay * Math.pow(1.5, attempt) + Math.random() * 500;
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      }
-      
-      reject(lastError);
-    });
-  }
-
-  // Create or update user profile in Firestore
+  // Create user profile (pure offline mode - no Firestore)
   const createUserProfile = async (user: User, provider: AuthProvider): Promise<UserProfile> => {
+    // Always create profile from auth data since Firestore is disabled
+    const profile: UserProfile = {
+      id: user.uid,
+      email: user.email || '',
+      displayName: user.displayName || user.email?.split('@')[0] || 'User',
+      photoURL: user.photoURL || undefined,
+      provider,
+      subscription: 'free',
+      preferences: {
+        theme: 'system',
+        soundEnabled: true,
+        vibrationEnabled: true,
+        autoAdvance: false,
+        showExplanations: true,
+        questionTimeLimit: null,
+        language: 'en',
+        accessibilityEnabled: false,
+        fontSize: 'medium',
+        notifications: {
+          dailyReminders: true,
+          achievementUpdates: true,
+          newContentAlerts: true,
+          friendActivity: false,
+          reminderTime: '19:00'
+        }
+      },
+      createdAt: new Date(),
+      lastActive: new Date(),
+      isAnonymous: user.isAnonymous
+    };
+
+    // Try to load any existing profile from localStorage
     try {
-      // Check if Firestore operations should be attempted
-      if (!shouldAttemptFirestoreOperation()) {
-        throw new Error('Firestore is currently blocked due to connection issues');
+      const savedProfile = localStorage.getItem(`userProfile_${user.uid}`);
+      if (savedProfile) {
+        const parsed = JSON.parse(savedProfile);
+        // Merge saved preferences with current auth data
+        profile.preferences = { ...profile.preferences, ...parsed.preferences };
+        profile.subscription = parsed.subscription || 'free';
+        profile.createdAt = new Date(parsed.createdAt) || profile.createdAt;
       }
-
-      const userDoc = safeDoc('users', user.uid);
-      
-      // Use retry mechanism for getting user document (reduced retries)
-      const userSnap = await retryFirestoreOperation(async () => {
-        return await safeGetDoc(userDoc);
-      }, 1, 200); // Only 1 retry with short delay
-
-      if (!userSnap || !userSnap.exists()) {
-        // Create new user profile
-        const newProfile: UserProfile = {
-          id: user.uid,
-          email: user.email || '',
-          displayName: user.displayName || 'Anonymous User',
-          photoURL: user.photoURL || undefined,
-          provider,
-          subscription: 'free',
-          preferences: {
-            theme: 'system',
-            soundEnabled: true,
-            vibrationEnabled: true,
-            autoAdvance: false,
-            showExplanations: true,
-            questionTimeLimit: null,
-            language: 'en',
-            accessibilityEnabled: false,
-            fontSize: 'medium',
-            notifications: {
-              dailyReminders: true,
-              achievementUpdates: true,
-              newContentAlerts: true,
-              friendActivity: false,
-              reminderTime: '19:00'
-            }
-          },
-          createdAt: new Date(),
-          lastActive: new Date(),
-          isAnonymous: user.isAnonymous
-        };
-
-        try {
-          await retryFirestoreOperation(async () => {
-            await safeSetDoc(userDoc, {
-              ...newProfile,
-              createdAt: serverTimestamp(),
-              lastActive: serverTimestamp()
-            });
-          }, 1, 200); // Reduced retries for writes
-        } catch (firestoreError: any) {
-          // Only log detailed errors in development
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('Could not save profile to Firestore:', firestoreError);
-          }
-          // Continue with local profile even if Firestore save fails
-        }
-
-        return newProfile;
-      } else {
-        // Update existing user profile
-        const existingProfile = userSnap.data() as UserProfile;
-        const updatedProfile = {
-          ...existingProfile,
-          lastActive: new Date(),
-          photoURL: user.photoURL || existingProfile.photoURL,
-          displayName: user.displayName || existingProfile.displayName
-        };
-
-        try {
-          await retryFirestoreOperation(async () => {
-            await safeUpdateDoc(userDoc, {
-              lastActive: serverTimestamp(),
-              photoURL: user.photoURL,
-              displayName: user.displayName
-            });
-          }, 1, 200); // Reduced retries for updates
-        } catch (firestoreError: any) {
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('Could not update profile in Firestore:', firestoreError);
-          }
-          // Continue with local profile even if Firestore update fails
-        }
-
-        return updatedProfile;
-      }
-    } catch (error: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Firestore error in createUserProfile, creating fallback profile:', error);
-      }
-      
-      // Record the error for circuit breaker
-      recordFirestoreError(error);
-      
-      // If Firestore is completely unavailable, create a basic profile from auth data
-      return {
-        id: user.uid,
-        email: user.email || '',
-        displayName: user.displayName || user.email?.split('@')[0] || 'User',
-        photoURL: user.photoURL || undefined,
-        provider,
-        subscription: 'free',
-        preferences: {
-          theme: 'system',
-          soundEnabled: true,
-          vibrationEnabled: true,
-          autoAdvance: false,
-          showExplanations: true,
-          questionTimeLimit: null,
-          language: 'en',
-          accessibilityEnabled: false,
-          fontSize: 'medium',
-          notifications: {
-            dailyReminders: true,
-            achievementUpdates: true,
-            newContentAlerts: true,
-            friendActivity: false,
-            reminderTime: '19:00'
-          }
-        },
-        createdAt: new Date(),
-        lastActive: new Date(),
-        isAnonymous: user.isAnonymous
-      };
+    } catch (error) {
+      console.warn('Could not load saved profile from localStorage:', error);
     }
+
+    // Save profile to localStorage for persistence
+    try {
+      localStorage.setItem(`userProfile_${user.uid}`, JSON.stringify(profile));
+    } catch (error) {
+      console.warn('Could not save profile to localStorage:', error);
+    }
+
+    return profile;
   };
 
   // Sign in with Google
@@ -489,31 +342,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setError(null);
       
-      // Check if Firestore operations should be attempted
-      if (!shouldAttemptFirestoreOperation()) {
-        // Just update local state if Firestore is blocked
-        const updatedProfile = { ...userProfile, ...updates };
-        setUserProfile(updatedProfile);
-        return;
-      }
-
-      const userDoc = safeDoc('users', user.uid);
-      const updatedProfile = { ...userProfile, ...updates };
-      
-      await safeUpdateDoc(userDoc, {
-        ...updates,
-        lastActive: serverTimestamp()
-      });
-      
+      // Update local state and localStorage (pure offline mode)
+      const updatedProfile = { ...userProfile, ...updates, lastActive: new Date() };
       setUserProfile(updatedProfile);
+      
+      // Save to localStorage for persistence
+      try {
+        localStorage.setItem(`userProfile_${user.uid}`, JSON.stringify(updatedProfile));
+      } catch (storageError) {
+        console.warn('Could not save updated profile to localStorage:', storageError);
+      }
+      
     } catch (error: any) {
-      // Still update local state even if Firestore fails
-      const updatedProfile = { ...userProfile, ...updates };
-      setUserProfile(updatedProfile);
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Profile update error (using local update):', error);
-      }
+      console.warn('Profile update error:', error);
+      setError('Failed to update profile');
     }
   };
 
@@ -528,7 +370,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return userTierIndex >= requiredTierIndex;
   };
 
-  // Listen for auth state changes
+  // Listen for auth state changes (pure offline mode)
   useEffect(() => {
     
     // Check for redirect result first
@@ -538,7 +380,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         
         if (result && result.user) {
           try {
-            const profile = await createUserProfile(result.user, 'google');
+            const provider = result.providerId?.includes('google') ? 'google' :
+                            result.providerId?.includes('facebook') ? 'facebook' :
+                            result.providerId?.includes('apple') ? 'apple' : 'email';
+            const profile = await createUserProfile(result.user, provider);
             setUserProfile(profile);
           } catch (profileError) {
             console.error('Error creating profile from redirect:', profileError);
@@ -561,138 +406,50 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (user) {
         setLoading(true);
         
+        // Since Firestore is disabled, always create profile from auth data
         try {
-          // Check circuit breaker before attempting Firestore operations
-          if (!shouldRetryFirestore() || !isFirestoreAvailable()) {
-            throw new Error('Firestore circuit breaker is open, using fallback profile');
-          }
+          const provider = user.providerData[0]?.providerId.includes('google') ? 'google' :
+                          user.providerData[0]?.providerId.includes('facebook') ? 'facebook' :
+                          user.providerData[0]?.providerId.includes('apple') ? 'apple' :
+                          user.isAnonymous ? 'anonymous' : 'email';
           
-          const userDocRef = safeDoc('users', user.uid);
-          if (!userDocRef) {
-            throw new Error('Firestore is not available, using fallback profile');
-          }
-          
-          // Use retry mechanism with shorter timeout for auth context
-          const userSnap = await retryFirestoreOperation(async () => {
-            const timeoutPromise = new Promise<never>((_, reject) => {
-              setTimeout(() => reject(new Error('Firestore operation timed out')), 2000); // Reduced to 2 second timeout
-            });
-            
-            return await Promise.race([safeGetDoc(userDocRef), timeoutPromise]);
-          }, 1, 300); // Reduced to 1 retry with 300ms base delay for auth context
-          
-          if (userSnap && userSnap.exists()) {
-            const profile = userSnap.data() as UserProfile;
-            setUserProfile(profile);
-          } else {
-            // Create profile for existing user without one
-            const provider = user.providerData[0]?.providerId.includes('google') ? 'google' :
-                            user.providerData[0]?.providerId.includes('facebook') ? 'facebook' :
-                            user.providerData[0]?.providerId.includes('apple') ? 'apple' :
-                            user.isAnonymous ? 'anonymous' : 'email';
-            
-            const profile = await createUserProfile(user, provider);
-            setUserProfile(profile);
-          }
+          const profile = await createUserProfile(user, provider);
+          setUserProfile(profile);
         } catch (error: any) {
-          if (process.env.NODE_ENV === 'development') {
-            console.error('[AuthContext] Error loading user profile:', error);
-          }
+          console.warn('[AuthContext] Error creating user profile:', error);
           
-          // Handle various Firestore errors by creating a temporary profile
-          if (error.code === 'unavailable' || 
-              error.code === 'permission-denied' ||
-              error.code === 'failed-precondition' ||
-              error.message?.includes('offline') || 
-              error.message?.includes('Failed to get document') ||
-              error.message?.includes('timed out') ||
-              error.message?.includes('400') ||
-              error.message?.includes('circuit breaker') ||
-              error.name === 'FirebaseError') {
-            
-            console.warn('[AuthContext] Creating offline profile due to Firestore error');
-            
-            // Create a temporary profile from auth user data
-            const tempProfile: UserProfile = {
-              id: user.uid,
-              email: user.email || '',
-              displayName: user.displayName || user.email?.split('@')[0] || 'User',
-              photoURL: user.photoURL || undefined,
-              provider: user.providerData[0]?.providerId.includes('google') ? 'google' :
-                       user.providerData[0]?.providerId.includes('facebook') ? 'facebook' :
-                       user.providerData[0]?.providerId.includes('apple') ? 'apple' :
-                       user.isAnonymous ? 'anonymous' : 'email',
-              subscription: 'free',
-              preferences: {
-                theme: 'system',
-                soundEnabled: true,
-                vibrationEnabled: true,
-                autoAdvance: false,
-                showExplanations: true,
-                questionTimeLimit: null,
-                language: 'en',
-                accessibilityEnabled: false,
-                fontSize: 'medium',
-                notifications: {
-                  dailyReminders: true,
-                  achievementUpdates: true,
-                  newContentAlerts: true,
-                  friendActivity: false,
-                  reminderTime: '19:00'
-                }
-              },
-              createdAt: new Date(),
-              lastActive: new Date(),
-              isAnonymous: user.isAnonymous
-            };
-            
-            setUserProfile(tempProfile);
-            
-            // Try to sync to Firestore in the background
-            setTimeout(async () => {
-              try {
-                await createUserProfile(user, tempProfile.provider);
-              } catch (syncError) {
-                console.warn('Could not sync profile to Firestore:', syncError);
+          // Create basic fallback profile
+          const fallbackProfile: UserProfile = {
+            id: user.uid,
+            email: user.email || '',
+            displayName: user.displayName || user.email?.split('@')[0] || 'User',
+            photoURL: user.photoURL || undefined,
+            provider: user.isAnonymous ? 'anonymous' : 'email',
+            subscription: 'free',
+            preferences: {
+              theme: 'system',
+              soundEnabled: true,
+              vibrationEnabled: true,
+              autoAdvance: false,
+              showExplanations: true,
+              questionTimeLimit: null,
+              language: 'en',
+              accessibilityEnabled: false,
+              fontSize: 'medium',
+              notifications: {
+                dailyReminders: true,
+                achievementUpdates: true,
+                newContentAlerts: true,
+                friendActivity: false,
+                reminderTime: '19:00'
               }
-            }, 2000);
-          } else {
-            // For any other errors, still create a temporary profile to prevent blank profile screen
-            const tempProfile: UserProfile = {
-              id: user.uid,
-              email: user.email || '',
-              displayName: user.displayName || user.email?.split('@')[0] || 'User',
-              photoURL: user.photoURL || undefined,
-              provider: user.providerData[0]?.providerId.includes('google') ? 'google' :
-                       user.providerData[0]?.providerId.includes('facebook') ? 'facebook' :
-                       user.providerData[0]?.providerId.includes('apple') ? 'apple' :
-                       user.isAnonymous ? 'anonymous' : 'email',
-              subscription: 'free',
-              preferences: {
-                theme: 'system',
-                soundEnabled: true,
-                vibrationEnabled: true,
-                autoAdvance: false,
-                showExplanations: true,
-                questionTimeLimit: null,
-                language: 'en',
-                accessibilityEnabled: false,
-                fontSize: 'medium',
-                notifications: {
-                  dailyReminders: true,
-                  achievementUpdates: true,
-                  newContentAlerts: true,
-                  friendActivity: false,
-                  reminderTime: '19:00'
-                }
-              },
-              createdAt: new Date(),
-              lastActive: new Date(),
-              isAnonymous: user.isAnonymous
-            };
-            
-            setUserProfile(tempProfile);
-          }
+            },
+            createdAt: new Date(),
+            lastActive: new Date(),
+            isAnonymous: user.isAnonymous
+          };
+          
+          setUserProfile(fallbackProfile);
         }
       } else {
         setUserProfile(null);
