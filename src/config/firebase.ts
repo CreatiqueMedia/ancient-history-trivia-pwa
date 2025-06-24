@@ -67,8 +67,6 @@ export const isFirestoreAvailable = (): boolean => {
 
 // Minimal Firestore blocking - ONLY block actual Firestore endpoints  
 if (typeof window !== 'undefined') {
-  console.log('[DEBUG] Setting up minimal Firestore blocking...');
-  
   // Block ONLY very specific Firestore endpoints
   const originalFetch = window.fetch;
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
