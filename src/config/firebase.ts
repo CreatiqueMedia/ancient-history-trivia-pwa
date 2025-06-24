@@ -21,7 +21,11 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase services
 export const auth = getAuth(app);
 
-// Enhanced circuit breaker for Firestore operations
+// KILL SWITCH: Firestore is COMPLETELY DISABLED by default
+// This prevents any automatic initialization or connection attempts
+const FIRESTORE_COMPLETELY_DISABLED = true; // Never enable Firestore in this session
+
+// Enhanced circuit breaker for Firestore operations (legacy, but kept for compatibility)
 let firestoreErrorCount = 0;
 let lastErrorTime = 0;
 let isCircuitOpen = false;
@@ -33,11 +37,16 @@ const CIRCUIT_OPEN_TIME = 300000; // 5 minutes - much longer block time
 let firestoreInstance: Firestore | null = null;
 let isFirestoreInitialized = false;
 let firestoreInitializationAttempted = false;
-let isFirestorePermanentlyBlocked = false; // Permanently block after first error
+let isFirestorePermanentlyBlocked = true; // Start permanently blocked
 let hasAnyFirestoreError = false; // Track if we've ever had any Firestore error
 
 // Function to check if Firestore should be blocked
 const shouldBlockFirestore = (): boolean => {
+  // KILL SWITCH: Always block if completely disabled
+  if (FIRESTORE_COMPLETELY_DISABLED) {
+    return true;
+  }
+
   // If permanently blocked, never allow Firestore again
   if (isFirestorePermanentlyBlocked || hasAnyFirestoreError) {
     return true;
@@ -51,6 +60,12 @@ const shouldBlockFirestore = (): boolean => {
 
 // Safe Firestore getter that returns null when blocked
 const getFirestoreInstance = (): Firestore | null => {
+  // KILL SWITCH: Never allow Firestore initialization
+  if (FIRESTORE_COMPLETELY_DISABLED) {
+    console.warn('[KILL SWITCH] Firestore is completely disabled by design - no initialization allowed');
+    return null;
+  }
+
   // Always check if blocked first - permanent blocking takes precedence
   if (shouldBlockFirestore()) {
     console.warn('[Circuit Breaker] Firestore access permanently blocked due to previous errors');
@@ -71,60 +86,9 @@ const getFirestoreInstance = (): Firestore | null => {
     return null;
   }
   
-  // Never retry initialization if we've had any errors
-  if (hasAnyFirestoreError || isFirestorePermanentlyBlocked) {
-    console.warn('[Circuit Breaker] Firestore permanently disabled due to previous errors');
-    return null;
-  }
-  
-  // Only attempt initialization once per session
-  if (firestoreInitializationAttempted && !isFirestoreInitialized) {
-    console.warn('[Circuit Breaker] Firestore initialization was already attempted and failed');
-    return null;
-  }
-  
-  if (!isFirestoreInitialized && typeof window !== 'undefined') {
-    firestoreInitializationAttempted = true;
-    
-    try {
-      console.log('[Circuit Breaker] Attempting Firestore initialization...');
-      
-      // Use the most minimal configuration possible to reduce connection issues
-      firestoreInstance = initializeFirestore(app, {
-        localCache: memoryLocalCache(), // Use memory cache to avoid persistence issues
-        ignoreUndefinedProperties: true
-        // Removed all experimental settings that might trigger connections
-      });
-      
-      isFirestoreInitialized = true;
-      console.log('[Circuit Breaker] Firestore initialization successful');
-      
-    } catch (error: any) {
-      console.warn('[Circuit Breaker] Failed to initialize Firestore:', error);
-      hasAnyFirestoreError = true;
-      isFirestorePermanentlyBlocked = true;
-      recordFirestoreError(error);
-      return null;
-    }
-  } else if (!isFirestoreInitialized && typeof window === 'undefined') {
-    firestoreInitializationAttempted = true;
-    
-    try {
-      firestoreInstance = initializeFirestore(app, {
-        localCache: memoryLocalCache(),
-        ignoreUndefinedProperties: true
-      });
-      isFirestoreInitialized = true;
-    } catch (error: any) {
-      console.warn('[Circuit Breaker] Failed to initialize server-side Firestore:', error);
-      hasAnyFirestoreError = true;
-      isFirestorePermanentlyBlocked = true;
-      recordFirestoreError(error);
-      return null;
-    }
-  }
-  
-  return firestoreInstance;
+  // This code should never execute due to KILL SWITCH, but kept for safety
+  console.warn('[KILL SWITCH] Firestore initialization attempt blocked - should not reach here');
+  return null;
 };
 
 // Export db as a dynamic getter to control access (DEPRECATED - use getFirestore() instead)
@@ -143,46 +107,38 @@ export const isFirestoreAvailable = (): boolean => {
   return !shouldBlockFirestore() && getFirestoreInstance() !== null;
 };
 
-// Add global error handler for Firestore connection issues
+// ULTRA-AGGRESSIVE global error and network blocking
 if (typeof window !== 'undefined') {
-  // Intercept and handle Firestore connection errors
-  window.addEventListener('unhandledrejection', (event) => {
-    if (event.reason && typeof event.reason === 'object') {
-      const error = event.reason;
-      const errorMessage = error.message || '';
-      const errorString = String(error);
-      const errorStack = error.stack || '';
-      
-      // More comprehensive error detection
-      if (errorMessage.includes('firestore') || 
-          errorMessage.includes('transport') ||
-          errorMessage.includes('400') ||
-          errorMessage.includes('Listen') ||
-          errorMessage.includes('UNAUTHENTICATED') ||
-          errorMessage.includes('WebChannelConnection') ||
-          errorMessage.includes('grpc') ||
-          errorMessage.includes('googleapis.com') ||
-          errorString.includes('firestore') ||
-          errorString.includes('Listen') ||
-          errorString.includes('400') ||
-          errorStack.includes('firestore') ||
-          errorStack.includes('WebChannelConnection')) {
-        
-        console.warn('[Circuit Breaker] Firestore-related error detected and suppressed:', errorMessage);
-        recordFirestoreError(error);
-        
-        // Prevent console noise and network spam
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-        
-        // Return false to prevent default handling
-        return false;
-      }
+  // Block ALL Firestore-related network requests immediately
+  const originalFetch = window.fetch;
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input.toString();
+    if (url.includes('firestore.googleapis.com') || 
+        url.includes('googleapis.com/v1/projects') ||
+        url.includes('google.firestore.v1.Firestore')) {
+      console.warn('[KILL SWITCH] Blocking ALL Firestore network requests');
+      // Immediately reject with a clear error
+      throw new Error('Firestore completely disabled - all network requests blocked');
     }
-  });
+    return originalFetch.call(window, input, init);
+  };
 
-  // Also intercept console errors that might be related to Firestore
+  // Block ALL WebSocket connections to Firestore
+  const originalWebSocket = window.WebSocket;
+  window.WebSocket = class extends WebSocket {
+    constructor(url: string | URL, protocols?: string | string[]) {
+      const urlString = url.toString();
+      if (urlString.includes('firestore') || 
+          urlString.includes('googleapis.com') ||
+          urlString.includes('google.firestore')) {
+        console.warn('[KILL SWITCH] Blocking ALL Firestore WebSocket connections');
+        throw new Error('Firestore WebSocket connections completely disabled');
+      }
+      super(url, protocols);
+    }
+  };
+
+  // Intercept and completely suppress ALL Firestore-related console output
   const originalConsoleError = console.error;
   console.error = (...args: any[]) => {
     const errorString = args.join(' ');
@@ -192,15 +148,16 @@ if (typeof window !== 'undefined') {
         errorString.includes('transport errored') ||
         errorString.includes('grpc') ||
         errorString.includes('googleapis.com') ||
-        errorString.includes('400')) {
-      console.warn('[Circuit Breaker] Firestore console error detected and suppressed:', errorString);
-      recordFirestoreError(new Error(errorString));
-      return; // Suppress the error completely
+        errorString.includes('400') ||
+        errorString.includes('persistence layer') ||
+        errorString.includes('Failed to obtain exclusive access')) {
+      console.warn('[KILL SWITCH] Firestore console error suppressed:', errorString.substring(0, 100) + '...');
+      return; // Completely suppress
     }
     originalConsoleError.apply(console, args);
   };
 
-  // Intercept console.warn as well since some Firestore errors show up as warnings
+  // Also suppress console.warn for Firestore
   const originalConsoleWarn = console.warn;
   console.warn = (...args: any[]) => {
     const errorString = args.join(' ');
@@ -208,42 +165,71 @@ if (typeof window !== 'undefined') {
         (errorString.includes('Listen') || 
          errorString.includes('WebChannelConnection') ||
          errorString.includes('transport errored') ||
-         errorString.includes('400'))) {
-      console.warn('[Circuit Breaker] Firestore console warning detected and suppressed:', errorString);
-      recordFirestoreError(new Error(errorString));
-      return; // Suppress the warning
+         errorString.includes('400') ||
+         errorString.includes('persistence layer') ||
+         errorString.includes('Failed to obtain exclusive access'))) {
+      // Don't log these Firestore warnings at all
+      return;
     }
     originalConsoleWarn.apply(console, args);
   };
 
-  // Intercept fetch requests to Firestore APIs
-  const originalFetch = window.fetch;
-  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = typeof input === 'string' ? input : input.toString();
-    if (url.includes('firestore.googleapis.com') || url.includes('googleapis.com/v1/projects')) {
-      if (shouldBlockFirestore() || hasAnyFirestoreError || isFirestorePermanentlyBlocked) {
-        console.warn('[Circuit Breaker] Blocking Firestore fetch request - Firestore is permanently disabled');
-        // Throw an error to prevent the request
-        throw new Error('Firestore permanently disabled due to previous errors');
+  // Intercept and suppress ALL Firestore unhandledrejection events
+  window.addEventListener('unhandledrejection', (event) => {
+    if (event.reason && typeof event.reason === 'object') {
+      const error = event.reason;
+      const errorMessage = error.message || '';
+      const errorString = String(error);
+      const errorStack = error.stack || '';
+      
+      // Extremely comprehensive error detection and suppression
+      if (errorMessage.includes('firestore') || 
+          errorMessage.includes('transport') ||
+          errorMessage.includes('400') ||
+          errorMessage.includes('Listen') ||
+          errorMessage.includes('UNAUTHENTICATED') ||
+          errorMessage.includes('WebChannelConnection') ||
+          errorMessage.includes('grpc') ||
+          errorMessage.includes('googleapis.com') ||
+          errorMessage.includes('persistence layer') ||
+          errorMessage.includes('Failed to obtain exclusive access') ||
+          errorString.includes('firestore') ||
+          errorString.includes('Listen') ||
+          errorString.includes('400') ||
+          errorStack.includes('firestore') ||
+          errorStack.includes('WebChannelConnection')) {
+        
+        console.warn('[KILL SWITCH] Firestore error completely suppressed');
+        recordFirestoreError(error);
+        
+        // Prevent ALL default handling
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        
+        return false;
       }
     }
-    return originalFetch.call(window, input, init);
-  };
+  });
 
-  // Also try to intercept WebSocket connections to Firestore
-  const originalWebSocket = window.WebSocket;
-  window.WebSocket = class extends WebSocket {
-    constructor(url: string | URL, protocols?: string | string[]) {
-      const urlString = url.toString();
-      if (urlString.includes('firestore') || urlString.includes('googleapis.com')) {
-        if (shouldBlockFirestore() || hasAnyFirestoreError || isFirestorePermanentlyBlocked) {
-          console.warn('[Circuit Breaker] Blocking Firestore WebSocket connection');
-          throw new Error('Firestore WebSocket connections permanently disabled');
-        }
-      }
-      super(url, protocols);
+  // Also try to block any attempt to create Firestore instances
+  // Override the initializeFirestore function globally
+  if ((window as any).firebase || (window as any).initializeFirestore) {
+    console.warn('[KILL SWITCH] Attempting to override global Firestore functions');
+    try {
+      // Try to override any global Firestore initialization
+      Object.defineProperty(window, 'initializeFirestore', {
+        value: () => {
+          console.warn('[KILL SWITCH] Global Firestore initialization blocked');
+          throw new Error('Firestore completely disabled');
+        },
+        writable: false,
+        configurable: false
+      });
+    } catch (e) {
+      // Ignore if we can't override
     }
-  };
+  }
 }
 
 // Configure Firestore settings for better offline handling
@@ -356,8 +342,9 @@ export const getFirestoreStatus = () => ({
   isBlocked: isFirestoreBlocked,
   isPermanentlyBlocked: isFirestorePermanentlyBlocked,
   hasAnyError: hasAnyFirestoreError,
+  isCompletelyDisabled: FIRESTORE_COMPLETELY_DISABLED,
   lastErrorTime,
-  canRetry: false // Never retry in this session after any error
+  canRetry: false // Never retry - completely disabled
 });
 
 // Add a function to test Firestore connectivity
