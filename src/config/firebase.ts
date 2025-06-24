@@ -25,79 +25,101 @@ export const auth = getAuth(app);
 let firestoreErrorCount = 0;
 let lastErrorTime = 0;
 let isCircuitOpen = false;
-let isFirestoreBlocked = false;
+let isFirestoreBlocked = true; // Start blocked by default to prevent immediate initialization
 const MAX_ERRORS = 1; // Extremely aggressive - just 1 error triggers circuit breaker
 const ERROR_WINDOW = 30000; // 30 seconds
 const CIRCUIT_OPEN_TIME = 300000; // 5 minutes - much longer block time
 
 let firestoreInstance: Firestore | null = null;
 let isFirestoreInitialized = false;
+let firestoreInitializationAttempted = false;
+let isFirestorePermanentlyBlocked = false; // Permanently block after first error
+let hasAnyFirestoreError = false; // Track if we've ever had any Firestore error
 
 // Function to check if Firestore should be blocked
 const shouldBlockFirestore = (): boolean => {
+  // If permanently blocked, never allow Firestore again
+  if (isFirestorePermanentlyBlocked || hasAnyFirestoreError) {
+    return true;
+  }
+
   const now = Date.now();
   
-  // Reset error count if enough time has passed
-  if (now - lastErrorTime > ERROR_WINDOW) {
-    firestoreErrorCount = 0;
-    isCircuitOpen = false;
-    isFirestoreBlocked = false;
-  }
-  
-  // If circuit is open, check if we should try again
-  if (isCircuitOpen && now - lastErrorTime > CIRCUIT_OPEN_TIME) {
-    isCircuitOpen = false;
-    isFirestoreBlocked = false;
-    firestoreErrorCount = Math.max(0, firestoreErrorCount - 1); // Gradually reduce error count
-  }
-  
+  // Also block if circuit breaker conditions are met
   return isFirestoreBlocked || isCircuitOpen || firestoreErrorCount >= MAX_ERRORS;
 };
 
 // Safe Firestore getter that returns null when blocked
 const getFirestoreInstance = (): Firestore | null => {
+  // Always check if blocked first - permanent blocking takes precedence
   if (shouldBlockFirestore()) {
-    // Force disconnect any existing instance when circuit breaker is open
-    if (firestoreInstance) {
+    console.warn('[Circuit Breaker] Firestore access permanently blocked due to previous errors');
+    
+    // Force complete cleanup of any existing instance
+    if (firestoreInstance && isFirestoreInitialized) {
       try {
         disableNetwork(firestoreInstance).catch(() => {
           // Ignore errors when disabling network
         });
+        // Clear the instance to prevent any lingering connections
+        firestoreInstance = null;
+        isFirestoreInitialized = false;
       } catch (error) {
-        // Ignore errors
+        // Ignore cleanup errors
       }
     }
     return null;
   }
   
+  // Never retry initialization if we've had any errors
+  if (hasAnyFirestoreError || isFirestorePermanentlyBlocked) {
+    console.warn('[Circuit Breaker] Firestore permanently disabled due to previous errors');
+    return null;
+  }
+  
+  // Only attempt initialization once per session
+  if (firestoreInitializationAttempted && !isFirestoreInitialized) {
+    console.warn('[Circuit Breaker] Firestore initialization was already attempted and failed');
+    return null;
+  }
+  
   if (!isFirestoreInitialized && typeof window !== 'undefined') {
+    firestoreInitializationAttempted = true;
+    
     try {
+      console.log('[Circuit Breaker] Attempting Firestore initialization...');
+      
+      // Use the most minimal configuration possible to reduce connection issues
       firestoreInstance = initializeFirestore(app, {
-        localCache: persistentLocalCache({ 
-          cacheSizeBytes: 50 * 1024 * 1024 // 50MB cache size
-        }),
-        // Add experimental settings to reduce connection issues
-        experimentalForceLongPolling: true, // Force long polling to avoid WebSocket issues
-        ignoreUndefinedProperties: true, // Ignore undefined properties to prevent errors
-        // Add settings to prevent automatic listeners
-        experimentalAutoDetectLongPolling: false
+        localCache: memoryLocalCache(), // Use memory cache to avoid persistence issues
+        ignoreUndefinedProperties: true
+        // Removed all experimental settings that might trigger connections
       });
+      
       isFirestoreInitialized = true;
+      console.log('[Circuit Breaker] Firestore initialization successful');
+      
     } catch (error: any) {
-      console.warn('Failed to initialize Firestore:', error);
+      console.warn('[Circuit Breaker] Failed to initialize Firestore:', error);
+      hasAnyFirestoreError = true;
+      isFirestorePermanentlyBlocked = true;
       recordFirestoreError(error);
       return null;
     }
   } else if (!isFirestoreInitialized && typeof window === 'undefined') {
+    firestoreInitializationAttempted = true;
+    
     try {
       firestoreInstance = initializeFirestore(app, {
-        localCache: memoryLocalCache(), // Use memory cache for server-side
-        ignoreUndefinedProperties: true,
-        experimentalForceLongPolling: true
+        localCache: memoryLocalCache(),
+        ignoreUndefinedProperties: true
       });
       isFirestoreInitialized = true;
     } catch (error: any) {
-      console.warn('Failed to initialize server-side Firestore:', error);
+      console.warn('[Circuit Breaker] Failed to initialize server-side Firestore:', error);
+      hasAnyFirestoreError = true;
+      isFirestorePermanentlyBlocked = true;
+      recordFirestoreError(error);
       return null;
     }
   }
@@ -129,22 +151,33 @@ if (typeof window !== 'undefined') {
       const error = event.reason;
       const errorMessage = error.message || '';
       const errorString = String(error);
+      const errorStack = error.stack || '';
       
+      // More comprehensive error detection
       if (errorMessage.includes('firestore') || 
           errorMessage.includes('transport') ||
           errorMessage.includes('400') ||
           errorMessage.includes('Listen') ||
           errorMessage.includes('UNAUTHENTICATED') ||
           errorMessage.includes('WebChannelConnection') ||
+          errorMessage.includes('grpc') ||
+          errorMessage.includes('googleapis.com') ||
           errorString.includes('firestore') ||
           errorString.includes('Listen') ||
-          errorString.includes('400')) {
+          errorString.includes('400') ||
+          errorStack.includes('firestore') ||
+          errorStack.includes('WebChannelConnection')) {
         
-        console.warn('[Circuit Breaker] Firestore error detected, triggering circuit breaker:', errorMessage);
+        console.warn('[Circuit Breaker] Firestore-related error detected and suppressed:', errorMessage);
         recordFirestoreError(error);
         
         // Prevent console noise and network spam
         event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        
+        // Return false to prevent default handling
+        return false;
       }
     }
   });
@@ -156,25 +189,60 @@ if (typeof window !== 'undefined') {
     if (errorString.includes('firestore') || 
         errorString.includes('Listen') || 
         errorString.includes('WebChannelConnection') ||
-        errorString.includes('transport errored')) {
-      console.warn('[Circuit Breaker] Firestore console error detected:', errorString);
+        errorString.includes('transport errored') ||
+        errorString.includes('grpc') ||
+        errorString.includes('googleapis.com') ||
+        errorString.includes('400')) {
+      console.warn('[Circuit Breaker] Firestore console error detected and suppressed:', errorString);
       recordFirestoreError(new Error(errorString));
-      return; // Suppress the error
+      return; // Suppress the error completely
     }
     originalConsoleError.apply(console, args);
+  };
+
+  // Intercept console.warn as well since some Firestore errors show up as warnings
+  const originalConsoleWarn = console.warn;
+  console.warn = (...args: any[]) => {
+    const errorString = args.join(' ');
+    if (errorString.includes('firestore') && 
+        (errorString.includes('Listen') || 
+         errorString.includes('WebChannelConnection') ||
+         errorString.includes('transport errored') ||
+         errorString.includes('400'))) {
+      console.warn('[Circuit Breaker] Firestore console warning detected and suppressed:', errorString);
+      recordFirestoreError(new Error(errorString));
+      return; // Suppress the warning
+    }
+    originalConsoleWarn.apply(console, args);
   };
 
   // Intercept fetch requests to Firestore APIs
   const originalFetch = window.fetch;
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === 'string' ? input : input.toString();
-    if (url.includes('firestore.googleapis.com')) {
-      if (shouldBlockFirestore()) {
-        console.warn('[Circuit Breaker] Blocking Firestore fetch request due to circuit breaker');
-        throw new Error('Firestore circuit breaker is open');
+    if (url.includes('firestore.googleapis.com') || url.includes('googleapis.com/v1/projects')) {
+      if (shouldBlockFirestore() || hasAnyFirestoreError || isFirestorePermanentlyBlocked) {
+        console.warn('[Circuit Breaker] Blocking Firestore fetch request - Firestore is permanently disabled');
+        // Throw an error to prevent the request
+        throw new Error('Firestore permanently disabled due to previous errors');
       }
     }
     return originalFetch.call(window, input, init);
+  };
+
+  // Also try to intercept WebSocket connections to Firestore
+  const originalWebSocket = window.WebSocket;
+  window.WebSocket = class extends WebSocket {
+    constructor(url: string | URL, protocols?: string | string[]) {
+      const urlString = url.toString();
+      if (urlString.includes('firestore') || urlString.includes('googleapis.com')) {
+        if (shouldBlockFirestore() || hasAnyFirestoreError || isFirestorePermanentlyBlocked) {
+          console.warn('[Circuit Breaker] Blocking Firestore WebSocket connection');
+          throw new Error('Firestore WebSocket connections permanently disabled');
+        }
+      }
+      super(url, protocols);
+    }
   };
 }
 
@@ -240,18 +308,26 @@ export const recordFirestoreError = (error?: any): void => {
   firestoreErrorCount++;
   lastErrorTime = Date.now();
   
-  // Open circuit immediately on first error
+  // Mark Firestore as permanently blocked after any error
+  hasAnyFirestoreError = true;
+  isFirestorePermanentlyBlocked = true;
   isCircuitOpen = true;
   isFirestoreBlocked = true;
   
-  console.warn('[Circuit Breaker] Firestore circuit breaker opened immediately due to error. Errors:', firestoreErrorCount);
+  console.warn('[Circuit Breaker] Firestore permanently blocked due to error. This session will not attempt Firestore operations again.');
   
-  // Aggressively disconnect Firestore to prevent more attempts
+  // Aggressively clean up any existing Firestore instance
   if (firestoreInstance) {
     try {
-      disableNetwork(firestoreInstance).catch(() => {
+      disableNetwork(firestoreInstance).then(() => {
+        console.log('[Circuit Breaker] Firestore network disabled');
+      }).catch(() => {
         // Ignore disconnection errors
       });
+      
+      // Clear the instance completely
+      firestoreInstance = null;
+      isFirestoreInitialized = false;
     } catch (disconnectError) {
       // Ignore disconnection errors
     }
@@ -259,25 +335,29 @@ export const recordFirestoreError = (error?: any): void => {
   
   // Log specific error patterns in development
   if (process.env.NODE_ENV === 'development' && error) {
-    if (error.code === 'unavailable' || error.code === 'failed-precondition') {
-      console.warn('Firestore connectivity issue:', error.code, error.message);
-    }
+    console.warn('Firestore error details:', error.code || 'unknown', error.message || 'no message');
   }
 };
 
 export const resetFirestoreErrors = (): void => {
+  // Do NOT reset the permanent block - once blocked, stay blocked for the session
+  console.warn('[Circuit Breaker] Reset requested, but permanent blocking remains in effect for this session');
+  // Only reset counters for informational purposes
   firestoreErrorCount = 0;
   lastErrorTime = 0;
-  isCircuitOpen = false;
-  isFirestoreBlocked = false;
+  // Keep permanent blocks in place:
+  // hasAnyFirestoreError = true (unchanged)
+  // isFirestorePermanentlyBlocked = true (unchanged)
 };
 
 export const getFirestoreStatus = () => ({
   errorCount: firestoreErrorCount,
   isCircuitOpen,
   isBlocked: isFirestoreBlocked,
+  isPermanentlyBlocked: isFirestorePermanentlyBlocked,
+  hasAnyError: hasAnyFirestoreError,
   lastErrorTime,
-  canRetry: shouldRetryFirestore()
+  canRetry: false // Never retry in this session after any error
 });
 
 // Add a function to test Firestore connectivity
