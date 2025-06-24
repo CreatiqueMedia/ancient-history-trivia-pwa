@@ -65,32 +65,43 @@ export const isFirestoreAvailable = (): boolean => {
   return false;
 };
 
-// ULTRA-AGGRESSIVE global error and network blocking
+// TARGETED Firestore blocking (not blocking Auth)
 if (typeof window !== 'undefined') {
-  // Block ALL Firestore-related network requests immediately
+  // Block ONLY Firestore-related network requests (allow Auth requests)
   const originalFetch = window.fetch;
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === 'string' ? input : input.toString();
+    
+    // Only block VERY SPECIFIC Firestore endpoints - be extremely precise to avoid blocking Auth
     if (url.includes('firestore.googleapis.com') || 
-        url.includes('googleapis.com/v1/projects') ||
-        url.includes('google.firestore.v1.Firestore')) {
-      console.warn('[KILL SWITCH] Blocking ALL Firestore network requests');
-      // Immediately reject with a clear error
-      throw new Error('Firestore completely disabled - all network requests blocked');
+        url.includes('/google.firestore.v1.Firestore/') ||
+        url.includes('v1/projects/') && url.includes('databases/') && url.includes('documents/')) {
+      console.warn('[KILL SWITCH] Blocking Firestore network request:', url.substring(0, 100) + '...');
+      throw new Error('Firestore completely disabled - request blocked');
     }
+    
+    // Debug: Log what we're allowing through
+    if (url.includes('googleapis.com')) {
+      console.log('[DEBUG] Allowing googleapis.com request:', url.substring(0, 100) + '...');
+    }
+    
+    // Allow all other requests (Auth, Analytics, etc.)
     return originalFetch.call(window, input, init);
   };
 
-  // Block ALL WebSocket connections to Firestore
+  // Block ONLY Firestore WebSocket connections (be very specific)
   const originalWebSocket = window.WebSocket;
   window.WebSocket = class extends WebSocket {
     constructor(url: string | URL, protocols?: string | string[]) {
       const urlString = url.toString();
-      if (urlString.includes('firestore') || 
-          urlString.includes('googleapis.com') ||
-          urlString.includes('google.firestore')) {
-        console.warn('[KILL SWITCH] Blocking ALL Firestore WebSocket connections');
-        throw new Error('Firestore WebSocket connections completely disabled');
+      // Only block Firestore-specific WebSocket connections
+      if (urlString.includes('firestore.googleapis.com')) {
+        console.warn('[KILL SWITCH] Blocking Firestore WebSocket connection:', urlString.substring(0, 100) + '...');
+        throw new Error('Firestore WebSocket connections disabled');
+      }
+      // Debug: Log what WebSocket connections we're allowing
+      if (urlString.includes('googleapis.com')) {
+        console.log('[DEBUG] Allowing WebSocket connection:', urlString.substring(0, 100) + '...');
       }
       super(url, protocols);
     }
