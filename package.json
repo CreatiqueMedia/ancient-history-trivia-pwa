@@ -13,10 +13,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build:github": "tsc && vite build --base=/ancient-history-trivia-pwa/",
     "deploy": "yarn build && firebase deploy --only hosting",
-    "deploy:github": "yarn build:github && yarn gh-pages -d dist",
-    "deploy:firebase": "yarn build && firebase deploy --only hosting",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -25,6 +22,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.0.18",
+    "@supabase/supabase-js": "^2.50.1",
     "clsx": "^2.0.0",
     "firebase": "^11.9.1",
     "firebaseui": "^6.1.0",

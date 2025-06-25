@@ -1,48 +1,27 @@
-name: Deploy to GitHub Pages
+name: GitHub Pages Deployment (DISABLED)
+
+# This workflow is disabled - using Firebase Hosting only
+# Firebase URL: https://ancient-history-trivia.web.app/
 
 on:
-  push:
-    branches: [ main ]
+  # Workflow disabled - only manual trigger available
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    inputs:
+      confirm_deploy:
+        description: 'Type "CONFIRM" to enable (not recommended)'
+        required: true
+        default: 'DISABLED'
 
 jobs:
-  build-and-deploy:
+  disabled-notice:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'yarn'
-          
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-        
-      - name: Build for GitHub Pages
-        run: yarn build:github
-        env:
-          NODE_ENV: production
-          
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-        
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './dist'
-          
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Display Notice
+        run: |
+          echo "❌ GitHub Pages deployment is DISABLED"
+          echo "✅ Using Firebase Hosting instead: https://ancient-history-trivia.web.app/"
+          echo "This workflow has been intentionally disabled."
+          if [ "${{ github.event.inputs.confirm_deploy }}" != "CONFIRM" ]; then
+            echo "Exiting - deployment not confirmed"
+            exit 1
+          fi
