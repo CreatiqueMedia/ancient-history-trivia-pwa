@@ -63,6 +63,21 @@ const UserProfileScreen: React.FC = () => {
     }
   };
 
+  const getPlanDescription = (planId: string) => {
+    switch (planId) {
+      case 'free':
+        return 'You are on the Explorer plan. Unlock all question bundles, advanced stats, and exclusive content by upgrading!';
+      case 'scholar':
+        return 'You are a Scholar! Enjoy unlimited questions and advanced features. Upgrade to Historian or Academy for even more.';
+      case 'historian':
+        return 'Historian status unlocked! Access exclusive content, analytics, and offline mode. Go Academy for the ultimate experience.';
+      case 'academy':
+        return 'Academy Biennial: You have the best value and all features unlocked for 2 years!';
+      default:
+        return '';
+    }
+  };
+
   const subscriptionBadge = getSubscriptionBadge();
 
   return (
@@ -238,9 +253,17 @@ const UserProfileScreen: React.FC = () => {
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
               Manage your subscription and unlock premium features
             </p>
-            <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${subscriptionBadge.color}`}>
-              {subscriptionBadge.icon} {subscriptionBadge.name}
-            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
+              {getPlanDescription(userProfile.subscription)}
+            </p>
+            {userProfile.subscription !== 'academy' && (
+              <Link
+                to="/subscription"
+                className="mt-2 inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
+              >
+                Upgrade Now
+              </Link>
+            )}
           </Link>
 
           {/* Settings */}

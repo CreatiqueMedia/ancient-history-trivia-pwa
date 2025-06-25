@@ -50,6 +50,22 @@ const formatPeriod = (period: string): string => {
   }
 };
 
+// Add persuasive marketing copy for each plan
+const getPlanTagline = (planId: string) => {
+  switch (planId) {
+    case 'free':
+      return 'Start your journey – no credit card required!';
+    case 'scholar':
+      return 'Unlock all question bundles and advanced features. Try free for 7 days!';
+    case 'historian':
+      return 'Go deeper with exclusive content, analytics, and offline access. 14-day free trial!';
+    case 'academy':
+      return 'Best value: 2 years of premium access, institution features, and the ultimate learning toolkit.';
+    default:
+      return '';
+  }
+};
+
 const StoreScreen: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'bundles' | 'subscription' | 'legacy'>('bundles');
@@ -394,6 +410,7 @@ const StoreScreen: React.FC = () => {
         
         <div className="text-center mt-4">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">{tier.name}</h3>
+          <p className="mt-2 text-primary-700 dark:text-primary-300 text-base font-medium">{getPlanTagline(tier.id)}</p>
           <div className="mt-2">
             <span className="text-3xl font-bold text-gray-900 dark:text-white">${tier.price}</span>
             <span className="text-gray-500 dark:text-gray-400">/{formatPeriod(tier.period)}</span>
@@ -423,7 +440,7 @@ const StoreScreen: React.FC = () => {
               : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
           } disabled:bg-gray-400 disabled:cursor-not-allowed`}
         >
-          {isPremiumUser ? 'Current Plan' : isProcessing ? 'Processing...' : 'Subscribe'}
+          {isPremiumUser ? 'Current Plan' : isProcessing ? 'Processing...' : tier.id === 'free' ? 'Switch to Free Plan' : tier.id === 'scholar' ? 'Start 7-Day Free Trial' : tier.id === 'historian' ? 'Start 14-Day Free Trial' : tier.id === 'academy' ? 'Unlock 2 Years – Best Value!' : `Get ${tier.name}`}
         </button>
       </div>
     );
@@ -574,6 +591,15 @@ const StoreScreen: React.FC = () => {
           </>
         ) : activeTab === 'subscription' ? (
           <>
+            {/* FOMO/Urgency Banner */}
+            {activeTab === 'subscription' && (
+              <div className="mb-8 text-center">
+                <span className="inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-2 rounded-full shadow-sm">
+                  Limited-time: Free trials and exclusive savings available now!
+                </span>
+              </div>
+            )}
+
             {/* Subscription Plans */}
             <div className="mb-8">
               <div className="text-center mb-8">

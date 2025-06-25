@@ -95,6 +95,22 @@ const SubscriptionScreen: React.FC = () => {
     }
   };
 
+  // Add/Update: Persuasive, standardized marketing copy and CTAs for each subscription plan
+  const getPlanTagline = (planId: string) => {
+    switch (planId) {
+      case 'free':
+        return 'Start your journey – no credit card required!';
+      case 'scholar':
+        return 'Unlock all question bundles, unlimited questions, and advanced features. Try free for 7 days!';
+      case 'historian':
+        return 'Go deeper with exclusive expert content, analytics, offline access, and more. 14-day free trial!';
+      case 'academy':
+        return 'Best value: 2 years of premium access, institution features, and the ultimate learning toolkit.';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div>
       {/* Header */}
@@ -140,6 +156,11 @@ const SubscriptionScreen: React.FC = () => {
 
       {/* Pricing Plans */}
       <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="mb-8 text-center">
+          <span className="inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-2 rounded-full shadow-sm">
+            Limited-time: Free trials and exclusive savings available now! Don't miss out – upgrade today.
+          </span>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {currentPlans.map((plan) => {
             const isCurrentPlan = userProfile?.subscription === plan.id;
@@ -184,6 +205,9 @@ const SubscriptionScreen: React.FC = () => {
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                       {plan.name}
                     </h3>
+                    <p className="mt-2 text-primary-700 dark:text-primary-300 text-base font-medium">
+                      {getPlanTagline(plan.id)}
+                    </p>
                     <div className="mt-4">
                       <span className="text-4xl font-bold text-gray-900 dark:text-white">
                         ${plan.price}
@@ -238,7 +262,13 @@ const SubscriptionScreen: React.FC = () => {
                     ) : isCurrentPlan ? (
                       'Current Plan'
                     ) : plan.id === 'free' ? (
-                      'Downgrade to Free'
+                      'Switch to Free Plan'
+                    ) : plan.id === 'scholar' ? (
+                      'Start 7-Day Free Trial'
+                    ) : plan.id === 'historian' ? (
+                      'Start 14-Day Free Trial'
+                    ) : plan.id === 'academy' ? (
+                      'Unlock 2 Years – Best Value!'
                     ) : (
                       `Get ${plan.name}`
                     )}
@@ -287,7 +317,7 @@ const SubscriptionScreen: React.FC = () => {
                   Is there a money-back guarantee?
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Absolutely! We offer a 30-day money-back guarantee. If you're not satisfied, we'll refund your payment in full.
+                  Absolutely! We offer a 30-day money-back guarantee. If you're not satisfied, we'll refund your payment in full – no questions asked.
                 </p>
               </div>
             </div>
