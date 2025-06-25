@@ -18,26 +18,42 @@ export class SampleQuizService {
    * Generate a sample quiz for a specific bundle
    */
   static generateSampleQuiz(bundle: QuestionBundle): Question[] {
-    // For now, we'll use questions from the general sample pool
-    // In production, each bundle would have its own question pool
     const bundleQuestions = this.getQuestionsForBundle(bundle);
-    
     const sampleQuiz: Question[] = [];
-    
-    // Get 3 easy questions
-    const easyQuestions = bundleQuestions.filter(q => q.difficulty === 'easy');
-    sampleQuiz.push(...this.getRandomQuestions(easyQuestions, 3));
-    
-    // Get 4 medium questions
-    const mediumQuestions = bundleQuestions.filter(q => q.difficulty === 'medium');
-    sampleQuiz.push(...this.getRandomQuestions(mediumQuestions, 4));
-    
-    // Get 3 hard questions
-    const hardQuestions = bundleQuestions.filter(q => q.difficulty === 'hard');
-    sampleQuiz.push(...this.getRandomQuestions(hardQuestions, 3));
-    
-    // Shuffle the final quiz
-    return this.shuffleArray(sampleQuiz);
+    const isFormatPack = bundle.category === 'format' || bundle.bpType === 'FormatPackType';
+    const format = bundle.format;
+    const totalQuestions = 10;
+
+    // Helper to filter by format
+    const getFormatType = (q: Question): string => {
+      if (q.options.length === 2 && (q.options[0].toLowerCase() === 'true' || q.options[1].toLowerCase() === 'false')) return 'True/False';
+      if (q.question.includes('_____') || q.question.toLowerCase().includes('blank')) return 'Fill-in-the-Blank';
+      return 'Multiple Choice';
+    };
+
+    if (isFormatPack && (format === 'Multiple Choice' || format === 'True/False' || format === 'Fill-in-the-Blank')) {
+      // Only use questions of the matching format
+      const formatQuestions = bundleQuestions.filter(q => getFormatType(q) === format);
+      return this.getRandomQuestions(formatQuestions, totalQuestions);
+    } else {
+      // Mixed: try to get as close to equal as possible
+      const tf = bundleQuestions.filter(q => getFormatType(q) === 'True/False');
+      const mc = bundleQuestions.filter(q => getFormatType(q) === 'Multiple Choice');
+      const fib = bundleQuestions.filter(q => getFormatType(q) === 'Fill-in-the-Blank');
+      // Try to get at least 3 of each, then fill remainder
+      const tfCount = Math.min(3, tf.length);
+      const mcCount = Math.min(3, mc.length);
+      const fibCount = Math.min(3, fib.length);
+      sampleQuiz.push(...this.getRandomQuestions(tf, tfCount));
+      sampleQuiz.push(...this.getRandomQuestions(mc, mcCount));
+      sampleQuiz.push(...this.getRandomQuestions(fib, fibCount));
+      // Fill up to 10 with remaining, prioritizing balance
+      let remaining = totalQuestions - sampleQuiz.length;
+      const leftovers = [...this.getRandomQuestions(tf, tf.length), ...this.getRandomQuestions(mc, mc.length), ...this.getRandomQuestions(fib, fib.length)]
+        .filter(q => !sampleQuiz.includes(q));
+      sampleQuiz.push(...leftovers.slice(0, remaining));
+      return this.shuffleArray(sampleQuiz).slice(0, totalQuestions);
+    }
   }
 
   /**

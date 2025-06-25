@@ -1,0 +1,25 @@
+name: README Compliance
+
+on:
+  push:
+    paths:
+      - 'README.md'
+      - 'scripts/check-readme-compliance.ts'
+  pull_request:
+    paths:
+      - 'README.md'
+      - 'scripts/check-readme-compliance.ts'
+
+jobs:
+  check-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Run README compliance check
+        run: yarn ts-node scripts/check-readme-compliance.ts
