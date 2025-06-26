@@ -238,11 +238,8 @@ const UserProfileScreen: React.FC = () => {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Subscription Management */}
-          <Link
-            to="/subscription"
-            className="card p-6 hover:shadow-lg transition-shadow"
-          >
+          {/* Subscription Management (removed /subscription link) */}
+          <div className="card p-6">
             <div className="flex items-center mb-4">
               <StarIcon className="w-8 h-8 text-primary-600 mr-3" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -256,14 +253,11 @@ const UserProfileScreen: React.FC = () => {
               {getPlanDescription(userProfile.subscription)}
             </p>
             {(!['pro_biennial', 'pro_annual', 'pro_monthly'].includes(userProfile.subscription as string)) && (
-              <Link
-                to="/subscription"
-                className="mt-2 inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
-              >
+              <span className="mt-2 inline-block bg-primary-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm opacity-50 cursor-not-allowed">
                 Upgrade Now
-              </Link>
+              </span>
             )}
-          </Link>
+          </div>
 
           {/* Settings */}
           <Link
