@@ -347,30 +347,88 @@ const UserProfileScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Subscription Management Section */}
+        {/* Subscription Status Section */}
         <div className="mb-8">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Your Subscription
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              {isPremiumUser ? 'Manage your premium subscription' : 'Choose a plan to unlock all premium features'}
+              Current subscription status and plan details
             </p>
           </div>
 
-          {/* Current Subscription or Available Plans */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Current Subscription Status Card */}
+          <div className="max-w-md mx-auto">
             {(() => {
               const currentTier = getCurrentSubscriptionTier();
               
               if (currentTier) {
-                // Show current subscription + other options
-                return SUBSCRIPTION_TIERS.map(tier => 
-                  renderSubscriptionCard(tier, tier.id === currentTier.id)
+                // Show current subscription status
+                return (
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border-2 border-green-500 shadow-sm">
+                    <div className="text-center">
+                      <div className="mb-4">
+                        <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                          ✓ Active Plan
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                        {currentTier.name}
+                      </h3>
+                      <div className="text-gray-600 dark:text-gray-400 mb-4">
+                        <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                          ${currentTier.price}
+                        </span>
+                        <span className="text-sm">/{formatPeriod(currentTier.period)}</span>
+                      </div>
+                      <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                        {currentTier.features.slice(0, 3).map((feature, index) => (
+                          <div key={index} className="flex items-center justify-center">
+                            <CheckCircleIcon className="w-4 h-4 text-green-500 mr-2" />
+                            {feature}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-6">
+                        <button
+                          onClick={handleManageSubscription}
+                          className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm"
+                        >
+                          Manage Subscription
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 );
               } else {
-                // Show all available subscription options
-                return SUBSCRIPTION_TIERS.map(tier => renderSubscriptionCard(tier, false));
+                // Show no subscription status with call-to-action
+                return (
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+                    <div className="text-center">
+                      <div className="mb-4">
+                        <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-3 py-1 rounded-full text-sm font-medium">
+                          No Active Plan
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                        Free Plan
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm">
+                        You're currently using the free version with limited access to question bundles.
+                      </p>
+                      <button
+                        onClick={handleManageSubscription}
+                        className="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-lg"
+                      >
+                        <span>Go with a Premium Subscription</span>
+                        <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                );
               }
             })()}
           </div>
