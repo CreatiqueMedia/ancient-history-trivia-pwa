@@ -11,7 +11,14 @@ const SubscriptionScreen: React.FC = () => {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [isLoading, setIsLoading] = useState(false);
 
-  const currentPlans = billingPeriod === 'monthly' ? SUBSCRIPTION_PLANS : [...SUBSCRIPTION_PLANS.slice(0, 1), ...YEARLY_PLANS, SUBSCRIPTION_PLANS[3]];
+  // Only show paid plans (remove free plan)
+  const paidPlans = billingPeriod === 'monthly'
+    ? SUBSCRIPTION_PLANS.filter(plan => plan.price > 0)
+    : [
+        ...YEARLY_PLANS,
+        SUBSCRIPTION_PLANS[2], // Historian monthly
+        SUBSCRIPTION_PLANS[3]  // Academy Biennial
+      ];
 
   const handleSubscribe = async (plan: SubscriptionPlan) => {
     if (!userProfile) return;
@@ -25,33 +32,28 @@ const SubscriptionScreen: React.FC = () => {
       // In a real app, you would integrate with payment processor here
       // For demo purposes, we'll simulate the subscription
       
-      if (plan.id === 'free') {
-        await updateUserProfile({ subscription: 'free' });
-        analyticsService.trackFunnelStep('subscription_downgrade_success');
+      // Simulate payment processing delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Update user subscription
+      const currentTier = userProfile.subscription;
+      await updateUserProfile({ subscription: plan.id });
+      
+      // Track successful subscription
+      if (currentTier === 'free') {
+        analyticsService.trackSubscriptionStart(plan.id, plan.trialDays);
       } else {
-        // Simulate payment processing delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Update user subscription
-        const currentTier = userProfile.subscription;
-        await updateUserProfile({ subscription: plan.id });
-        
-        // Track successful subscription
-        if (currentTier === 'free') {
-          analyticsService.trackSubscriptionStart(plan.id, plan.trialDays);
-        } else {
-          analyticsService.trackSubscriptionUpgrade(currentTier, plan.id);
-        }
-        
-        analyticsService.setUserProperties({
-          subscription_tier: plan.id,
-          last_activity: new Date().toISOString()
-        });
-        
-        analyticsService.trackFunnelStep(`subscription_success_${plan.id}`);
-        
-        alert(`Successfully subscribed to ${plan.name}!`);
+        analyticsService.trackSubscriptionUpgrade(currentTier, plan.id);
       }
+      
+      analyticsService.setUserProperties({
+        subscription_tier: plan.id,
+        last_activity: new Date().toISOString()
+      });
+      
+      analyticsService.trackFunnelStep(`subscription_success_${plan.id}`);
+      
+      alert(`Successfully subscribed to ${plan.name}!`);
     } catch (error: any) {
       console.error('Subscription error:', error);
       
@@ -162,7 +164,7 @@ const SubscriptionScreen: React.FC = () => {
           </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {currentPlans.map((plan) => {
+          {paidPlans.map((plan) => {
             const isCurrentPlan = userProfile?.subscription === plan.id;
             const isPopular = plan.popular;
 
@@ -261,8 +263,6 @@ const SubscriptionScreen: React.FC = () => {
                       </div>
                     ) : isCurrentPlan ? (
                       'Current Plan'
-                    ) : plan.id === 'free' ? (
-                      'Switch to Free Plan'
                     ) : plan.id === 'scholar' ? (
                       'Start 7-Day Free Trial'
                     ) : plan.id === 'historian' ? (
