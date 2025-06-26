@@ -69,6 +69,7 @@ const StoreScreen: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'bundles' | 'subscription' | 'legacy'>('bundles');
   const [showSampleQuiz, setShowSampleQuiz] = useState<string | null>(null);
+  const [processingTiers, setProcessingTiers] = useState<Set<string>>(new Set());
 
   // Listen for custom event to set active tab
   useEffect(() => {
@@ -240,6 +241,9 @@ const StoreScreen: React.FC = () => {
   };
 
   const handleSubscribe = async (tier: SubscriptionTier) => {
+    // Add this tier to processing state
+    setProcessingTiers(prev => new Set([...prev, tier.id]));
+    
     try {
       const success = await subscribe('pro', tier.period);
       if (success) {
@@ -247,6 +251,13 @@ const StoreScreen: React.FC = () => {
       }
     } catch (error) {
       alert('Subscription failed. Please try again.');
+    } finally {
+      // Remove this tier from processing state
+      setProcessingTiers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(tier.id);
+        return newSet;
+      });
     }
   };
 
@@ -408,6 +419,8 @@ const StoreScreen: React.FC = () => {
   };
 
   const renderSubscriptionCard = (tier: SubscriptionTier) => {
+    const isThisTierProcessing = processingTiers.has(tier.id);
+    
     return (
       <div key={tier.id} className={`rounded-lg p-6 border-2 ${
         tier.isPopular 
@@ -447,14 +460,14 @@ const StoreScreen: React.FC = () => {
 
         <button
           onClick={() => handleSubscribe(tier)}
-          disabled={isProcessing || isPremiumUser}
+          disabled={isThisTierProcessing || isPremiumUser}
           className={`w-full mt-6 py-3 px-4 rounded-lg font-medium transition-colors ${
             tier.isPopular 
               ? 'bg-blue-600 hover:bg-blue-700 text-white' 
               : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
           } disabled:bg-gray-400 disabled:cursor-not-allowed`}
         >
-          {isPremiumUser ? 'Current Plan' : isProcessing ? 'Processing...' : tier.id === 'pro_monthly' ? 'Start Pro Monthly' : tier.id === 'pro_annual' ? 'Start Pro Annual' : tier.id === 'pro_biennial' ? 'Unlock 2 Years – Best Value!' : `Get ${tier.name}`}
+          {isPremiumUser ? 'Current Plan' : isThisTierProcessing ? 'Processing...' : tier.id === 'pro_monthly' ? 'Start Pro Monthly' : tier.id === 'pro_annual' ? 'Start Pro Annual' : tier.id === 'pro_biennial' ? 'Unlock 2 Years – Best Value!' : `Get ${tier.name}`}
         </button>
       </div>
     );
