@@ -130,14 +130,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <div className="flex items-center space-x-3">
                 {/* Subscription Badge */}
                 {userProfile?.subscription && userProfile.subscription !== 'free' && (
-                  <Link
-                    to="/subscription"
-                    className="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-3 py-1 rounded-full text-sm font-medium hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors"
+                  <span
+                    className="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-3 py-1 rounded-full text-sm font-medium"
                   >
                     {userProfile.subscription === 'scholar' ? '📚 Scholar' : 
                      userProfile.subscription === 'historian' ? '🏛️ Historian' : 
                      userProfile.subscription === 'academy' ? '👑 Academy' : 'Pro'}
-                  </Link>
+                  </span>
                 )}
                 
                 {/* User Avatar/Name */}
