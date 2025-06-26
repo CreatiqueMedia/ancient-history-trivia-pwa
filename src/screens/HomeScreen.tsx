@@ -128,9 +128,8 @@ const HomeScreen = () => {
                 {userProfile.subscription !== 'free' && (
                   <div className="mt-3 inline-flex items-center bg-white/20 rounded-full px-4 py-2">
                     <span className="text-sm font-medium">
-                      {userProfile.subscription === 'scholar' ? '📚 Scholar Member' :
-                       userProfile.subscription === 'historian' ? '🏛️ Historian Member' :
-                       userProfile.subscription === 'academy' ? '👑 Academy Member' : 'Premium Member'}
+                      {userProfile.subscription === 'pro_monthly' ? '⭐ Pro Monthly Member' :
+                       userProfile.subscription === 'pro_annual' ? '🏆 Pro Annual Member' : 'Premium Member'}
                     </span>
                   </div>
                 )}

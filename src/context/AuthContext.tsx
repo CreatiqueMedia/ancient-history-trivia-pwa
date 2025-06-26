@@ -380,9 +380,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const isSubscribed = (tier?: SubscriptionTier): boolean => {
     if (!userProfile) return false;
     
-    const tierHierarchy = ['free', 'scholar', 'historian', 'academy'];
+    const tierHierarchy = ['free', 'pro_monthly', 'pro_annual'];
     const userTierIndex = tierHierarchy.indexOf(userProfile.subscription);
-    const requiredTierIndex = tierHierarchy.indexOf(tier || 'scholar');
+    const requiredTierIndex = tierHierarchy.indexOf(tier || 'pro_monthly');
     
     return userTierIndex >= requiredTierIndex;
   };

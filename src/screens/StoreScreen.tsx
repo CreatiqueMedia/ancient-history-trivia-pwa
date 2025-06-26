@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   PlayIcon, 
@@ -69,6 +69,21 @@ const StoreScreen: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'bundles' | 'subscription' | 'legacy'>('bundles');
   const [showSampleQuiz, setShowSampleQuiz] = useState<string | null>(null);
+
+  // Listen for custom event to set active tab
+  useEffect(() => {
+    const handleSetStoreTab = (event: CustomEvent) => {
+      if (event.detail === 'subscription') {
+        setActiveTab('subscription');
+      }
+    };
+
+    window.addEventListener('setStoreTab', handleSetStoreTab as EventListener);
+    
+    return () => {
+      window.removeEventListener('setStoreTab', handleSetStoreTab as EventListener);
+    };
+  }, []);
   
   const { 
     hasAccessToBundle, 
