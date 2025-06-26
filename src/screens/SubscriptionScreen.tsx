@@ -1,24 +1,17 @@
 import React, { useState } from 'react';
 import { CheckIcon, StarIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
-import { SUBSCRIPTION_PLANS, YEARLY_PLANS } from '../data/pricing';
+import { SUBSCRIPTION_TIERS } from '../data/bundles';
 import { analyticsService } from '../services/AnalyticsService';
 import { errorHandler } from '../services/ErrorHandlingService';
 import type { SubscriptionPlan } from '../types';
 
 const SubscriptionScreen: React.FC = () => {
   const { userProfile, isSubscribed, updateUserProfile } = useAuth();
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Only show paid plans (remove free plan)
-  const paidPlans = billingPeriod === 'monthly'
-    ? SUBSCRIPTION_PLANS.filter(plan => plan.price > 0)
-    : [
-        ...YEARLY_PLANS,
-        SUBSCRIPTION_PLANS[2], // Historian monthly
-        SUBSCRIPTION_PLANS[3]  // Academy Biennial
-      ];
+  // Only show paid plans from SUBSCRIPTION_TIERS (no free plan)
+  const paidPlans = SUBSCRIPTION_TIERS.filter(plan => plan.price > 0);
 
   const handleSubscribe = async (plan: SubscriptionPlan) => {
     if (!userProfile) return;
@@ -69,13 +62,11 @@ const SubscriptionScreen: React.FC = () => {
 
   const getPlanIcon = (planId: string) => {
     switch (planId) {
-      case 'free':
-        return '🌟';
-      case 'scholar':
+      case 'pro_monthly':
         return '📚';
-      case 'historian':
+      case 'pro_annual':
         return '🏛️';
-      case 'academy':
+      case 'pro_biennial':
         return '👑';
       default:
         return '📖';
@@ -84,13 +75,11 @@ const SubscriptionScreen: React.FC = () => {
 
   const getPlanColor = (planId: string) => {
     switch (planId) {
-      case 'free':
-        return 'from-gray-400 to-gray-600';
-      case 'scholar':
+      case 'pro_monthly':
         return 'from-blue-400 to-blue-600';
-      case 'historian':
+      case 'pro_annual':
         return 'from-purple-400 to-purple-600';
-      case 'academy':
+      case 'pro_biennial':
         return 'from-yellow-400 to-yellow-600';
       default:
         return 'from-gray-400 to-gray-600';
@@ -100,14 +89,12 @@ const SubscriptionScreen: React.FC = () => {
   // Add/Update: Persuasive, standardized marketing copy and CTAs for each subscription plan
   const getPlanTagline = (planId: string) => {
     switch (planId) {
-      case 'free':
-        return 'Start your journey – no credit card required!';
-      case 'scholar':
-        return 'Unlock all question bundles, unlimited questions, and advanced features. Try free for 7 days!';
-      case 'historian':
-        return 'Go deeper with exclusive expert content, analytics, offline access, and more. 14-day free trial!';
-      case 'academy':
-        return 'Best value: 2 years of premium access, institution features, and the ultimate learning toolkit.';
+      case 'pro_monthly':
+        return 'Unlock all question bundles, unlimited questions, and advanced features.';
+      case 'pro_annual':
+        return 'Go deeper with exclusive expert content, analytics, offline access, and more. Save 33%!';
+      case 'pro_biennial':
+        return 'Best value: 2 years of premium access, institution features, and the ultimate learning toolkit. Save 42%!';
       default:
         return '';
     }

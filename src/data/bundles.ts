@@ -16,18 +16,7 @@ export const PRICING = {
 };
 
 export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: 0,
-    period: 'monthly',
-    features: [
-      'Access to basic question set',
-      'Standard quiz modes',
-      'Basic statistics',
-      'Limited daily challenges'
-    ]
-  },
+  // Free plan removed for paid-only subscription model
   {
     id: 'pro_monthly',
     name: 'Pro Monthly',

@@ -49,32 +49,31 @@ const UserProfileScreen: React.FC = () => {
     }
   };
 
+  // Map subscription to SUBSCRIPTION_TIERS for badge display
   const getSubscriptionBadge = () => {
     const subscription = userProfile.subscription;
     switch (subscription) {
-      case 'scholar':
-        return { icon: '📚', name: 'Scholar', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' };
-      case 'historian':
-        return { icon: '🏛️', name: 'Historian', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' };
-      case 'academy':
-        return { icon: '👑', name: 'Academy', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' };
+      case 'pro_monthly':
+        return { icon: '📚', name: 'Pro Monthly', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' };
+      case 'pro_annual':
+        return { icon: '🏛️', name: 'Pro Annual', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' };
+      case 'pro_biennial':
+        return { icon: '👑', name: 'Pro Biennial', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' };
       default:
-        return { icon: '🌟', name: 'Explorer', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' };
+        return { icon: '❓', name: 'No Subscription', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' };
     }
   };
 
   const getPlanDescription = (planId: string) => {
     switch (planId) {
-      case 'free':
-        return 'You are on the Explorer plan. Unlock all question bundles, advanced stats, and exclusive content by upgrading!';
-      case 'scholar':
-        return 'You are a Scholar! Enjoy unlimited questions and advanced features. Upgrade to Historian or Academy for even more.';
-      case 'historian':
-        return 'Historian status unlocked! Access exclusive content, analytics, and offline mode. Go Academy for the ultimate experience.';
-      case 'academy':
-        return 'Academy Biennial: You have the best value and all features unlocked for 2 years!';
+      case 'pro_monthly':
+        return 'You are a Pro Monthly subscriber! Enjoy all premium features and unlimited access.';
+      case 'pro_annual':
+        return 'You are a Pro Annual subscriber! Enjoy all premium features and exclusive savings.';
+      case 'pro_biennial':
+        return 'You are a Pro Biennial subscriber! Best value and all features unlocked for 2 years!';
       default:
-        return '';
+        return 'No active subscription. Unlock premium features in the Store or Subscription tab!';
     }
   };
 
@@ -256,7 +255,7 @@ const UserProfileScreen: React.FC = () => {
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
               {getPlanDescription(userProfile.subscription)}
             </p>
-            {userProfile.subscription !== 'academy' && (
+            {(!['pro_biennial', 'pro_annual', 'pro_monthly'].includes(userProfile.subscription)) && (
               <Link
                 to="/subscription"
                 className="mt-2 inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
