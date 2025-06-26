@@ -124,69 +124,6 @@ const UserProfileScreen: React.FC = () => {
     );
   };
 
-  // Render subscription card similar to store
-  const renderSubscriptionCard = (tier: any, isCurrent: boolean = false) => {
-    return (
-      <div key={tier.id} className={`rounded-lg p-6 border-2 ${
-        tier.isPopular 
-          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
-      } ${isCurrent ? 'ring-2 ring-green-500' : ''}`}>
-        {tier.isPopular && !isCurrent && (
-          <div className="text-center">
-            <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              Most Popular
-            </span>
-          </div>
-        )}
-        
-        {isCurrent && (
-          <div className="text-center">
-            <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              Current Plan
-            </span>
-          </div>
-        )}
-        
-        <div className="text-center mt-4">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{tier.name}</h3>
-          <p className="mt-2 text-primary-700 dark:text-primary-300 text-base font-medium">{getPlanTagline(tier.id)}</p>
-          <div className="mt-2">
-            <span className="text-3xl font-bold text-gray-900 dark:text-white">${tier.price}</span>
-            <span className="text-gray-500 dark:text-gray-400">/{formatPeriod(tier.period)}</span>
-          </div>
-          {tier.savings && (
-            <span className="inline-block mt-2 bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
-              {tier.savings}
-            </span>
-          )}
-        </div>
-
-        <ul className="mt-6 space-y-3">
-          {tier.features.map((feature: string, index: number) => (
-            <li key={index} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-              {feature}
-            </li>
-          ))}
-        </ul>
-
-        <button
-          onClick={() => isCurrent ? handleManageSubscription() : handleSubscribe(tier)}
-          disabled={isProcessing}
-          className={`w-full mt-6 py-3 px-4 rounded-lg font-medium transition-colors ${
-            isCurrent
-              ? 'bg-green-600 hover:bg-green-700 text-white'
-              : tier.isPopular 
-                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
-          } disabled:bg-gray-400 disabled:cursor-not-allowed`}
-        >
-          {isCurrent ? 'Manage Subscription' : isProcessing ? 'Processing...' : tier.id === 'pro_monthly' ? 'Start Pro Monthly' : tier.id === 'pro_annual' ? 'Start Pro Annual' : tier.id === 'pro_biennial' ? 'Unlock 2 Years – Best Value!' : `Get ${tier.name}`}
-        </button>
-      </div>
-    );
-  };
 
   const subscriptionBadge = getSubscriptionBadge();
 
