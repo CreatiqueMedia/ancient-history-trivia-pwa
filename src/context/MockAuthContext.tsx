@@ -253,14 +253,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return userProfile.subscription !== 'free';
     }
     
-    const tierLevels = {
+    const tierLevels: Record<string, number> = {
       'free': 0,
-      'scholar': 1,
-      'historian': 2,
-      'academy': 3
+      'pro_monthly': 1,
+      'pro_annual': 1
     };
     
-    return tierLevels[userProfile.subscription] >= tierLevels[tier];
+    const userLevel = tierLevels[userProfile.subscription] || 0;
+    const requiredLevel = tierLevels[tier] || 0;
+    
+    return userLevel >= requiredLevel;
   };
 
   console.log('🔧 About to create context value...');
