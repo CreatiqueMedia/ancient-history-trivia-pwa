@@ -58,12 +58,13 @@ const SubscriptionScreen: React.FC = () => {
     }
   };
 
+  // Use exact names and icons as in SUBSCRIPTION_TIERS
   const getPlanIcon = (planId: string) => {
     switch (planId) {
       case 'pro_monthly':
-        return '📚';
+        return '�';
       case 'pro_annual':
-        return '🏛️';
+        return '�';
       case 'pro_biennial':
         return '👑';
       default:
@@ -85,14 +86,15 @@ const SubscriptionScreen: React.FC = () => {
   };
 
   // Add/Update: Persuasive, standardized marketing copy and CTAs for each subscription plan
+  // Use exact taglines as in SUBSCRIPTION_TIERS (update as needed)
   const getPlanTagline = (planId: string) => {
     switch (planId) {
       case 'pro_monthly':
-        return 'Unlock all question bundles, unlimited questions, and advanced features.';
+        return 'All-access pass, billed monthly. Cancel anytime.';
       case 'pro_annual':
-        return 'Go deeper with exclusive expert content, analytics, offline access, and more. Save 33%!';
+        return 'Best value: Save 33% with annual billing.';
       case 'pro_biennial':
-        return 'Best value: 2 years of premium access, institution features, and the ultimate learning toolkit. Save 42%!';
+        return 'Ultimate deal: 2 years of premium for the lowest price.';
       default:
         return '';
     }
