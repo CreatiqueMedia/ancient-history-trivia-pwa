@@ -31,7 +31,7 @@ const SubscriptionScreen: React.FC = () => {
       
       // Update user subscription
       const currentTier = userProfile.subscription;
-      await updateUserProfile({ subscription: plan });
+      await updateUserProfile({ subscription: plan ?? undefined });
       
       // Track successful subscription
       analyticsService.trackSubscriptionUpgrade(currentTier, plan.id);
