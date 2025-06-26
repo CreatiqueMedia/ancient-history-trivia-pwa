@@ -30,8 +30,9 @@ const SubscriptionScreen: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Update user subscription
+      // Store only the plan id (string) in userProfile.subscription for type safety
       const currentTier = userProfile.subscription;
-      await updateUserProfile({ subscription: plan ?? undefined });
+      await updateUserProfile({ subscription: plan.id });
       
       // Track successful subscription
       analyticsService.trackSubscriptionUpgrade(currentTier, plan.id);
