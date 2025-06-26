@@ -133,9 +133,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <span
                     className="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-3 py-1 rounded-full text-sm font-medium"
                   >
-                    {userProfile.subscription === 'scholar' ? '📚 Scholar' : 
-                     userProfile.subscription === 'historian' ? '🏛️ Historian' : 
-                     userProfile.subscription === 'academy' ? '👑 Academy' : 'Pro'}
+                    {userProfile.subscription === 'pro_monthly' ? '⭐ Pro Monthly' :
+                     userProfile.subscription === 'pro_annual' ? '🏆 Pro Annual' : 'Pro'}
                   </span>
                 )}
                 

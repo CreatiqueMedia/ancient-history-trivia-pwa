@@ -90,7 +90,7 @@ export interface NotificationPreferences {
 
 export type AuthProvider = 'google' | 'facebook' | 'apple' | 'email' | 'anonymous';
 
-export type SubscriptionTier = 'free' | 'scholar' | 'historian' | 'academy';
+export type SubscriptionTier = 'free' | 'pro_monthly' | 'pro_annual';
 
 export interface SubscriptionPlan {
   id: SubscriptionTier;

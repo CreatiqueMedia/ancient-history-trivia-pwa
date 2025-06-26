@@ -1,117 +1,49 @@
 import type { SubscriptionPlan } from '../types';
 
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
-  // Free plan removed for paid-only subscription model
   {
-    id: 'scholar',
-    name: 'Scholar',
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    period: 'monthly',
+    features: [
+      'Access to basic question set',
+      'Standard quiz modes',
+      'Basic statistics',
+      'Limited daily challenges'
+    ]
+  },
+  {
+    id: 'pro_monthly',
+    name: 'Pro Monthly',
     price: 4.99,
     period: 'monthly',
-    trialDays: 7,
-    popular: true,
     features: [
-      'All 13 question bundles',
-      'Unlimited questions',
-      'Advanced achievements',
-      'Detailed statistics',
-      'Cloud sync',
-      'No advertisements',
-      'Friend challenges',
-      'Leaderboards'
+      'Access to all question bundles',
+      'Unlimited quiz modes',
+      'Advanced statistics & analytics',
+      'Daily challenges & streaks',
+      'Spaced repetition learning',
+      'Offline access',
+      'No advertisements'
     ]
   },
   {
-    id: 'historian',
-    name: 'Historian',
-    price: 8.99,
-    period: 'monthly',
-    trialDays: 14,
-    features: [
-      'Everything in Scholar',
-      'Exclusive expert bundles',
-      'Priority support',
-      'Early access to new content',
-      'Advanced analytics',
-      'Custom study plans',
-      'Spaced repetition system',
-      'Offline mode'
-    ]
-  },
-  {
-    id: 'academy',
-    name: 'Academy Biennial',
-    price: 139.99,
-    period: 'biennial',
-    savings: 'Save 35%',
-    features: [
-      'Everything in Historian',
-      '2-year commitment savings',
-      'Educational institution features',
-      'Priority customer success manager',
-      'Custom branding options',
-      'Advanced analytics dashboard',
-      'Content creation tools',
-      'Quarterly feature previews'
-    ]
-  }
-];
-
-export const YEARLY_PLANS: SubscriptionPlan[] = [
-  {
-    id: 'scholar',
-    name: 'Scholar Annual',
+    id: 'pro_annual',
+    name: 'Pro Annual',
     price: 39.99,
     period: 'yearly',
-    trialDays: 7,
-    savings: 'Save 33%',
-    popular: true,
-    features: SUBSCRIPTION_PLANS[1].features
-  },
-  {
-    id: 'historian',
-    name: 'Historian Annual',
-    price: 79.99,
-    period: 'yearly',
-    trialDays: 14,
-    savings: 'Save 26%',
-    features: SUBSCRIPTION_PLANS[2].features
+    features: [
+      'Access to all question bundles',
+      'Unlimited quiz modes',
+      'Advanced statistics & analytics',
+      'Daily challenges & streaks',
+      'Spaced repetition learning',
+      'Offline access',
+      'No advertisements'
+    ]
   }
 ];
-
-// Feature gates for different subscription tiers
-export const FEATURE_GATES = {
-  // Free plan removed for paid-only subscription model
-  scholar: {
-    maxDailyQuestions: Infinity,
-    maxBundles: Infinity,
-    cloudSync: true,
-    advancedStats: true,
-    friendChallenges: true,
-    customStudyPlans: false,
-    prioritySupport: false,
-    offlineMode: false
-  },
-  historian: {
-    maxDailyQuestions: Infinity,
-    maxBundles: Infinity,
-    cloudSync: true,
-    advancedStats: true,
-    friendChallenges: true,
-    customStudyPlans: true,
-    prioritySupport: true,
-    offlineMode: true
-  },
-  academy: {
-    maxDailyQuestions: Infinity,
-    maxBundles: Infinity,
-    cloudSync: true,
-    advancedStats: true,
-    friendChallenges: true,
-    customStudyPlans: true,
-    prioritySupport: true,
-    offlineMode: true
-  }
-};
 
 // Pricing configuration for individual bundles (if needed)
 export const BUNDLE_PRICING = {

@@ -139,16 +139,20 @@ describe('Authentication System', () => {
       // Default should be free tier
       expect(result.current.isSubscribed()).toBe(false);
       expect(result.current.isSubscribed('free')).toBe(true);
-      expect(result.current.isSubscribed('scholar')).toBe(false);
-
-      // Update to scholar subscription
+      expect(result.current.isSubscribed('pro_monthly')).toBe(false);
+      // Update to pro_monthly subscription
       await act(async () => {
-        await result.current.updateUserProfile({ subscription: 'scholar' });
+        await result.current.updateUserProfile({ subscription: 'pro_monthly' });
       });
-
-      expect(result.current.isSubscribed()).toBe(true);
-      expect(result.current.isSubscribed('scholar')).toBe(true);
-      expect(result.current.isSubscribed('historian')).toBe(false);
+      expect(result.current.isSubscribed('pro_monthly')).toBe(true);
+      expect(result.current.isSubscribed('pro_annual')).toBe(false);
+      const tierHierarchy = ['free', 'pro_monthly', 'pro_annual'];
+      // Update to pro_annual subscription
+      await act(async () => {
+        await result.current.updateUserProfile({ subscription: 'pro_annual' });
+      });
+      expect(result.current.isSubscribed('pro_monthly')).toBe(false);
+      expect(result.current.isSubscribed('pro_annual')).toBe(true);
     });
   });
 });
@@ -162,7 +166,7 @@ function calculateTrialDaysRemaining(trialStart: Date, trialDays: number): numbe
 }
 
 function isSubscribed(profile: any, tier: string): boolean {
-  const tierHierarchy = ['free', 'scholar', 'historian', 'academy'];
+  const tierHierarchy = ['free', 'pro_monthly', 'pro_annual'];
   const currentTierIndex = tierHierarchy.indexOf(profile.subscription);
   const requiredTierIndex = tierHierarchy.indexOf(tier);
   return currentTierIndex >= requiredTierIndex;

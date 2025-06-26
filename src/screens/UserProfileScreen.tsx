@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   UserIcon, 
   CogIcon, 
@@ -7,14 +7,19 @@ import {
   ChartBarIcon,
   TrophyIcon,
   ArrowRightOnRectangleIcon,
-  PencilIcon
+  PencilIcon,
+  CheckCircleIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 import { useStats } from '../context/StatsContext';
+import { usePurchase } from '../context/PurchaseContext';
+import { SUBSCRIPTION_TIERS } from '../data/bundles';
 
 const UserProfileScreen: React.FC = () => {
+  const navigate = useNavigate();
   const { user, userProfile, logout, updateUserProfile } = useAuth();
   const { stats } = useStats();
+  const { isPremiumUser, subscribe, isProcessing } = usePurchase();
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     displayName: userProfile?.displayName || '',
@@ -49,32 +54,138 @@ const UserProfileScreen: React.FC = () => {
     }
   };
 
+  // Helper function to format subscription period display
+  const formatPeriod = (period: string): string => {
+    switch (period) {
+      case 'monthly': return 'month';
+      case 'yearly': return 'year';
+      case 'biennial': return '2 years';
+      case 'lifetime': return 'lifetime';
+      default: return period;
+    }
+  };
+
+  // Get persuasive marketing copy for each plan
+  const getPlanTagline = (planId: string) => {
+    switch (planId) {
+      case 'scholar':
+        return 'Unlock all question bundles and advanced features. Try free for 7 days!';
+      case 'historian':
+        return 'Go deeper with exclusive content, analytics, and offline access. 14-day free trial!';
+      case 'academy':
+        return 'Best value: 2 years of premium access, institution features, and the ultimate learning toolkit.';
+      default:
+        return '';
+    }
+  };
+
+  // Handle subscription
+  const handleSubscribe = async (tier: any) => {
+    try {
+      const success = await subscribe('pro', tier.period);
+      if (success) {
+        alert(`Successfully subscribed to ${tier.name}!`);
+      }
+    } catch (error) {
+      alert('Subscription failed. Please try again.');
+    }
+  };
+
+  // Navigate to store subscription tab
+  const handleManageSubscription = () => {
+    navigate('/store');
+    // Use setTimeout to ensure navigation completes before setting tab
+    setTimeout(() => {
+      // Trigger the subscription tab to be active
+      const event = new CustomEvent('setStoreTab', { detail: 'subscription' });
+      window.dispatchEvent(event);
+    }, 100);
+  };
+
   // Map subscription to SUBSCRIPTION_TIERS for badge display
   const getSubscriptionBadge = () => {
     const subscription = userProfile.subscription;
     switch (subscription) {
       case 'pro_monthly':
-        return { icon: '📚', name: 'Pro Monthly', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' };
+        return { icon: '⭐', name: 'Pro Monthly', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' };
       case 'pro_annual':
-        return { icon: '🏛️', name: 'Pro Annual', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' };
-      case 'pro_biennial':
-        return { icon: '👑', name: 'Pro Biennial', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' };
+        return { icon: '🏆', name: 'Pro Annual', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' };
       default:
         return { icon: '❓', name: 'No Subscription', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' };
     }
   };
 
-  const getPlanDescription = (planId: string) => {
-    switch (planId) {
-      case 'pro_monthly':
-        return 'You are a Pro Monthly subscriber! Enjoy all premium features and unlimited access.';
-      case 'pro_annual':
-        return 'You are a Pro Annual subscriber! Enjoy all premium features and exclusive savings.';
-      case 'pro_biennial':
-        return 'You are a Pro Biennial subscriber! Best value and all features unlocked for 2 years!';
-      default:
-        return 'No active subscription. Unlock premium features in the Store or Subscription tab!';
-    }
+  // Get current subscription tier details
+  const getCurrentSubscriptionTier = () => {
+    const subscription = userProfile.subscription;
+    return SUBSCRIPTION_TIERS.find(tier => 
+      (subscription === 'pro_monthly' && tier.id === 'pro_monthly') ||
+      (subscription === 'pro_annual' && tier.id === 'pro_annual')
+    );
+  };
+
+  // Render subscription card similar to store
+  const renderSubscriptionCard = (tier: any, isCurrent: boolean = false) => {
+    return (
+      <div key={tier.id} className={`rounded-lg p-6 border-2 ${
+        tier.isPopular 
+          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+      } ${isCurrent ? 'ring-2 ring-green-500' : ''}`}>
+        {tier.isPopular && !isCurrent && (
+          <div className="text-center">
+            <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+              Most Popular
+            </span>
+          </div>
+        )}
+        
+        {isCurrent && (
+          <div className="text-center">
+            <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+              Current Plan
+            </span>
+          </div>
+        )}
+        
+        <div className="text-center mt-4">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{tier.name}</h3>
+          <p className="mt-2 text-primary-700 dark:text-primary-300 text-base font-medium">{getPlanTagline(tier.id)}</p>
+          <div className="mt-2">
+            <span className="text-3xl font-bold text-gray-900 dark:text-white">${tier.price}</span>
+            <span className="text-gray-500 dark:text-gray-400">/{formatPeriod(tier.period)}</span>
+          </div>
+          {tier.savings && (
+            <span className="inline-block mt-2 bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+              {tier.savings}
+            </span>
+          )}
+        </div>
+
+        <ul className="mt-6 space-y-3">
+          {tier.features.map((feature: string, index: number) => (
+            <li key={index} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+              <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+              {feature}
+            </li>
+          ))}
+        </ul>
+
+        <button
+          onClick={() => isCurrent ? handleManageSubscription() : handleSubscribe(tier)}
+          disabled={isProcessing}
+          className={`w-full mt-6 py-3 px-4 rounded-lg font-medium transition-colors ${
+            isCurrent
+              ? 'bg-green-600 hover:bg-green-700 text-white'
+              : tier.isPopular 
+                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
+          } disabled:bg-gray-400 disabled:cursor-not-allowed`}
+        >
+          {isCurrent ? 'Manage Subscription' : isProcessing ? 'Processing...' : tier.id === 'pro_monthly' ? 'Start Pro Monthly' : tier.id === 'pro_annual' ? 'Start Pro Annual' : tier.id === 'pro_biennial' ? 'Unlock 2 Years – Best Value!' : `Get ${tier.name}`}
+        </button>
+      </div>
+    );
   };
 
   const subscriptionBadge = getSubscriptionBadge();
@@ -236,29 +347,37 @@ const UserProfileScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Subscription Management (removed /subscription link) */}
-          <div className="card p-6">
-            <div className="flex items-center mb-4">
-              <StarIcon className="w-8 h-8 text-primary-600 mr-3" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Subscription
-              </h3>
-            </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
-              Manage your subscription and unlock premium features
+        {/* Subscription Management Section */}
+        <div className="mb-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Your Subscription
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              {isPremiumUser ? 'Manage your premium subscription' : 'Choose a plan to unlock all premium features'}
             </p>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
-              {getPlanDescription(userProfile.subscription)}
-            </p>
-            {(!['pro_biennial', 'pro_annual', 'pro_monthly'].includes(userProfile.subscription as string)) && (
-              <span className="mt-2 inline-block bg-primary-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm opacity-50 cursor-not-allowed">
-                Upgrade Now
-              </span>
-            )}
           </div>
 
+          {/* Current Subscription or Available Plans */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {(() => {
+              const currentTier = getCurrentSubscriptionTier();
+              
+              if (currentTier) {
+                // Show current subscription + other options
+                return SUBSCRIPTION_TIERS.map(tier => 
+                  renderSubscriptionCard(tier, tier.id === currentTier.id)
+                );
+              } else {
+                // Show all available subscription options
+                return SUBSCRIPTION_TIERS.map(tier => renderSubscriptionCard(tier, false));
+              }
+            })()}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Settings */}
           <Link
             to="/settings"
