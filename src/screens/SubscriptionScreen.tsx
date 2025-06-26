@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { SUBSCRIPTION_TIERS } from '../data/bundles';
 import { analyticsService } from '../services/AnalyticsService';
 import { errorHandler } from '../services/ErrorHandlingService';
-import type { SubscriptionPlan } from '../types';
+import type { SubscriptionTier } from '../types/bundles';
 
 const SubscriptionScreen: React.FC = () => {
   const { userProfile, isSubscribed, updateUserProfile } = useAuth();
@@ -12,8 +12,9 @@ const SubscriptionScreen: React.FC = () => {
 
   // Only show paid plans from SUBSCRIPTION_TIERS (no free plan)
   const paidPlans = SUBSCRIPTION_TIERS.filter(plan => plan.price > 0);
+  // Remove billingPeriod toggle for paid-only model
 
-  const handleSubscribe = async (plan: SubscriptionPlan) => {
+  const handleSubscribe = async (plan: SubscriptionTier) => {
     if (!userProfile) return;
 
     setIsLoading(true);
@@ -33,11 +34,7 @@ const SubscriptionScreen: React.FC = () => {
       await updateUserProfile({ subscription: plan.id });
       
       // Track successful subscription
-      if (currentTier === 'free') {
-        analyticsService.trackSubscriptionStart(plan.id, plan.trialDays);
-      } else {
-        analyticsService.trackSubscriptionUpgrade(currentTier, plan.id);
-      }
+      analyticsService.trackSubscriptionUpgrade(currentTier, plan.id);
       
       analyticsService.setUserProperties({
         subscription_tier: plan.id,
@@ -113,32 +110,7 @@ const SubscriptionScreen: React.FC = () => {
               Unlock the full potential of ancient history exploration
             </p>
 
-            {/* Billing Toggle */}
-            <div className="flex items-center justify-center mb-8">
-              <span className={`mr-3 ${billingPeriod === 'monthly' ? 'text-gray-900 dark:text-white font-semibold' : 'text-gray-500'}`}>
-                Monthly
-              </span>
-              <button
-                onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'yearly' : 'monthly')}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  billingPeriod === 'yearly' ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-700'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    billingPeriod === 'yearly' ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-              <span className={`ml-3 ${billingPeriod === 'yearly' ? 'text-gray-900 dark:text-white font-semibold' : 'text-gray-500'}`}>
-                Yearly
-              </span>
-              {billingPeriod === 'yearly' && (
-                <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
-                  Save up to 33%
-                </span>
-              )}
-            </div>
+            {/* Billing Toggle removed for paid-only model */}
           </div>
         </div>
       </div>
@@ -153,7 +125,7 @@ const SubscriptionScreen: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {paidPlans.map((plan) => {
             const isCurrentPlan = userProfile?.subscription === plan.id;
-            const isPopular = plan.popular;
+            const isPopular = plan.isPopular;
 
             return (
               <div
@@ -201,22 +173,16 @@ const SubscriptionScreen: React.FC = () => {
                       <span className="text-4xl font-bold text-gray-900 dark:text-white">
                         ${plan.price}
                       </span>
-                      {plan.period !== 'lifetime' && (
-                        <span className="text-gray-500 dark:text-gray-400">
-                          /{plan.period === 'monthly' ? 'mo' : 'yr'}
-                        </span>
-                      )}
+                      <span className="text-gray-500 dark:text-gray-400">
+                        /{plan.period === 'monthly' ? 'mo' : plan.period === 'annual' ? 'yr' : plan.period === 'biennial' ? '2yr' : plan.period}
+                      </span>
                     </div>
                     {plan.savings && (
                       <div className="mt-2 text-green-600 dark:text-green-400 font-medium">
                         {plan.savings}
                       </div>
                     )}
-                    {plan.trialDays && (
-                      <div className="mt-2 text-primary-600 dark:text-primary-400 text-sm">
-                        {plan.trialDays}-day free trial
-                      </div>
-                    )}
+                    {/* No trialDays in SubscriptionTier */}
                   </div>
 
                   {/* Features */}

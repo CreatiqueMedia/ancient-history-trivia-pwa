@@ -255,7 +255,7 @@ const UserProfileScreen: React.FC = () => {
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
               {getPlanDescription(userProfile.subscription)}
             </p>
-            {(!['pro_biennial', 'pro_annual', 'pro_monthly'].includes(userProfile.subscription)) && (
+            {(!['pro_biennial', 'pro_annual', 'pro_monthly'].includes(userProfile.subscription as string)) && (
               <Link
                 to="/subscription"
                 className="mt-2 inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
