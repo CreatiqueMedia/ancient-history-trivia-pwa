@@ -27,62 +27,27 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     const loadPurchaseData = async () => {
       try {
-        // Clear any old subscription data that might be causing issues
-        const savedSubscription = localStorage.getItem('subscription');
-        if (savedSubscription) {
-          try {
-            const sub = JSON.parse(savedSubscription);
-            // If subscription data exists but is invalid, clear it
-            if (!sub.tier || !sub.period || sub.tier === 'free') {
-              localStorage.removeItem('subscription');
-              console.log('Cleared invalid subscription data');
-            }
-          } catch (e) {
-            localStorage.removeItem('subscription');
-            console.log('Cleared corrupted subscription data');
-          }
-        }
-
-        const savedBundles = localStorage.getItem('ownedBundles');
-        const cleanSubscription = localStorage.getItem('subscription');
+        // FORCE CLEAR ALL SUBSCRIPTION DATA - DEBUGGING
+        console.log('🔧 FORCE CLEARING ALL SUBSCRIPTION DATA');
+        localStorage.removeItem('subscription');
+        localStorage.removeItem('ownedBundles');
         
-        if (savedBundles) {
-          setOwnedBundles(JSON.parse(savedBundles));
-        }
+        // Force reset to free tier
+        setSubscriptionTier('free');
+        setSubscriptionPeriod('none');
+        setSubscriptionExpiry(undefined);
+        setOwnedBundles([]);
         
-        if (cleanSubscription) {
-          const sub = JSON.parse(cleanSubscription);
-          // Only set subscription if it's valid and not expired
-          if (sub.tier && sub.tier !== 'free' && sub.expiry) {
-            const expiryDate = new Date(sub.expiry);
-            if (expiryDate > new Date()) {
-              setSubscriptionTier(sub.tier);
-              setSubscriptionPeriod(sub.period);
-              setSubscriptionExpiry(sub.expiry);
-              console.log('Loaded valid subscription:', sub);
-            } else {
-              // Subscription expired, reset to free
-              setSubscriptionTier('free');
-              setSubscriptionPeriod('none');
-              setSubscriptionExpiry(undefined);
-              localStorage.removeItem('subscription');
-              console.log('Subscription expired, reset to free');
-            }
-          }
-        }
+        console.log('🔧 FORCED RESET - All users should be FREE tier');
+        console.log('🔧 isPremiumUser should be FALSE');
         
-        console.log('Final subscription state:', {
-          tier: subscriptionTier,
-          period: subscriptionPeriod,
-          expiry: subscriptionExpiry
-        });
       } catch (error) {
-        console.error('Error loading purchase data:', error);
+        console.error('Error in force reset:', error);
         // Reset to defaults on error
         setSubscriptionTier('free');
         setSubscriptionPeriod('none');
         setSubscriptionExpiry(undefined);
-        localStorage.removeItem('subscription');
+        setOwnedBundles([]);
       }
     };
 
