@@ -53,8 +53,7 @@ const formatPeriod = (period: string): string => {
 // Add persuasive marketing copy for each plan
 const getPlanTagline = (planId: string) => {
   switch (planId) {
-    case 'free':
-      return 'Start your journey – no credit card required!';
+    // Free plan removed for paid-only subscription model
     case 'scholar':
       return 'Unlock all question bundles and advanced features. Try free for 7 days!';
     case 'historian':
@@ -440,7 +439,7 @@ const StoreScreen: React.FC = () => {
               : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
           } disabled:bg-gray-400 disabled:cursor-not-allowed`}
         >
-          {isPremiumUser ? 'Current Plan' : isProcessing ? 'Processing...' : tier.id === 'free' ? 'Switch to Free Plan' : tier.id === 'scholar' ? 'Start 7-Day Free Trial' : tier.id === 'historian' ? 'Start 14-Day Free Trial' : tier.id === 'academy' ? 'Unlock 2 Years – Best Value!' : `Get ${tier.name}`}
+          {isPremiumUser ? 'Current Plan' : isProcessing ? 'Processing...' : tier.id === 'pro_monthly' ? 'Start Pro Monthly' : tier.id === 'pro_annual' ? 'Start Pro Annual' : tier.id === 'pro_biennial' ? 'Unlock 2 Years – Best Value!' : `Get ${tier.name}`}
         </button>
       </div>
     );

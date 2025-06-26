@@ -1,19 +1,7 @@
 import type { SubscriptionPlan } from '../types';
 
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
-  {
-    id: 'free',
-    name: 'Explorer',
-    price: 0,
-    period: 'monthly',
-    features: [
-      '3 question bundles',
-      'Basic achievements',
-      'Local progress tracking',
-      'Limited daily questions (10/day)',
-      'Basic statistics'
-    ]
-  },
+  // Free plan removed for paid-only subscription model
   {
     id: 'scholar',
     name: 'Scholar',
@@ -92,16 +80,7 @@ export const YEARLY_PLANS: SubscriptionPlan[] = [
 
 // Feature gates for different subscription tiers
 export const FEATURE_GATES = {
-  free: {
-    maxDailyQuestions: 10,
-    maxBundles: 3,
-    cloudSync: false,
-    advancedStats: false,
-    friendChallenges: false,
-    customStudyPlans: false,
-    prioritySupport: false,
-    offlineMode: false
-  },
+  // Free plan removed for paid-only subscription model
   scholar: {
     maxDailyQuestions: Infinity,
     maxBundles: Infinity,
