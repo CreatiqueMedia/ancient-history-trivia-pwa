@@ -19,7 +19,7 @@ const UserProfileScreen: React.FC = () => {
   const navigate = useNavigate();
   const { user, userProfile, logout, updateUserProfile } = useAuth();
   const { stats } = useStats();
-  const { isPremiumUser, subscribe, isProcessing } = usePurchase();
+  const { isPremiumUser, subscribe, isProcessing, subscriptionTier, subscriptionPeriod, subscriptionExpiry } = usePurchase();
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     displayName: userProfile?.displayName || '',
@@ -102,26 +102,45 @@ const UserProfileScreen: React.FC = () => {
     }, 100);
   };
 
-  // Map subscription to SUBSCRIPTION_TIERS for badge display
+  // Map subscription to SUBSCRIPTION_TIERS for badge display using PurchaseContext
   const getSubscriptionBadge = () => {
-    const subscription = userProfile.subscription;
-    switch (subscription) {
-      case 'pro_monthly':
-        return { icon: '⭐', name: 'Pro Monthly', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' };
-      case 'pro_annual':
-        return { icon: '🏆', name: 'Pro Annual', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' };
-      default:
-        return { icon: '❓', name: 'No Subscription', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' };
+    if (subscriptionTier === 'pro' && subscriptionExpiry) {
+      const expiry = new Date(subscriptionExpiry);
+      if (expiry > new Date()) {
+        switch (subscriptionPeriod) {
+          case 'monthly':
+            return { icon: '⭐', name: 'Pro Monthly', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' };
+          case 'annual':
+            return { icon: '🏆', name: 'Pro Annual', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' };
+          case 'biennial':
+            return { icon: '💎', name: 'Pro Biennial', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' };
+          default:
+            return { icon: '⭐', name: 'Pro Plan', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' };
+        }
+      }
     }
+    return { icon: '❓', name: 'No Subscription', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' };
   };
 
-  // Get current subscription tier details
+  // Get current subscription tier details using PurchaseContext
   const getCurrentSubscriptionTier = () => {
-    const subscription = userProfile.subscription;
-    return SUBSCRIPTION_TIERS.find(tier => 
-      (subscription === 'pro_monthly' && tier.id === 'pro_monthly') ||
-      (subscription === 'pro_annual' && tier.id === 'pro_annual')
-    );
+    if (subscriptionTier === 'pro' && subscriptionExpiry) {
+      const expiry = new Date(subscriptionExpiry);
+      if (expiry > new Date()) {
+        // Map PurchaseContext periods to SUBSCRIPTION_TIERS
+        switch (subscriptionPeriod) {
+          case 'monthly':
+            return SUBSCRIPTION_TIERS.find(tier => tier.id === 'pro_monthly');
+          case 'annual':
+            return SUBSCRIPTION_TIERS.find(tier => tier.id === 'pro_annual');
+          case 'biennial':
+            return SUBSCRIPTION_TIERS.find(tier => tier.id === 'pro_biennial');
+          default:
+            return null;
+        }
+      }
+    }
+    return null;
   };
 
 

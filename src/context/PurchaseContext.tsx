@@ -27,27 +27,38 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     const loadPurchaseData = async () => {
       try {
-        // FORCE CLEAR ALL SUBSCRIPTION DATA - DEBUGGING
-        console.log('🔧 FORCE CLEARING ALL SUBSCRIPTION DATA');
-        localStorage.removeItem('subscription');
-        localStorage.removeItem('ownedBundles');
+        const savedBundles = localStorage.getItem('ownedBundles');
+        const savedSubscription = localStorage.getItem('subscription');
         
-        // Force reset to free tier
-        setSubscriptionTier('free');
-        setSubscriptionPeriod('none');
-        setSubscriptionExpiry(undefined);
-        setOwnedBundles([]);
+        if (savedBundles) {
+          setOwnedBundles(JSON.parse(savedBundles));
+        }
         
-        console.log('🔧 FORCED RESET - All users should be FREE tier');
-        console.log('🔧 isPremiumUser should be FALSE');
+        if (savedSubscription) {
+          const sub = JSON.parse(savedSubscription);
+          // Only set subscription if it's valid and not expired
+          if (sub.tier && sub.tier !== 'free' && sub.expiry) {
+            const expiryDate = new Date(sub.expiry);
+            if (expiryDate > new Date()) {
+              setSubscriptionTier(sub.tier);
+              setSubscriptionPeriod(sub.period);
+              setSubscriptionExpiry(sub.expiry);
+              console.log('Loaded valid subscription:', sub);
+            } else {
+              // Subscription expired, reset to free
+              console.log('Subscription expired, reset to free');
+            }
+          }
+        }
         
+        console.log('Subscription state loaded:', {
+          tier: subscriptionTier,
+          period: subscriptionPeriod,
+          expiry: subscriptionExpiry,
+          isPremium: isPremiumUser
+        });
       } catch (error) {
-        console.error('Error in force reset:', error);
-        // Reset to defaults on error
-        setSubscriptionTier('free');
-        setSubscriptionPeriod('none');
-        setSubscriptionExpiry(undefined);
-        setOwnedBundles([]);
+        console.error('Error loading purchase data:', error);
       }
     };
 
