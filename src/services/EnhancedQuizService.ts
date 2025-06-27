@@ -47,7 +47,7 @@ export class EnhancedQuizService {
   /**
    * Generate Bundle Sample Quiz with proper distribution:
    * - 33% Easy, 33% Medium, 33% Hard (except for Difficulty Packs)
-   * - Mixed formats for all bundles
+   * - 33% Multiple Choice, 33% True/False, 33% Fill-in-the-Blank (except for Format Packs)
    * - Bundle-specific content
    */
   static generateBundleSampleQuiz(bundleId: string, questionCount: number = 10): Question[] {
@@ -70,12 +70,18 @@ export class EnhancedQuizService {
       return this.generateDifficultyPackQuiz(bundle, bundleQuestions, questionCount);
     }
     
-    // For all other bundles, use 33/33/33 distribution
+    // Special handling for Format Packs - maintain their specific format
+    if (bundle.category === 'format') {
+      return this.generateFormatPackQuiz(bundle, bundleQuestions, questionCount);
+    }
+    
+    // For all other bundles, use 33/33/33 difficulty and format distribution
     return this.generateMixedDifficultyQuiz(bundleQuestions, questionCount);
   }
   
   /**
    * Generate quiz for Difficulty Packs - maintain specific difficulty level
+   * Still applies format mixing (33/33/33) unless it's also a format pack
    */
   private static generateDifficultyPackQuiz(bundle: any, questions: Question[], questionCount: number): Question[] {
     const targetDifficulty = bundle.difficulty;
@@ -89,6 +95,40 @@ export class EnhancedQuizService {
     }
     
     return this.selectQuestionsWithFormatMix(this.shuffleArray(filteredQuestions), questionCount);
+  }
+  
+  /**
+   * Generate quiz for Format Packs - maintain specific format
+   * No format mixing for these packs since they're designed to showcase one format
+   */
+  private static generateFormatPackQuiz(bundle: any, questions: Question[], questionCount: number): Question[] {
+    const targetFormat = bundle.subcategory; // 'Multiple Choice', 'True/False', 'Fill-in-the-Blank'
+    
+    // Filter questions by target format
+    let filteredQuestions: Question[] = [];
+    
+    switch (targetFormat) {
+      case 'Multiple Choice':
+        filteredQuestions = questions.filter(q => this.isMultipleChoiceQuestion(q));
+        break;
+      case 'True/False':
+        filteredQuestions = questions.filter(q => this.isTrueFalseQuestion(q));
+        break;
+      case 'Fill-in-the-Blank':
+        filteredQuestions = questions.filter(q => this.isFillBlankQuestion(q));
+        break;
+      default:
+        filteredQuestions = questions; // Fallback to all questions
+    }
+    
+    if (filteredQuestions.length < questionCount) {
+      console.warn(`Not enough ${targetFormat} questions for ${bundle.id}, using all available`);
+      // For format packs, don't use format mixing - just random selection from available
+      return this.shuffleArray(filteredQuestions).slice(0, filteredQuestions.length);
+    }
+    
+    // For format packs, don't use format mixing - just random selection
+    return this.shuffleArray(filteredQuestions).slice(0, questionCount);
   }
   
   /**
@@ -127,21 +167,78 @@ export class EnhancedQuizService {
   
   /**
    * Select questions ensuring format variety (Multiple Choice, True/False, Fill-in-the-Blank)
+   * 33% Multiple Choice, 33% True/False, 33% Fill-in-the-Blank
    */
   private static selectQuestionsWithFormatMix(questions: Question[], count: number): Question[] {
     if (questions.length === 0 || count === 0) return [];
     
-    // For now, since most questions are Multiple Choice format, we'll select randomly
-    // In a real implementation, you would filter by format property
-    const selected: Question[] = [];
-    const available = [...questions];
+    // Calculate format distribution (33/33/33)
+    const multipleChoiceCount = Math.floor(count * 0.33);
+    const trueFalseCount = Math.floor(count * 0.33);
+    const fillBlankCount = count - multipleChoiceCount - trueFalseCount;
     
-    for (let i = 0; i < count && available.length > 0; i++) {
-      const randomIndex = Math.floor(Math.random() * available.length);
-      selected.push(available.splice(randomIndex, 1)[0]);
+    // Separate questions by format (inferred from question structure)
+    const multipleChoiceQuestions = questions.filter(q => this.isMultipleChoiceQuestion(q));
+    const trueFalseQuestions = questions.filter(q => this.isTrueFalseQuestion(q));
+    const fillBlankQuestions = questions.filter(q => this.isFillBlankQuestion(q));
+    
+    const selected: Question[] = [];
+    
+    // Select Multiple Choice questions
+    const shuffledMC = this.shuffleArray([...multipleChoiceQuestions]);
+    selected.push(...shuffledMC.slice(0, Math.min(multipleChoiceCount, shuffledMC.length)));
+    
+    // Select True/False questions
+    const shuffledTF = this.shuffleArray([...trueFalseQuestions]);
+    selected.push(...shuffledTF.slice(0, Math.min(trueFalseCount, shuffledTF.length)));
+    
+    // Select Fill-in-the-Blank questions
+    const shuffledFB = this.shuffleArray([...fillBlankQuestions]);
+    selected.push(...shuffledFB.slice(0, Math.min(fillBlankCount, shuffledFB.length)));
+    
+    // If we don't have enough questions in specific formats, fill with any available
+    while (selected.length < count && questions.length > selected.length) {
+      const remaining = questions.filter(q => !selected.includes(q));
+      if (remaining.length > 0) {
+        const randomIndex = Math.floor(Math.random() * remaining.length);
+        selected.push(remaining[randomIndex]);
+      } else {
+        break;
+      }
     }
     
-    return selected;
+    return this.shuffleArray(selected);
+  }
+  
+  /**
+   * Determine if a question is Multiple Choice format
+   */
+  private static isMultipleChoiceQuestion(question: Question): boolean {
+    // Multiple choice questions have 3+ options and are not True/False or Fill-in-the-Blank
+    return question.options.length >= 3 && 
+           !this.isTrueFalseQuestion(question) && 
+           !this.isFillBlankQuestion(question);
+  }
+  
+  /**
+   * Determine if a question is True/False format
+   */
+  private static isTrueFalseQuestion(question: Question): boolean {
+    // True/False questions have exactly 2 options: "True" and "False"
+    return question.options.length === 2 && 
+           question.options.some(opt => opt.toLowerCase().includes('true')) &&
+           question.options.some(opt => opt.toLowerCase().includes('false'));
+  }
+  
+  /**
+   * Determine if a question is Fill-in-the-Blank format
+   */
+  private static isFillBlankQuestion(question: Question): boolean {
+    // Fill-in-the-blank questions have blanks in the question text or specific format indicators
+    return question.question.includes('_____') || 
+           question.question.includes('___') ||
+           question.question.toLowerCase().includes('fill in') ||
+           question.question.toLowerCase().includes('complete the');
   }
   
   /**
