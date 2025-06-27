@@ -102,6 +102,55 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      {/* Mobile Header */}
+      <header className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center">
+            <Logo size={24} className="mr-2" />
+            <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+              Ancient History
+            </h1>
+          </div>
+
+          {/* Mobile User Profile Section */}
+          <div className="flex items-center space-x-2">
+            {user ? (
+              <div className="flex items-center space-x-2">
+                {/* Subscription Badge - Compact */}
+                {userProfile?.subscription && userProfile.subscription !== 'free' && (
+                  <span className="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-2 py-1 rounded text-xs font-medium">
+                    {userProfile.subscription === 'pro_monthly' ? '⭐' :
+                     userProfile.subscription === 'pro_annual' ? '🏆' : 'Pro'}
+                  </span>
+                )}
+                
+                {/* User Avatar - Compact */}
+                <Link to="/profile" className="flex items-center">
+                  {userProfile?.photoURL ? (
+                    <img
+                      src={userProfile.photoURL}
+                      alt={userProfile.displayName}
+                      className="w-6 h-6 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center">
+                      <UserIcon className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </Link>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAuthModalOpen(true)}
+                className="text-sm font-medium text-primary-600 dark:text-primary-400"
+              >
+                Sign In
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
       {/* Desktop Header with Toggle */}
       <header className="hidden md:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
         <div className="flex items-center justify-between px-4 py-3">
@@ -236,7 +285,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <main className={`flex-1 transition-all duration-300 ease-in-out ${
           sidebarOpen ? 'md:ml-64' : 'md:ml-0'
         } pb-20 md:pb-6`}>
-          <div className="md:pt-20">
+          <div className="pt-0 md:pt-20">
             {children}
           </div>
         </main>

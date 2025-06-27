@@ -242,7 +242,7 @@ const HomeScreen = () => {
         </div>
 
         {/* Decorative Topics Showcase Slider */}
-        <section className="mb-8 overflow-hidden">
+        <section className="mb-8">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Journey Through Ancient History
@@ -252,22 +252,22 @@ const HomeScreen = () => {
             </p>
           </div>
 
-          <div className="relative">
+          <div className="relative overflow-hidden">
             {/* Sliding container */}
             <div className="flex animate-scroll">
               {/* First set of topics */}
               {topicShowcase.map((topic) => (
                 <div
                   key={topic.id}
-                  className="flex-shrink-0 w-80 mx-4"
+                  className="flex-shrink-0 w-72 md:w-80 mx-2 md:mx-4"
                 >
-                  <div className={`card p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
+                  <div className={`card p-4 md:p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
                     <div className="text-center">
-                      <div className="text-5xl mb-4 filter drop-shadow-lg">{topic.icon}</div>
-                      <h3 className="text-xl font-bold mb-3 text-white drop-shadow-md">
+                      <div className="text-4xl md:text-5xl mb-3 md:mb-4 filter drop-shadow-lg">{topic.icon}</div>
+                      <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3 text-white drop-shadow-md">
                         {topic.title}
                       </h3>
-                      <p className="text-white/90 text-sm leading-relaxed">
+                      <p className="text-white/90 text-xs md:text-sm leading-relaxed">
                         {topic.description}
                       </p>
                     </div>
@@ -278,15 +278,15 @@ const HomeScreen = () => {
               {topicShowcase.map((topic) => (
                 <div
                   key={`${topic.id}-duplicate`}
-                  className="flex-shrink-0 w-80 mx-4"
+                  className="flex-shrink-0 w-72 md:w-80 mx-2 md:mx-4"
                 >
-                  <div className={`card p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
+                  <div className={`card p-4 md:p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
                     <div className="text-center">
-                      <div className="text-5xl mb-4 filter drop-shadow-lg">{topic.icon}</div>
-                      <h3 className="text-xl font-bold mb-3 text-white drop-shadow-md">
+                      <div className="text-4xl md:text-5xl mb-3 md:mb-4 filter drop-shadow-lg">{topic.icon}</div>
+                      <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3 text-white drop-shadow-md">
                         {topic.title}
                       </h3>
-                      <p className="text-white/90 text-sm leading-relaxed">
+                      <p className="text-white/90 text-xs md:text-sm leading-relaxed">
                         {topic.description}
                       </p>
                     </div>
@@ -296,8 +296,8 @@ const HomeScreen = () => {
             </div>
             
             {/* Gradient fade edges */}
-            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-50 dark:from-gray-900 to-transparent pointer-events-none z-10"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-50 dark:from-gray-900 to-transparent pointer-events-none z-10"></div>
+            <div className="absolute left-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-r from-gray-50 dark:from-gray-900 to-transparent pointer-events-none z-10"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-l from-gray-50 dark:from-gray-900 to-transparent pointer-events-none z-10"></div>
           </div>
         </section>
 
