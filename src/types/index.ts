@@ -9,6 +9,7 @@ export interface Question {
   period: string;
   explanation?: string;
   tags?: string[];
+  format?: 'Multiple Choice' | 'True/False' | 'Fill-in-the-Blank' | 'Mixed';
 }
 
 export interface QuizState {
@@ -33,6 +34,7 @@ export interface QuestionBundle {
   isPremium: boolean;
   price?: number;
   icon?: string;
+  storage_path?: string; // Path to the bundle's questions in Supabase Storage
 }
 
 export interface QuizResult {

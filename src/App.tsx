@@ -9,6 +9,8 @@ import { PurchaseProvider } from './context/PurchaseContext';
 // Use Firebase authentication everywhere now that GitHub Pages domain is authorized
 import { AuthProvider } from './context/AuthContext';
 import { useFirebaseAuth, getServiceWorkerPath } from './config/environment';
+import PaymentProvider from './components/PaymentProvider';
+import PaymentModal from './components/PaymentModal';
 import HomeScreen from './screens/HomeScreen.tsx';
 import QuizScreen from './screens/QuizScreen.tsx';
 import ResultsScreen from './screens/ResultsScreen.tsx';
@@ -26,6 +28,7 @@ import ProtectedRoute from './components/ProtectedRoute.tsx';
 import { analyticsService } from './services/AnalyticsService';
 import { notificationService } from './services/NotificationService';
 import { errorHandler } from './services/ErrorHandlingService';
+import { QuestionService } from './services/QuestionService';
 
 // AppContent component to handle auth loading state
 const AppContent = () => {
@@ -111,6 +114,9 @@ const AppContent = () => {
         {/* Catch-all route to redirect auth handlers back to home */}
         <Route path="*" element={<HomeScreen />} />
       </Routes>
+      
+      {/* Payment Modal for handling purchases */}
+      <PaymentModal />
     </Layout>
   );
 };
@@ -131,6 +137,9 @@ function App() {
         
         // Initialize notifications
         await notificationService.initialize();
+        
+        // Initialize QuestionService for on-demand question loading
+        await QuestionService.initialize();
         
         // Temporarily disable service worker for GitHub Pages to fix the loading issue
         // TODO: Fix PWA service worker configuration for GitHub Pages
@@ -175,11 +184,13 @@ function App() {
       <AuthProvider>
         <SettingsProvider>
           <StatsProvider>
-            <PurchaseProvider>
-              <QuizProvider>
-                <AppContent />
-              </QuizProvider>
-            </PurchaseProvider>
+            <PaymentProvider>
+              <PurchaseProvider>
+                <QuizProvider>
+                  <AppContent />
+                </QuizProvider>
+              </PurchaseProvider>
+            </PaymentProvider>
           </StatsProvider>
         </SettingsProvider>
       </AuthProvider>
