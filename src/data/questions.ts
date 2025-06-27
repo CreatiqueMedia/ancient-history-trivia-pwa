@@ -204,8 +204,37 @@ export const getQuestionsByCategory = (category: string): Question[] => {
 };
 
 export const getRandomQuestions = (count: number): Question[] => {
+  // Import EnhancedQuizService for better question distribution
+  // For now, maintain backward compatibility with simple random selection
   const shuffled = [...sampleQuestions].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
+};
+
+// Enhanced random questions with proper distribution
+export const getEnhancedRandomQuestions = (count: number = 10): Question[] => {
+  // This will be used by the Enhanced Quiz Service
+  // 33% Easy, 33% Medium, 33% Hard distribution
+  const easyCount = Math.floor(count * 0.33);
+  const mediumCount = Math.floor(count * 0.33);
+  const hardCount = count - easyCount - mediumCount;
+  
+  const easyQuestions = sampleQuestions.filter(q => q.difficulty === 'easy');
+  const mediumQuestions = sampleQuestions.filter(q => q.difficulty === 'medium');
+  const hardQuestions = sampleQuestions.filter(q => q.difficulty === 'hard');
+  
+  const selectedQuestions: Question[] = [];
+  
+  // Shuffle and select from each difficulty
+  const shuffledEasy = [...easyQuestions].sort(() => 0.5 - Math.random());
+  const shuffledMedium = [...mediumQuestions].sort(() => 0.5 - Math.random());
+  const shuffledHard = [...hardQuestions].sort(() => 0.5 - Math.random());
+  
+  selectedQuestions.push(...shuffledEasy.slice(0, easyCount));
+  selectedQuestions.push(...shuffledMedium.slice(0, mediumCount));
+  selectedQuestions.push(...shuffledHard.slice(0, hardCount));
+  
+  // Final shuffle to mix difficulties
+  return selectedQuestions.sort(() => 0.5 - Math.random());
 };
 
 export const getBundleById = (id: string): QuestionBundle | undefined => {

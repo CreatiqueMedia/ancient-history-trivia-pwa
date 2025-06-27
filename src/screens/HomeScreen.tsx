@@ -4,6 +4,8 @@ import { questionBundles } from '../data/questions';
 import { useStats } from '../context/StatsContext';
 import { useAuth } from '../context/AuthContext';
 import { Logo } from '../components/Logo';
+import DailyChallengeCard from '../components/DailyChallengeCard';
+import TrialBanner from '../components/TrialBanner';
 
 const HomeScreen = () => {
   const { stats } = useStats();
@@ -149,6 +151,16 @@ const HomeScreen = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
+        {/* Trial Banner */}
+        <div className="mb-6">
+          <TrialBanner />
+        </div>
+
+        {/* Daily Challenge Card */}
+        <div className="mb-8">
+          <DailyChallengeCard />
+        </div>
+
         {/* Quick Stats - Only show if user has played at least one game */}
         {stats.totalQuestions > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

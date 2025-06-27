@@ -1,6 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeftIcon, GlobeAltIcon, HeartIcon, AcademicCapIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import { 
+  ArrowLeftIcon, 
+  GlobeAltIcon, 
+  HeartIcon, 
+  AcademicCapIcon, 
+  BookOpenIcon,
+  LightBulbIcon,
+  TrophyIcon,
+  FireIcon,
+  StarIcon,
+  CheckCircleIcon
+} from '@heroicons/react/24/outline';
 import { Logo } from '../components/Logo';
 
 const AboutScreen: React.FC = () => {
@@ -31,6 +42,354 @@ const AboutScreen: React.FC = () => {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* App Overview Section */}
+        <div className="card p-8 mb-8">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <Logo size={48} className="drop-shadow-lg" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              Ancient History Trivia App
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              Your comprehensive educational platform for exploring ancient civilizations
+            </p>
+          </div>
+
+          <div className="prose prose-lg max-w-none dark:prose-invert">
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+              Welcome to the Ancient History Trivia app - more than just a quiz game, this is a complete educational 
+              platform designed to make learning about ancient civilizations engaging, comprehensive, and rewarding. 
+              Whether you're an elementary student just beginning to explore history or a high school scholar diving 
+              deep into complex historical concepts, our app adapts to your learning level.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
+                <div className="flex items-center mb-4">
+                  <AcademicCapIcon className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3" />
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Educational Focus</h3>
+                </div>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">
+                  Every quiz is carefully designed with educational value in mind, featuring questions that span 
+                  elementary to high school difficulty levels with rich explanations and historical context.
+                </p>
+              </div>
+
+              <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg">
+                <div className="flex items-center mb-4">
+                  <BookOpenIcon className="w-6 h-6 text-green-600 dark:text-green-400 mr-3" />
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Comprehensive Content</h3>
+                </div>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">
+                  Explore ancient civilizations from around the world including Egypt, Rome, Greece, Mesopotamia, 
+                  China, India, and the Americas across different historical periods.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quiz System Explanation */}
+        <div className="card p-8 mb-8">
+          <div className="flex items-center mb-6">
+            <LightBulbIcon className="w-8 h-8 text-yellow-500 mr-4" />
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Intelligent Quiz System</h3>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 p-6 rounded-lg">
+              <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Smart Question Distribution</h4>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Our enhanced quiz system ensures every quiz provides balanced educational value:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-2">
+                    33%
+                  </div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Easy Questions</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Elementary School Level</div>
+                </div>
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-2">
+                    33%
+                  </div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Medium Questions</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Middle School Level</div>
+                </div>
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-2">
+                    33%
+                  </div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Hard Questions</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">High School Level</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Enhanced Question Display</h4>
+                <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                    📍 Regional information (Egypt, Rome, Greece, etc.)
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
+                    ⏳ Historical age context (Bronze Age, Iron Age, etc.)
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                    📚 Subject categories (Architecture, Politics, Religion)
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></span>
+                    🎓 Educational level indicators
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Question Formats</h4>
+                <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                    Multiple Choice questions for concept understanding
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                    True/False questions for quick knowledge checks
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
+                    Fill-in-the-Blank for specific recall testing
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bundle System Explanation */}
+        <div className="card p-8 mb-8">
+          <div className="flex items-center mb-6">
+            <BookOpenIcon className="w-8 h-8 text-blue-500 mr-4" />
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Question Bundle System</h3>
+          </div>
+
+          <div className="space-y-6">
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              Our comprehensive bundle system organizes content into focused learning modules, each containing 
+              100 carefully curated questions with 10-question sample quizzes available for preview.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                <div className="text-center">
+                  <div className="text-2xl mb-2">🌍</div>
+                  <h4 className="font-bold text-gray-900 dark:text-white">Region Packs</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                    Ancient Rome, Egypt, Greece, Mesopotamia, China, India, Americas, Europe
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-700">
+                <div className="text-center">
+                  <div className="text-2xl mb-2">⏳</div>
+                  <h4 className="font-bold text-gray-900 dark:text-white">Age Packs</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                    Prehistoric, Bronze Age, Iron Age periods
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-700">
+                <div className="text-center">
+                  <div className="text-2xl mb-2">🎯</div>
+                  <h4 className="font-bold text-gray-900 dark:text-white">Difficulty Packs</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                    Easy, Medium, Hard - maintain specific difficulty levels
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
+                <div className="text-center">
+                  <div className="text-2xl mb-2">📝</div>
+                  <h4 className="font-bold text-gray-900 dark:text-white">Format Packs</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                    Multiple Choice, True/False, Fill-in-the-Blank
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
+              <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Bundle Pricing</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">$2.99</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Individual Bundle</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">20% Off</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Group Discounts</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">30% Off</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">All Bundles Package</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Daily Challenges & Achievements */}
+        <div className="card p-8 mb-8">
+          <div className="flex items-center mb-6">
+            <TrophyIcon className="w-8 h-8 text-yellow-500 mr-4" />
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Daily Challenges & Achievements</h3>
+          </div>
+
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-6 rounded-lg">
+                <div className="flex items-center mb-4">
+                  <FireIcon className="w-6 h-6 text-orange-500 mr-3" />
+                  <h4 className="text-lg font-bold text-gray-900 dark:text-white">Daily Challenges</h4>
+                </div>
+                <ul className="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                  <li>• Fresh themed challenges every day</li>
+                  <li>• Build and maintain learning streaks</li>
+                  <li>• Earn XP, badges, and streak bonuses</li>
+                  <li>• 8 rotating themes (Ancient Empires, Legendary Rulers, etc.)</li>
+                  <li>• Automatic difficulty cycling for balanced learning</li>
+                </ul>
+              </div>
+
+              <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-6 rounded-lg">
+                <div className="flex items-center mb-4">
+                  <TrophyIcon className="w-6 h-6 text-yellow-500 mr-3" />
+                  <h4 className="text-lg font-bold text-gray-900 dark:text-white">Achievement System</h4>
+                </div>
+                <ul className="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                  <li>• Unlock achievements for various accomplishments</li>
+                  <li>• Track progress across different categories</li>
+                  <li>• Daily challenge achievements and streaks</li>
+                  <li>• Category mastery and difficulty achievements</li>
+                  <li>• Visual progress tracking and completion rates</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-blue-900/20 p-6 rounded-lg">
+              <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Streak Rewards & Milestones</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-xl font-bold text-yellow-600 dark:text-yellow-400">3 Days</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Beginner Streak</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-orange-600 dark:text-orange-400">7 Days</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Week Warrior</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-red-600 dark:text-red-400">30 Days</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Month Master</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-purple-600 dark:text-purple-400">100 Days</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Century Scholar</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Subscription & Trial Information */}
+        <div className="card p-8 mb-8">
+          <div className="flex items-center mb-6">
+            <StarIcon className="w-8 h-8 text-purple-500 mr-4" />
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Subscription Plans & Free Trial</h3>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-6 rounded-lg">
+              <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4">🎁 7-Day Free Trial</h4>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Experience the full power of our educational platform with unlimited access to all premium content:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex items-center">
+                  <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">All Premium Bundles</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Unlimited Questions</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Advanced Features</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Pro Monthly</h4>
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-4">$4.99<span className="text-sm text-gray-500">/month</span></div>
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <li>✓ Access to all question bundles</li>
+                  <li>✓ Unlimited quiz modes</li>
+                  <li>✓ Advanced statistics</li>
+                  <li>✓ Daily challenges & streaks</li>
+                  <li>✓ No advertisements</li>
+                </ul>
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg p-6 transform scale-105 shadow-lg">
+                <div className="text-center mb-2">
+                  <span className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold">MOST POPULAR</span>
+                </div>
+                <h4 className="text-lg font-bold mb-2">Pro Annual</h4>
+                <div className="text-3xl font-bold mb-2">$39.99<span className="text-sm opacity-75">/year</span></div>
+                <div className="text-sm opacity-75 mb-4">Save 33% vs Monthly</div>
+                <ul className="space-y-2 text-sm">
+                  <li>✓ Everything in Monthly</li>
+                  <li>✓ Best value for serious learners</li>
+                  <li>✓ Priority customer support</li>
+                  <li>✓ Early access to new features</li>
+                </ul>
+              </div>
+
+              <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Pro Biennial</h4>
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">$69.99<span className="text-sm text-gray-500">/2 years</span></div>
+                <div className="text-sm text-green-600 dark:text-green-400 mb-4">Save 42% vs Monthly</div>
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <li>✓ Maximum savings</li>
+                  <li>✓ Perfect for long-term learning</li>
+                  <li>✓ All premium features</li>
+                  <li>✓ Locked-in pricing</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-700">
+              <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Smart Trial Conversion</h4>
+              <p className="text-gray-700 dark:text-gray-300 text-sm">
+                Our intelligent system tracks your trial usage and provides personalized subscription recommendations 
+                based on your learning patterns. The more you explore during your trial, the better we can suggest 
+                the perfect plan for your educational journey.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Introduction Card */}
         <div className="card p-8 mb-8">
           <div className="text-center mb-6">

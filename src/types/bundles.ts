@@ -55,6 +55,7 @@ export interface QuestionBundle {
     background: string;
     text: string;
   };
+  storage_path?: string; // Path to the bundle's questions in Supabase Storage
 }
 
 export interface BundleVersion {

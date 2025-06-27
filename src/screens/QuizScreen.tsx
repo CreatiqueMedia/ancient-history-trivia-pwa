@@ -6,6 +6,7 @@ import { useSettings } from '../context/SettingsContext';
 import { getBundleById, getRandomQuestions, getQuestionsForBundle } from '../data/questions';
 import { QUESTION_BUNDLES } from '../data/bundles';
 import { Question } from '../types';
+import { EnhancedQuizService } from '../services/EnhancedQuizService';
 
 const QuizScreen: React.FC = () => {
   const { bundleId } = useParams<{ bundleId?: string }>();
@@ -47,7 +48,7 @@ const QuizScreen: React.FC = () => {
     
     setIsLoading(true);
     
-    // Load questions based on sample quiz, bundle, or use random questions
+    // Load questions based on sample quiz, bundle, or use enhanced quiz generation
     let quizQuestions: Question[];
     let bundle = null;
     
@@ -56,20 +57,21 @@ const QuizScreen: React.FC = () => {
       quizQuestions = sampleQuiz.questions;
       bundle = QUESTION_BUNDLES.find(b => b.id === sampleQuiz.bundleId);
       setCurrentBundle(bundle);
-      // Loading sample quiz questions
     } else if (bundleId) {
       // Find the bundle for UI display
       bundle = QUESTION_BUNDLES.find(b => b.id === bundleId);
       setCurrentBundle(bundle);
       
-      // Use the new bundle-specific question loading
-      quizQuestions = getQuestionsForBundle(bundleId);
+      // Use Enhanced Quiz Service for bundle sample quizzes
+      quizQuestions = EnhancedQuizService.generateBundleSampleQuiz(bundleId, 10);
+      
       if (quizQuestions.length === 0) {
-        // Fallback to random questions if bundle has no questions
-        quizQuestions = getRandomQuestions(10);
+        // Fallback to enhanced quick quiz
+        quizQuestions = EnhancedQuizService.generateQuickQuiz(10);
       }
     } else {
-      quizQuestions = getRandomQuestions(10);
+      // Use Enhanced Quiz Service for quick quiz with proper distribution
+      quizQuestions = EnhancedQuizService.generateQuickQuiz(10);
       setCurrentBundle(null);
     }
     
@@ -147,6 +149,9 @@ const QuizScreen: React.FC = () => {
 
   const currentQuestion = questions[currentQuiz.currentQuestionIndex];
   const progress = ((currentQuiz.currentQuestionIndex + 1) / questions.length) * 100;
+  
+  // Get enhanced question display information
+  const questionDisplayInfo = EnhancedQuizService.getQuestionDisplayInfo(currentQuestion);
 
   return (
     <div>
@@ -230,23 +235,36 @@ const QuizScreen: React.FC = () => {
               {currentQuestion.question}
             </h1>
             
-            {/* Question Meta */}
-            <div className="flex flex-wrap gap-2 text-sm">
-              <span className="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-2 py-1 rounded">
-                {currentQuestion.region}
+            {/* Enhanced Question Meta */}
+            <div className="flex flex-wrap gap-2 text-sm mb-3">
+              <span className="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-3 py-1 rounded-full font-medium">
+                📍 {questionDisplayInfo.region}
               </span>
-              <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded">
-                {currentQuestion.category}
+              <span className="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full font-medium">
+                ⏳ {questionDisplayInfo.historicalAge}
               </span>
-              <span className={`px-2 py-1 rounded ${
+              <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">
+                📚 {questionDisplayInfo.category}
+              </span>
+            </div>
+            
+            {/* Difficulty Level Display */}
+            <div className="mb-4">
+              <div className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm ${
                 currentQuestion.difficulty === 'easy' 
-                  ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                  ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border border-green-300 dark:border-green-700'
                   : currentQuestion.difficulty === 'medium'
-                  ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300'
-                  : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+                  ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 border border-yellow-300 dark:border-yellow-700'
+                  : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border border-red-300 dark:border-red-700'
               }`}>
-                {currentQuestion.difficulty}
-              </span>
+                <span className="mr-2">
+                  {currentQuestion.difficulty === 'easy' ? '🟢' : 
+                   currentQuestion.difficulty === 'medium' ? '🟡' : '🔴'}
+                </span>
+                <span className="capitalize">{currentQuestion.difficulty}</span>
+                <span className="mx-2">•</span>
+                <span>{questionDisplayInfo.difficultyLevel}</span>
+              </div>
             </div>
           </div>
 

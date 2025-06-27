@@ -1,4 +1,22 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import { 
+  getBundlePrice, 
+  getSubscriptionPrice, 
+  getBundleName,
+  createPaymentIntent,
+  createSubscription,
+  purchaseBundleWithRevenueCat,
+  subscribeWithRevenueCat,
+  restorePurchasesWithRevenueCat,
+  shouldUseAppStorePurchases,
+  shouldUseStripe
+} from '../config/payment';
+import {
+  isPlatform,
+  isAppStoreEnvironment,
+  isWebEnvironment
+} from '../utils/platform';
 
 interface PurchaseContextType {
   ownedBundles: string[];
@@ -6,22 +24,29 @@ interface PurchaseContextType {
   subscriptionPeriod: 'none' | 'monthly' | 'annual' | 'biennial';
   subscriptionExpiry?: string;
   isProcessing: boolean;
+  showPaymentModal: boolean;
+  currentPurchase: { type: 'bundle' | 'subscription', id: string } | null;
   purchaseBundle: (bundleId: string) => Promise<boolean>;
   purchaseGroup: (bundleIds: string[]) => Promise<boolean>;
   subscribe: (tier: string, period: string) => Promise<boolean>;
   restorePurchases: () => Promise<void>;
   hasAccessToBundle: (bundleId: string) => boolean;
   isPremiumUser: boolean;
+  closePaymentModal: () => void;
+  handlePaymentSuccess: () => void;
 }
 
 const PurchaseContext = createContext<PurchaseContextType | undefined>(undefined);
 
 export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, userProfile } = useAuth();
   const [ownedBundles, setOwnedBundles] = useState<string[]>([]);
   const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'pro'>('free');
   const [subscriptionPeriod, setSubscriptionPeriod] = useState<'none' | 'monthly' | 'annual' | 'biennial'>('none');
   const [subscriptionExpiry, setSubscriptionExpiry] = useState<string>();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [currentPurchase, setCurrentPurchase] = useState<{ type: 'bundle' | 'subscription', id: string } | null>(null);
 
   // Load saved purchase data on initialization
   useEffect(() => {
@@ -78,48 +103,26 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }));
   }, [subscriptionTier, subscriptionPeriod, subscriptionExpiry]);
 
-  const purchaseBundle = async (bundleId: string): Promise<boolean> => {
-    setIsProcessing(true);
-    try {
-      // Simulate purchase process - in a real app this would integrate with Stripe
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+  const closePaymentModal = () => {
+    setShowPaymentModal(false);
+    setCurrentPurchase(null);
+  };
+
+  const handlePaymentSuccess = () => {
+    if (!currentPurchase) return;
+    
+    if (currentPurchase.type === 'bundle') {
       // Add bundle to owned bundles
-      setOwnedBundles(prev => [...prev, bundleId]);
+      setOwnedBundles(prev => [...prev, currentPurchase.id]);
       
-      return true;
-    } catch (error) {
-      console.error('Purchase failed:', error);
-      return false;
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const purchaseGroup = async (bundleIds: string[]): Promise<boolean> => {
-    setIsProcessing(true);
-    try {
-      // Simulate group purchase
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Save to localStorage
+      const updatedBundles = [...ownedBundles, currentPurchase.id];
+      localStorage.setItem('ownedBundles', JSON.stringify(updatedBundles));
       
-      // Add all bundles to owned bundles
-      setOwnedBundles(prev => [...prev, ...bundleIds]);
-      
-      return true;
-    } catch (error) {
-      console.error('Group purchase failed:', error);
-      return false;
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const subscribe = async (tier: string, period: string): Promise<boolean> => {
-    setIsProcessing(true);
-    try {
-      // Simulate subscription purchase
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      console.log(`Successfully purchased ${getBundleName(currentPurchase.id)} bundle`);
+    } else {
+      // Handle subscription success
+      const period = currentPurchase.id;
       const now = new Date();
       let expiryDate: Date;
       
@@ -137,27 +140,138 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           expiryDate = now;
       }
       
-      setSubscriptionTier(tier as 'free' | 'pro');
+      setSubscriptionTier('pro');
       setSubscriptionPeriod(period as any);
       setSubscriptionExpiry(expiryDate.toISOString());
       
-      return true;
+      console.log(`Successfully subscribed to ${period} plan`);
+    }
+    
+    // Close the payment modal
+    closePaymentModal();
+  };
+
+  const purchaseBundle = async (bundleId: string): Promise<boolean> => {
+    if (!user) {
+      console.error('User must be logged in to make purchases');
+      return false;
+    }
+    
+    setIsProcessing(true);
+    try {
+      // Check if we should use app store purchases (iOS/Android)
+      if (shouldUseAppStorePurchases()) {
+        // For app store versions, use RevenueCat
+        return await purchaseBundleWithRevenueCat(bundleId);
+      } else {
+        // For web/PWA, show payment modal with Stripe
+        setCurrentPurchase({ type: 'bundle', id: bundleId });
+        setShowPaymentModal(true);
+        
+        // The actual purchase will be handled by the PaymentForm component
+        // We'll return true here and the actual result will be handled by handlePaymentSuccess
+        setIsProcessing(false);
+        return true;
+      }
     } catch (error) {
-      console.error('Subscription failed:', error);
+      console.error('Purchase failed:', error);
+      setIsProcessing(false);
+      return false;
+    }
+  };
+
+  const purchaseGroup = async (bundleIds: string[]): Promise<boolean> => {
+    if (!user) {
+      console.error('User must be logged in to make purchases');
+      return false;
+    }
+    
+    setIsProcessing(true);
+    try {
+      // For group purchases, we'll process them one by one
+      let allSuccessful = true;
+      
+      for (const bundleId of bundleIds) {
+        // Check if we should use app store purchases (iOS/Android)
+        if (shouldUseAppStorePurchases()) {
+          // For app store versions, use RevenueCat
+          const success = await purchaseBundleWithRevenueCat(bundleId);
+          if (!success) {
+            allSuccessful = false;
+          }
+        } else {
+          // For web/PWA, show payment modal for each bundle
+          setCurrentPurchase({ type: 'bundle', id: bundleId });
+          setShowPaymentModal(true);
+          
+          // Wait for the payment to complete (this is a simplified approach)
+          // In a real implementation, you would need to handle this more robustly
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // Check if the bundle was added to ownedBundles
+          if (!ownedBundles.includes(bundleId)) {
+            allSuccessful = false;
+          }
+        }
+      }
+      
+      return allSuccessful;
+    } catch (error) {
+      console.error('Group purchase failed:', error);
       return false;
     } finally {
       setIsProcessing(false);
+      closePaymentModal();
+    }
+  };
+
+  const subscribe = async (tier: string, period: string): Promise<boolean> => {
+    if (!user) {
+      console.error('User must be logged in to subscribe');
+      return false;
+    }
+    
+    setIsProcessing(true);
+    try {
+      // Check if we should use app store purchases (iOS/Android)
+      if (shouldUseAppStorePurchases()) {
+        // For app store versions, use RevenueCat
+        return await subscribeWithRevenueCat(tier, period);
+      } else {
+        // For web/PWA, show payment modal with Stripe
+        setCurrentPurchase({ type: 'subscription', id: period });
+        setShowPaymentModal(true);
+        
+        // The actual subscription will be handled by the PaymentForm component
+        // We'll return true here and the actual result will be handled by handlePaymentSuccess
+        setIsProcessing(false);
+        return true;
+      }
+    } catch (error) {
+      console.error('Subscription failed:', error);
+      setIsProcessing(false);
+      return false;
     }
   };
 
   const restorePurchases = async (): Promise<void> => {
     setIsProcessing(true);
     try {
-      // Simulate restore purchases
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In a real app, this would contact the payment provider to restore purchases
-      // Purchases restored successfully
+      // Check if we should use app store purchases (iOS/Android)
+      if (shouldUseAppStorePurchases()) {
+        // For app store versions, use RevenueCat
+        await restorePurchasesWithRevenueCat();
+      } else {
+        // For web/PWA, we would need to implement a server-side solution
+        // to restore purchases based on the user's account
+        console.log('Restoring web purchases for user:', user?.uid);
+        
+        // Simulate restore process
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // In a real implementation, this would fetch the user's purchases from the server
+        // and update the local state accordingly
+      }
     } catch (error) {
       console.error('Restore purchases failed:', error);
     } finally {
@@ -187,12 +301,16 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     subscriptionPeriod,
     subscriptionExpiry,
     isProcessing,
+    showPaymentModal,
+    currentPurchase,
     purchaseBundle,
     purchaseGroup,
     subscribe,
     restorePurchases,
     hasAccessToBundle,
-    isPremiumUser
+    isPremiumUser,
+    closePaymentModal,
+    handlePaymentSuccess
   };
 
   return (
