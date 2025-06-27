@@ -22,10 +22,21 @@ export class QuestionService {
     try {
       if (this.isInitialized) return true;
       
+      // Check if Supabase is configured
+      if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured. QuestionService will work in offline mode only.');
+        this.isInitialized = true;
+        this.loadCachedBundlesIntoMemory();
+        return true;
+      }
+      
       // Initialize Supabase client
       const supabase = await initializeSupabase();
       if (!supabase) {
-        throw new Error('Failed to initialize Supabase client');
+        console.warn('Failed to initialize Supabase client. Working in offline mode.');
+        this.isInitialized = true;
+        this.loadCachedBundlesIntoMemory();
+        return true;
       }
       
       this.supabase = supabase;
@@ -34,12 +45,13 @@ export class QuestionService {
       // Load any cached bundles into memory
       this.loadCachedBundlesIntoMemory();
       
-      console.log('QuestionService initialized successfully');
+      console.log('QuestionService initialized successfully with Supabase');
       return true;
     } catch (error) {
-      console.error('Failed to initialize QuestionService:', error);
-      errorHandler.handleGenericError(error, 'question-service-init');
-      return false;
+      console.warn('QuestionService initialization failed, working in offline mode:', error);
+      this.isInitialized = true;
+      this.loadCachedBundlesIntoMemory();
+      return true;
     }
   }
   
@@ -496,6 +508,9 @@ export class QuestionService {
   private static checkInitialization(): void {
     if (!this.isInitialized) {
       throw new Error('QuestionService not initialized. Call initialize() first.');
+    }
+    if (!this.supabase) {
+      throw new Error('Supabase not configured. This feature requires Supabase configuration.');
     }
   }
 }
