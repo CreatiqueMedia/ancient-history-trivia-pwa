@@ -128,6 +128,56 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
       period: 'Empire',
       explanation: 'The Antonine Plague was a pandemic, possibly smallpox, that devastated the Roman Empire from 165-180 CE.',
       tags: ['plague', 'pandemic', 'antonine']
+    },
+    // True/False Questions
+    {
+      id: 'rome-tf-1',
+      question: 'The Roman Empire was founded by Julius Caesar.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Politics',
+      region: 'Rome',
+      period: 'Empire',
+      explanation: 'False. The Roman Empire was founded by Augustus (Octavian), not Julius Caesar. Caesar was a dictator during the Roman Republic.',
+      tags: ['caesar', 'augustus', 'empire']
+    },
+    {
+      id: 'rome-tf-2',
+      question: 'Roman gladiators were always slaves.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Society',
+      region: 'Rome',
+      period: 'Empire',
+      explanation: 'False. While many gladiators were slaves, some were free men who chose to fight for fame and money.',
+      tags: ['gladiators', 'slaves', 'society']
+    },
+    // Fill-in-the-Blank Questions
+    {
+      id: 'rome-fib-1',
+      question: 'The famous Roman road system was built to connect all parts of the empire to _____, the capital city.',
+      options: ['Rome', 'Athens', 'Alexandria', 'Constantinople'],
+      correctAnswer: 0,
+      difficulty: 'easy',
+      category: 'Engineering',
+      region: 'Rome',
+      period: 'Empire',
+      explanation: 'Roman roads were built to connect all parts of the empire to Rome, leading to the saying "All roads lead to Rome."',
+      tags: ['roads', 'rome', 'engineering']
+    },
+    {
+      id: 'rome-fib-2',
+      question: 'The Roman military unit consisting of about 5,000 soldiers was called a _____.',
+      options: ['Legion', 'Century', 'Cohort', 'Maniple'],
+      correctAnswer: 0,
+      difficulty: 'medium',
+      category: 'Military',
+      region: 'Rome',
+      period: 'Empire',
+      explanation: 'A Roman legion was the main military unit, typically consisting of about 5,000 soldiers.',
+      tags: ['legion', 'military', 'soldiers']
     }
   ],
 
