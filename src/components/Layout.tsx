@@ -103,7 +103,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Mobile Header */}
-      <header className="block md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+      <header className="block lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
             <Logo size={24} className="mr-2" />
@@ -152,7 +152,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </header>
 
       {/* Desktop Header with Toggle */}
-      <header className="hidden md:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+      <header className="hidden lg:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
             <button
@@ -244,7 +244,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       <div className="flex flex-1"> {/* Changed to flex-1 to allow footer to stick to bottom */}
         {/* Desktop Sidebar */}
-        <aside className={`hidden md:block fixed left-0 top-0 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-30 transition-transform duration-300 ease-in-out ${
+        <aside className={`hidden lg:block fixed left-0 top-0 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-30 transition-transform duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-0'
         }`}>
           <div className="pt-20 h-full overflow-y-auto">
@@ -276,23 +276,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Overlay for mobile */}
         {sidebarOpen && (
           <div 
-            className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+            className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
         {/* Main Content */}
         <main className={`flex-1 transition-all duration-300 ease-in-out ${
-          sidebarOpen ? 'md:ml-64' : 'md:ml-0'
-        } pb-20 md:pb-6`}>
-          <div className="pt-0 md:pt-20">
+          sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'
+        } pb-20 lg:pb-6`}>
+          <div className="pt-0 lg:pt-20">
             {children}
           </div>
         </main>
       </div>
 
       {/* New Desktop Footer */}
-      <footer className="hidden md:block bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 px-6">
+      <footer className="hidden lg:block bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
             <Logo size={48} className="mr-2" />
@@ -304,7 +304,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </footer>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 md:hidden z-50">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 lg:hidden z-50">
         <div className="flex justify-around items-center py-2">
           {navItems.map(({ path, label, icon: Icon, iconSolid: IconSolid }) => {
             const active = isActive(path);
