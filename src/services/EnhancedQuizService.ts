@@ -11,37 +11,42 @@ export class EnhancedQuizService {
   
   /**
    * Generate Quick Quiz with proper distribution:
-   * - 33% Easy (elementary), 33% Medium (middle school), 33% Hard (high school)
+   * - If mixed difficulties available: 33% Easy, 33% Medium, 33% Hard
+   * - If single difficulty: Use all available questions up to questionCount
    * - Mixed formats: Multiple Choice, True/False, Fill-in-the-Blank
    * - Mixed regions and historical periods
    */
-  static generateQuickQuiz(questionCount: number = 10): Question[] {
+  static generateQuickQuiz(questionCount: number = 33): Question[] {
     const allQuestions = [...sampleQuestions];
     
-    // Calculate distribution
-    const easyCount = Math.floor(questionCount * 0.33);
-    const mediumCount = Math.floor(questionCount * 0.33);
-    const hardCount = questionCount - easyCount - mediumCount;
+    // Check what difficulties are available
+    const easyQuestions = allQuestions.filter(q => q.difficulty === 'easy');
+    const mediumQuestions = allQuestions.filter(q => q.difficulty === 'medium');
+    const hardQuestions = allQuestions.filter(q => q.difficulty === 'hard');
     
-    // Get questions by difficulty
-    const easyQuestions = this.shuffleArray(allQuestions.filter(q => q.difficulty === 'easy'));
-    const mediumQuestions = this.shuffleArray(allQuestions.filter(q => q.difficulty === 'medium'));
-    const hardQuestions = this.shuffleArray(allQuestions.filter(q => q.difficulty === 'hard'));
+    // If we have mixed difficulties, use 33/33/33 distribution
+    if (easyQuestions.length > 0 && mediumQuestions.length > 0 && hardQuestions.length > 0) {
+      // Calculate distribution
+      const easyCount = Math.floor(questionCount * 0.33);
+      const mediumCount = Math.floor(questionCount * 0.33);
+      const hardCount = questionCount - easyCount - mediumCount;
+      
+      const selectedQuestions: Question[] = [];
+      
+      // Add questions with format distribution
+      selectedQuestions.push(...this.selectQuestionsWithFormatMix(this.shuffleArray(easyQuestions), easyCount));
+      selectedQuestions.push(...this.selectQuestionsWithFormatMix(this.shuffleArray(mediumQuestions), mediumCount));
+      selectedQuestions.push(...this.selectQuestionsWithFormatMix(this.shuffleArray(hardQuestions), hardCount));
+      
+      return this.shuffleArray(selectedQuestions);
+    }
     
-    // Select questions with format distribution
-    const selectedQuestions: Question[] = [];
+    // If all questions are the same difficulty (like all HARD), use all available up to questionCount
+    const availableQuestions = this.shuffleArray(allQuestions);
+    const questionsToUse = Math.min(questionCount, availableQuestions.length);
     
-    // Add easy questions
-    selectedQuestions.push(...this.selectQuestionsWithFormatMix(easyQuestions, easyCount));
-    
-    // Add medium questions
-    selectedQuestions.push(...this.selectQuestionsWithFormatMix(mediumQuestions, mediumCount));
-    
-    // Add hard questions
-    selectedQuestions.push(...this.selectQuestionsWithFormatMix(hardQuestions, hardCount));
-    
-    // Shuffle final selection to mix difficulties
-    return this.shuffleArray(selectedQuestions);
+    // Use format distribution for the available questions
+    return this.selectQuestionsWithFormatMix(availableQuestions, questionsToUse);
   }
   
   /**
