@@ -259,7 +259,7 @@ const HomeScreen = () => {
               {topicShowcase.map((topic) => (
                 <div
                   key={topic.id}
-                  className="flex-shrink-0 w-72 md:w-80 mx-2 md:mx-4"
+                  className="flex-shrink-0 w-72 lg:w-80 mx-2 lg:mx-4"
                 >
                   <div className={`card p-4 md:p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
                     <div className="text-center">
