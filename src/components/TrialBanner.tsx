@@ -128,7 +128,45 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
       </div>
 
       <div className="relative p-4 md:p-6">
-        <div className="flex items-center justify-between">
+        {/* Mobile Layout - Centered */}
+        <div className="block lg:hidden text-center">
+          {/* Icon */}
+          <div className="flex justify-center mb-3">
+            {conversionMessage.urgency === 'high' ? (
+              <ExclamationTriangleIcon className={`w-8 h-8 ${styles.icon}`} />
+            ) : trialStatus ? (
+              <ClockIcon className={`w-8 h-8 ${styles.icon}`} />
+            ) : (
+              <GiftIcon className={`w-8 h-8 ${styles.icon}`} />
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="mb-4">
+            <h3 className={`text-lg font-bold ${styles.text} mb-2`}>
+              {conversionMessage.title}
+            </h3>
+            
+            <p className={`text-sm ${styles.text} opacity-90 mb-3`}>
+              {conversionMessage.message}
+            </p>
+
+            {/* Trial Timer */}
+            {trialStatus && trialStatus.isActive && (
+              <div className="flex justify-center mb-3">
+                <div className="flex items-center bg-black bg-opacity-20 rounded-full px-3 py-1">
+                  <ClockIcon className="w-4 h-4 text-white mr-1" />
+                  <span className="text-white text-sm font-mono">
+                    {formatTimeRemaining(trialStatus.endDate)}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Desktop Layout - Horizontal */}
+        <div className="hidden lg:flex items-center justify-between">
           <div className="flex items-center flex-1">
             {/* Icon */}
             <div className="flex-shrink-0 mr-4">
@@ -205,6 +243,65 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
               to="/subscription"
               onClick={handleConversionClick}
               className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${styles.button}`}
+            >
+              {conversionMessage.cta}
+            </Link>
+
+            {/* Dismiss Button */}
+            {showDismiss && conversionMessage.urgency !== 'high' && (
+              <button
+                onClick={handleDismiss}
+                className="p-2 rounded-full text-white hover:bg-black hover:bg-opacity-20 transition-colors"
+                title="Dismiss"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Benefits List and Action Buttons */}
+        <div className="block lg:hidden">
+          {/* Trial Progress Bar for Mobile */}
+          {trialStatus && trialStatus.isActive && (
+            <div className="mb-4">
+              <div className="flex justify-between text-xs text-white opacity-75 mb-1">
+                <span>Trial Progress</span>
+                <span>{trialStatus.accessedBundles.length} bundles explored</span>
+              </div>
+              <div className="w-full bg-black bg-opacity-20 rounded-full h-2">
+                <div 
+                  className="bg-white h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${getProgressPercentage()}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+
+          {/* Benefits List for New Users - Mobile Centered */}
+          {!trialStatus && (
+            <div className="flex flex-col items-center space-y-2 mb-4">
+              <div className="flex items-center text-white text-sm">
+                <SparklesIcon className="w-4 h-4 mr-1" />
+                <span>All Premium Bundles</span>
+              </div>
+              <div className="flex items-center text-white text-sm">
+                <SparklesIcon className="w-4 h-4 mr-1" />
+                <span>Unlimited Questions</span>
+              </div>
+              <div className="flex items-center text-white text-sm">
+                <SparklesIcon className="w-4 h-4 mr-1" />
+                <span>Advanced Features</span>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons - Mobile Centered */}
+          <div className="flex flex-col items-center space-y-3">
+            <Link
+              to="/subscription"
+              onClick={handleConversionClick}
+              className={`px-6 py-3 rounded-lg font-semibold text-sm transition-colors ${styles.button} w-full max-w-xs text-center`}
             >
               {conversionMessage.cta}
             </Link>
