@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useStats } from '../context/StatsContext';
 import { usePurchase } from '../context/PurchaseContext';
+import { TrialService } from '../services/TrialService';
 import { SUBSCRIPTION_TIERS } from '../data/bundles';
 
 const UserProfileScreen: React.FC = () => {
@@ -104,6 +105,16 @@ const UserProfileScreen: React.FC = () => {
 
   // Map subscription to SUBSCRIPTION_TIERS for badge display using PurchaseContext
   const getSubscriptionBadge = () => {
+    // Check for active trial first
+    const trialStatus = TrialService.getTrialStatus();
+    if (trialStatus && trialStatus.isActive) {
+      return { 
+        icon: '🎁', 
+        name: `Trial (${trialStatus.daysRemaining}d)`, 
+        color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+      };
+    }
+    
     if (subscriptionTier === 'pro' && subscriptionExpiry) {
       const expiry = new Date(subscriptionExpiry);
       if (expiry > new Date()) {
@@ -119,11 +130,30 @@ const UserProfileScreen: React.FC = () => {
         }
       }
     }
-    return { icon: '❓', name: 'No Subscription', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' };
+    return { icon: '❓', name: 'Free Plan', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' };
   };
 
   // Get current subscription tier details using PurchaseContext
   const getCurrentSubscriptionTier = () => {
+    // Check for active trial first
+    const trialStatus = TrialService.getTrialStatus();
+    if (trialStatus && trialStatus.isActive) {
+      return {
+        id: 'trial',
+        name: '7-Day Free Trial',
+        price: 0,
+        period: 'trial',
+        features: [
+          'Access to all premium bundles',
+          'Unlimited questions',
+          'Advanced features',
+          `${trialStatus.daysRemaining} days remaining`
+        ],
+        isPopular: false,
+        savings: null
+      };
+    }
+    
     if (subscriptionTier === 'pro' && subscriptionExpiry) {
       const expiry = new Date(subscriptionExpiry);
       if (expiry > new Date()) {

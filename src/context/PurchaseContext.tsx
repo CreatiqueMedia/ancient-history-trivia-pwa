@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { TrialService } from '../services/TrialService';
 import { 
   getBundlePrice, 
   getSubscriptionPrice, 
@@ -280,6 +281,11 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const hasAccessToBundle = (bundleId: string): boolean => {
+    // Check if user has an active trial (gives access to all bundles)
+    if (TrialService.isInTrial()) {
+      return true;
+    }
+    
     // Pro users have access to all bundles
     if (subscriptionTier === 'pro' && subscriptionExpiry) {
       const expiry = new Date(subscriptionExpiry);
@@ -292,8 +298,16 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return ownedBundles.includes(bundleId);
   };
 
-  const isPremiumUser = subscriptionTier === 'pro' && subscriptionExpiry ? 
-    new Date(subscriptionExpiry) > new Date() : false;
+  const isPremiumUser = (() => {
+    // Check if user has an active trial
+    if (TrialService.isInTrial()) {
+      return true;
+    }
+    
+    // Check if user has active subscription
+    return subscriptionTier === 'pro' && subscriptionExpiry ? 
+      new Date(subscriptionExpiry) > new Date() : false;
+  })();
 
   const value: PurchaseContextType = {
     ownedBundles,

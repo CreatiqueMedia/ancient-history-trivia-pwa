@@ -85,7 +85,9 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
           
           // Show success message and navigate to store
           alert('🎉 Your 7-day free trial has started! You now have access to all premium content.');
-          navigate('/store');
+          
+          // Force a page refresh to update all contexts
+          window.location.reload();
         } else {
           throw new Error('Unable to sign in');
         }
