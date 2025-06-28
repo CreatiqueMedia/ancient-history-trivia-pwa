@@ -99,11 +99,11 @@ const HomeScreen = () => {
     <div>
       {/* Header */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
-        <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
+        <div className="max-w-4xl mx-auto px-4 py-8 lg:py-12">
           <div className="text-center">
             {/* Brought to you by text */}
             <div className="mb-6">
-              <p className="text-primary-200 text-sm md:text-base font-medium tracking-wide">
+              <p className="text-primary-200 text-sm lg:text-base font-medium tracking-wide">
                 Brought to you by, 
                 <span className="text-white font-bold ml-1 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                   "The Awakened Hybrid and CreatiqueMedia LLC"
@@ -121,7 +121,7 @@ const HomeScreen = () => {
             
             {user && userProfile ? (
               <>
-                <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                <h1 className="text-2xl lg:text-3xl font-bold mb-2">
                   {getGreeting()}, {userProfile.displayName}! 👋
                 </h1>
                 <p className="text-primary-100 text-lg">
@@ -138,7 +138,7 @@ const HomeScreen = () => {
               </>
             ) : (
               <>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                <h1 className="text-3xl lg:text-4xl font-bold mb-2">
                   Ancient History Trivia
                 </h1>
                 <p className="text-primary-100 text-lg">
@@ -150,7 +150,7 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
+      <div className="max-w-4xl mx-auto px-4 py-6 lg:py-8">
         {/* Trial Banner */}
         <div className="mb-6">
           <TrialBanner />
@@ -163,7 +163,7 @@ const HomeScreen = () => {
 
         {/* Quick Stats - Only show if user has played at least one game */}
         {stats.totalQuestions > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {quickStats.map((stat, index) => (
               <div key={index} className="card p-4 text-center">
                 <div className="text-2xl mb-2">{stat.icon}</div>
@@ -179,7 +179,7 @@ const HomeScreen = () => {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
           <Link
             to="/quiz"
             className="card p-6 hover:shadow-xl transition-shadow duration-200 group"
@@ -261,13 +261,13 @@ const HomeScreen = () => {
                   key={topic.id}
                   className="flex-shrink-0 w-72 lg:w-80 mx-2 lg:mx-4"
                 >
-                  <div className={`card p-4 md:p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
+                  <div className={`card p-4 lg:p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
                     <div className="text-center">
-                      <div className="text-4xl md:text-5xl mb-3 md:mb-4 filter drop-shadow-lg">{topic.icon}</div>
-                      <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3 text-white drop-shadow-md">
+                      <div className="text-4xl lg:text-5xl mb-3 lg:mb-4 filter drop-shadow-lg">{topic.icon}</div>
+                      <h3 className="text-lg lg:text-xl font-bold mb-2 lg:mb-3 text-white drop-shadow-md">
                         {topic.title}
                       </h3>
-                      <p className="text-white/90 text-xs md:text-sm leading-relaxed">
+                      <p className="text-white/90 text-xs lg:text-sm leading-relaxed">
                         {topic.description}
                       </p>
                     </div>
@@ -280,13 +280,13 @@ const HomeScreen = () => {
                   key={`${topic.id}-duplicate`}
                   className="flex-shrink-0 w-72 md:w-80 mx-2 md:mx-4"
                 >
-                  <div className={`card p-4 md:p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
+                  <div className={`card p-4 lg:p-6 bg-gradient-to-br ${topic.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
                     <div className="text-center">
-                      <div className="text-4xl md:text-5xl mb-3 md:mb-4 filter drop-shadow-lg">{topic.icon}</div>
-                      <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3 text-white drop-shadow-md">
+                      <div className="text-4xl lg:text-5xl mb-3 lg:mb-4 filter drop-shadow-lg">{topic.icon}</div>
+                      <h3 className="text-lg lg:text-xl font-bold mb-2 lg:mb-3 text-white drop-shadow-md">
                         {topic.title}
                       </h3>
-                      <p className="text-white/90 text-xs md:text-sm leading-relaxed">
+                      <p className="text-white/90 text-xs lg:text-sm leading-relaxed">
                         {topic.description}
                       </p>
                     </div>
@@ -296,8 +296,8 @@ const HomeScreen = () => {
             </div>
             
             {/* Gradient fade edges */}
-            <div className="absolute left-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-r from-gray-50 dark:from-gray-900 to-transparent pointer-events-none z-10"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-l from-gray-50 dark:from-gray-900 to-transparent pointer-events-none z-10"></div>
+            <div className="absolute left-0 top-0 bottom-0 w-8 lg:w-16 bg-gradient-to-r from-gray-50 dark:from-gray-900 to-transparent pointer-events-none z-10"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-8 lg:w-16 bg-gradient-to-l from-gray-50 dark:from-gray-900 to-transparent pointer-events-none z-10"></div>
           </div>
         </section>
 
