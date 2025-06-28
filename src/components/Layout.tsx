@@ -284,8 +284,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Main Content */}
         <main className={`flex-1 transition-all duration-300 ease-in-out ${
           sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'
-        } pb-20 lg:pb-6`}>
-          <div className="pt-0 lg:pt-20">
+        } pb-20 lg:pb-6 overflow-y-auto`}>
+          <div className="pt-0 lg:pt-20 min-h-full">
             {children}
           </div>
         </main>
