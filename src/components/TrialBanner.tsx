@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   ClockIcon, 
   SparklesIcon, 
@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { TrialStatus } from '../types/enhancements';
 import { TrialService } from '../services/TrialService';
+import { useAuth } from '../context/AuthContext';
 
 interface TrialBannerProps {
   className?: string;
@@ -21,8 +22,11 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
   onDismiss,
   showDismiss = true 
 }) => {
+  const { user, signInAnonymously } = useAuth();
+  const navigate = useNavigate();
   const [trialStatus, setTrialStatus] = useState<TrialStatus | null>(null);
   const [isVisible, setIsVisible] = useState(true);
+  const [isStartingTrial, setIsStartingTrial] = useState(false);
   const [conversionMessage, setConversionMessage] = useState<{
     title: string;
     message: string;
@@ -53,12 +57,50 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
     }
   };
 
-  const handleConversionClick = () => {
-    TrialService.markConversionOffered();
-    // Analytics tracking would happen here
-    
-    // Set the store to show subscription tab
-    window.dispatchEvent(new CustomEvent('setStoreTab', { detail: 'subscription' }));
+  const handleConversionClick = async (e: React.MouseEvent) => {
+    // If user doesn't have a trial yet and this is a "Start Free Trial" button
+    if (!trialStatus && conversionMessage?.title.includes('Start')) {
+      e.preventDefault(); // Prevent navigation
+      
+      setIsStartingTrial(true);
+      
+      try {
+        // Ensure user is signed in (anonymously if needed)
+        let currentUser = user;
+        if (!currentUser) {
+          await signInAnonymously();
+          // Wait a moment for auth state to update
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          currentUser = user;
+        }
+        
+        if (currentUser) {
+          // Start the trial
+          const newTrialStatus = TrialService.startTrial(currentUser.uid);
+          setTrialStatus(newTrialStatus);
+          
+          // Update the conversion message
+          const newMessage = TrialService.getConversionMessage();
+          setConversionMessage(newMessage);
+          
+          // Show success message and navigate to store
+          alert('🎉 Your 7-day free trial has started! You now have access to all premium content.');
+          navigate('/store');
+        } else {
+          throw new Error('Unable to sign in');
+        }
+      } catch (error) {
+        console.error('Error starting trial:', error);
+        alert('Sorry, there was an error starting your trial. Please try again.');
+      } finally {
+        setIsStartingTrial(false);
+      }
+    } else {
+      // For existing trials or subscription prompts, just mark conversion offered and navigate
+      TrialService.markConversionOffered();
+      // Set the store to show subscription tab
+      window.dispatchEvent(new CustomEvent('setStoreTab', { detail: 'subscription' }));
+    }
   };
 
   const getUrgencyStyles = (urgency: 'low' | 'medium' | 'high') => {
@@ -242,13 +284,23 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-3 ml-4">
-            <Link
-              to="/store"
-              onClick={handleConversionClick}
-              className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${styles.button}`}
-            >
-              {conversionMessage.cta}
-            </Link>
+            {!trialStatus && conversionMessage?.title.includes('Start') ? (
+              <button
+                onClick={handleConversionClick}
+                disabled={isStartingTrial}
+                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${styles.button} disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {isStartingTrial ? 'Starting Trial...' : conversionMessage.cta}
+              </button>
+            ) : (
+              <Link
+                to="/store"
+                onClick={handleConversionClick}
+                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${styles.button}`}
+              >
+                {conversionMessage.cta}
+              </Link>
+            )}
 
             {/* Dismiss Button */}
             {showDismiss && conversionMessage.urgency !== 'high' && (
@@ -301,13 +353,23 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
 
           {/* Action Buttons - Mobile Centered */}
           <div className="flex flex-col items-center space-y-3">
-            <Link
-              to="/store"
-              onClick={handleConversionClick}
-              className={`px-6 py-3 rounded-lg font-semibold text-sm transition-colors ${styles.button} w-full max-w-xs text-center`}
-            >
-              {conversionMessage.cta}
-            </Link>
+            {!trialStatus && conversionMessage?.title.includes('Start') ? (
+              <button
+                onClick={handleConversionClick}
+                disabled={isStartingTrial}
+                className={`px-6 py-3 rounded-lg font-semibold text-sm transition-colors ${styles.button} w-full max-w-xs text-center disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {isStartingTrial ? 'Starting Trial...' : conversionMessage.cta}
+              </button>
+            ) : (
+              <Link
+                to="/store"
+                onClick={handleConversionClick}
+                className={`px-6 py-3 rounded-lg font-semibold text-sm transition-colors ${styles.button} w-full max-w-xs text-center`}
+              >
+                {conversionMessage.cta}
+              </Link>
+            )}
 
             {/* Dismiss Button */}
             {showDismiss && conversionMessage.urgency !== 'high' && (
