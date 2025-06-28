@@ -291,7 +291,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </main>
       </div>
 
-      {/* New Desktop Footer */}
+      {/* Mobile Footer */}
+      <footer className="block lg:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-3 px-4 mb-20">
+        <div className="text-center">
+          <div className="flex justify-center mb-2">
+            <Logo size={24} className="opacity-80" />
+          </div>
+          <p className="text-xs text-gray-600 dark:text-gray-400">
+            &copy; {new Date().getFullYear()} Ancient History Trivia
+          </p>
+        </div>
+      </footer>
+
+      {/* Desktop Footer */}
       <footer className="hidden lg:block bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
