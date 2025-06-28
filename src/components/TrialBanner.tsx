@@ -56,6 +56,9 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
   const handleConversionClick = () => {
     TrialService.markConversionOffered();
     // Analytics tracking would happen here
+    
+    // Set the store to show subscription tab
+    window.dispatchEvent(new CustomEvent('setStoreTab', { detail: 'subscription' }));
   };
 
   const getUrgencyStyles = (urgency: 'low' | 'medium' | 'high') => {
@@ -240,7 +243,7 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
           {/* Action Buttons */}
           <div className="flex items-center space-x-3 ml-4">
             <Link
-              to="/subscription"
+              to="/store"
               onClick={handleConversionClick}
               className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${styles.button}`}
             >
@@ -299,7 +302,7 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
           {/* Action Buttons - Mobile Centered */}
           <div className="flex flex-col items-center space-y-3">
             <Link
-              to="/subscription"
+              to="/store"
               onClick={handleConversionClick}
               className={`px-6 py-3 rounded-lg font-semibold text-sm transition-colors ${styles.button} w-full max-w-xs text-center`}
             >
