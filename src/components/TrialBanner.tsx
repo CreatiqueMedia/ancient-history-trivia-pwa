@@ -62,35 +62,32 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
     if (!trialStatus && conversionMessage?.title.includes('Start')) {
       e.preventDefault(); // Prevent navigation
       
+      // Check if user is properly logged in (not anonymous)
+      if (!user || user.isAnonymous) {
+        // User needs to sign in first
+        alert('Please sign in to start your free trial. This helps us track your trial period and ensure you don\'t lose access.');
+        
+        // Navigate to home page where they can sign in
+        navigate('/');
+        return;
+      }
+      
       setIsStartingTrial(true);
       
       try {
-        // Ensure user is signed in (anonymously if needed)
-        let currentUser = user;
-        if (!currentUser) {
-          await signInAnonymously();
-          // Wait a moment for auth state to update
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          currentUser = user;
-        }
+        // Start the trial with the authenticated user
+        const newTrialStatus = TrialService.startTrial(user.uid);
+        setTrialStatus(newTrialStatus);
         
-        if (currentUser) {
-          // Start the trial
-          const newTrialStatus = TrialService.startTrial(currentUser.uid);
-          setTrialStatus(newTrialStatus);
-          
-          // Update the conversion message
-          const newMessage = TrialService.getConversionMessage();
-          setConversionMessage(newMessage);
-          
-          // Show success message and navigate to store
-          alert('🎉 Your 7-day free trial has started! You now have access to all premium content.');
-          
-          // Force a page refresh to update all contexts
-          window.location.reload();
-        } else {
-          throw new Error('Unable to sign in');
-        }
+        // Update the conversion message
+        const newMessage = TrialService.getConversionMessage();
+        setConversionMessage(newMessage);
+        
+        // Show success message and navigate to store
+        alert('🎉 Your 7-day free trial has started! You now have access to all premium content.');
+        
+        // Force a page refresh to update all contexts
+        window.location.reload();
       } catch (error) {
         console.error('Error starting trial:', error);
         alert('Sorry, there was an error starting your trial. Please try again.');
@@ -292,7 +289,8 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
                 disabled={isStartingTrial}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${styles.button} disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {isStartingTrial ? 'Starting Trial...' : conversionMessage.cta}
+                {isStartingTrial ? 'Starting Trial...' : 
+                 (!user || user.isAnonymous) ? 'Sign In for Free Trial' : conversionMessage.cta}
               </button>
             ) : (
               <Link
@@ -361,7 +359,8 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
                 disabled={isStartingTrial}
                 className={`px-6 py-3 rounded-lg font-semibold text-sm transition-colors ${styles.button} w-full max-w-xs text-center disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {isStartingTrial ? 'Starting Trial...' : conversionMessage.cta}
+                {isStartingTrial ? 'Starting Trial...' : 
+                 (!user || user.isAnonymous) ? 'Sign In for Free Trial' : conversionMessage.cta}
               </button>
             ) : (
               <Link
