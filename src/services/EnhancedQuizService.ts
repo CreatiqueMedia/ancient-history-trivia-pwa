@@ -45,13 +45,24 @@ export class EnhancedQuizService {
     const availableQuestions = this.shuffleArray(allQuestions);
     const questionsToUse = Math.min(questionCount, availableQuestions.length);
     
-    // TEMPORARY: Return all questions without format mixing to debug the issue
-    if (questionCount === 33) {
-      console.log(`Returning all ${questionsToUse} questions without format mixing`);
-      return availableQuestions.slice(0, questionsToUse);
+    // For the 33 AP-level questions, ensure we get proper format distribution
+    if (questionsToUse === 33) {
+      // Calculate exact format distribution for 33 questions: 11 MC, 11 TF, 11 FIB
+      const multipleChoiceQuestions = availableQuestions.filter(q => this.isMultipleChoiceQuestion(q));
+      const trueFalseQuestions = availableQuestions.filter(q => this.isTrueFalseQuestion(q));
+      const fillBlankQuestions = availableQuestions.filter(q => this.isFillBlankQuestion(q));
+      
+      const selected: Question[] = [];
+      
+      // Select exactly 11 from each format (33/33/33 distribution)
+      selected.push(...this.shuffleArray(multipleChoiceQuestions).slice(0, 11));
+      selected.push(...this.shuffleArray(trueFalseQuestions).slice(0, 11));
+      selected.push(...this.shuffleArray(fillBlankQuestions).slice(0, 11));
+      
+      return this.shuffleArray(selected);
     }
     
-    // Use format distribution for the available questions
+    // Use format distribution for other question counts
     return this.selectQuestionsWithFormatMix(availableQuestions, questionsToUse);
   }
   
