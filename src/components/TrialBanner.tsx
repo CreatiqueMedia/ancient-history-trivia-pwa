@@ -97,8 +97,6 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
     } else {
       // For existing trials or subscription prompts, just mark conversion offered and navigate
       TrialService.markConversionOffered();
-      // Set the store to show subscription tab
-      window.dispatchEvent(new CustomEvent('setStoreTab', { detail: 'subscription' }));
     }
   };
 
@@ -294,7 +292,7 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
               </button>
             ) : (
               <Link
-                to="/store"
+                to="/store?tab=subscription"
                 onClick={handleConversionClick}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${styles.button}`}
               >
@@ -364,7 +362,7 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
               </button>
             ) : (
               <Link
-                to="/store"
+                to="/store?tab=subscription"
                 onClick={handleConversionClick}
                 className={`px-6 py-3 rounded-lg font-semibold text-sm transition-colors ${styles.button} w-full max-w-xs text-center`}
               >

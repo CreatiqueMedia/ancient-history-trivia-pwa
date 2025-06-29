@@ -67,11 +67,25 @@ const getPlanTagline = (planId: string) => {
 
 const StoreScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'bundles' | 'subscription' | 'legacy'>('bundles');
+  
+  // Check URL parameters for initial tab state
+  const getInitialTab = (): 'bundles' | 'subscription' | 'legacy' => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    
+    if (tabParam === 'subscription') {
+      return 'subscription';
+    } else if (tabParam === 'legacy') {
+      return 'legacy';
+    }
+    return 'bundles';
+  };
+  
+  const [activeTab, setActiveTab] = useState<'bundles' | 'subscription' | 'legacy'>(getInitialTab());
   const [showSampleQuiz, setShowSampleQuiz] = useState<string | null>(null);
   const [processingTiers, setProcessingTiers] = useState<Set<string>>(new Set());
 
-  // Listen for custom event to set active tab
+  // Listen for custom event to set active tab (keeping for backward compatibility)
   useEffect(() => {
     const handleSetStoreTab = (event: CustomEvent) => {
       if (event.detail === 'subscription') {
