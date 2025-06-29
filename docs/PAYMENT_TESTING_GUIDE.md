@@ -39,16 +39,27 @@ const STRIPE_PUBLISHABLE_KEY = 'pk_test_your_test_key_here';
 
 ### Use Stripe Test Cards
 
-When testing payments, use these Stripe test card numbers:
+The app is currently configured with Stripe test mode using the test key `pk_test_51NxSampleKeyForTestingPurposesOnly`. This means **NO REAL MONEY** will be charged and you can safely test with these Stripe test card numbers:
 
-- **Successful payment**: 4242 4242 4242 4242
-- **Payment requires authentication**: 4000 0025 0000 3155
-- **Payment declined**: 4000 0000 0000 0002
+#### **✅ Recommended for Testing - Always Successful:**
+- **Card Number**: `4242 4242 4242 4242`
+- **Expiration**: Any future date (e.g., `12/25`, `01/26`)
+- **CVC**: Any 3 digits (e.g., `123`)
+- **ZIP Code**: Any postal code (e.g., `12345`)
 
-For all test cards:
-- Use any future expiration date (MM/YY)
-- Use any 3-digit CVC
-- Use any postal code
+#### **🔐 Payment Requiring Authentication:**
+- **Card Number**: `4000 0025 0000 3155`
+- **Expiration**: Any future date
+- **CVC**: Any 3 digits
+- **ZIP Code**: Any postal code
+
+#### **❌ Declined Payment (For Error Testing):**
+- **Card Number**: `4000 0000 0000 0002`
+- **Expiration**: Any future date
+- **CVC**: Any 3 digits
+- **ZIP Code**: Any postal code
+
+**Important**: All transactions are simulated in test mode. No real credit cards are needed and no actual charges will occur.
 
 ### Test Web Payment Flow
 

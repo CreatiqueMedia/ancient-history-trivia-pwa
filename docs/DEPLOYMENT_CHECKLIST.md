@@ -121,18 +121,23 @@ This document provides a comprehensive checklist of completed tasks and remainin
 
 ### Stripe Setup
 
-- [ ] Create Stripe account
+- [x] **Stripe Test Mode Configured** - App currently uses test key `pk_test_51NxSampleKeyForTestingPurposesOnly`
+- [x] **Test Card Numbers Available** - Use `4242 4242 4242 4242` for successful test payments
+- [x] **Safe Testing Environment** - No real money charges in test mode
+- [ ] Create production Stripe account (when ready for live payments)
 - [ ] Set up Stripe products and prices:
   - [ ] Bundle products (one for each bundle)
   - [ ] Subscription products (monthly, annual, biennial)
 - [ ] Configure webhook endpoints
 - [ ] Set up Stripe customer portal (for subscription management)
-- [ ] Add Stripe API keys to environment variables:
+- [ ] Add production Stripe API keys to environment variables:
   - [ ] `VITE_STRIPE_PUBLISHABLE_KEY`
 - [ ] Create Firebase Cloud Functions for Stripe integration:
   - [ ] Payment intent creation
   - [ ] Subscription creation
   - [ ] Webhook handling
+
+**Testing Instructions**: Use Stripe test card `4242 4242 4242 4242` with any future expiration, any 3-digit CVC, and any ZIP code. See [docs/PAYMENT_TESTING_GUIDE.md](docs/PAYMENT_TESTING_GUIDE.md) for complete testing instructions.
 
 ### RevenueCat Setup
 
