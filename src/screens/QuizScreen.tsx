@@ -66,12 +66,12 @@ const QuizScreen: React.FC = () => {
       quizQuestions = EnhancedQuizService.generateBundleSampleQuiz(bundleId, 10);
       
       if (quizQuestions.length === 0) {
-        // Fallback to enhanced quick quiz
-        quizQuestions = EnhancedQuizService.generateQuickQuiz(10);
+        // Fallback to enhanced quick quiz with all 33 AP-level questions
+        quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
       }
     } else {
-      // Use Enhanced Quiz Service for quick quiz with proper distribution
-      quizQuestions = EnhancedQuizService.generateQuickQuiz(10);
+      // Use Enhanced Quiz Service for quick quiz with all 33 AP-level questions
+      quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
       setCurrentBundle(null);
     }
     
