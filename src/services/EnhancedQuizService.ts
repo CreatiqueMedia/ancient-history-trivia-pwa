@@ -45,6 +45,12 @@ export class EnhancedQuizService {
     const availableQuestions = this.shuffleArray(allQuestions);
     const questionsToUse = Math.min(questionCount, availableQuestions.length);
     
+    // TEMPORARY: Return all questions without format mixing to debug the issue
+    if (questionCount === 33) {
+      console.log(`Returning all ${questionsToUse} questions without format mixing`);
+      return availableQuestions.slice(0, questionsToUse);
+    }
+    
     // Use format distribution for the available questions
     return this.selectQuestionsWithFormatMix(availableQuestions, questionsToUse);
   }
