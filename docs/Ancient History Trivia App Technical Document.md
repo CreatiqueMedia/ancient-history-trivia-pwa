@@ -173,11 +173,20 @@ interface QuestionBundle {
 - **In-App Store:** Users browse available bundles in the app's Store screen.
 - **Purchase Flow:**
   1. User selects a bundle and initiates purchase.
-  2. On web: Payment is handled via Stripe or a similar provider (if enabled).
+  2. On web: Payment is handled via **Stripe** (currently in test mode with key `pk_test_51NxSampleKeyForTestingPurposesOnly`).
   3. On Android/iOS: Purchase is handled via Google Play Billing or Apple In-App Purchase APIs, using TWA (Android) or Capacitor/Cordova (iOS) wrappers.
   4. On success, the app unlocks the bundle for the user and updates their entitlements locally and/or via a backend endpoint (if user accounts are enabled).
 - **Entitlement Persistence:** Purchases are stored in local storage and, if user accounts are enabled, synced to the cloud for cross-device access.
 - **Restoring Purchases:** Users can restore purchases on new devices by logging in (if accounts are enabled) or using platform-specific restore flows.
+
+### Testing Payments (Stripe Test Mode)
+- **Safe Testing Environment:** App uses Stripe test mode - no real money is charged
+- **Test Card Numbers:**
+  - **Successful Payment:** `4242 4242 4242 4242`
+  - **Expiration:** Any future date (e.g., `12/25`)
+  - **CVC:** Any 3 digits (e.g., `123`)
+  - **ZIP:** Any postal code (e.g., `12345`)
+- **Complete Testing Guide:** See [docs/PAYMENT_TESTING_GUIDE.md](docs/PAYMENT_TESTING_GUIDE.md)
 
 ### Purchasing & Managing Subscriptions
 - **Subscription Options:** Users can subscribe to unlock all bundles and premium features (monthly, annual, biennial).

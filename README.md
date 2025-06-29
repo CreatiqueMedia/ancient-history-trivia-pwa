@@ -53,6 +53,20 @@ yarn build
 yarn preview
 ```
 
+### Testing Payments (Stripe Test Mode)
+
+The app includes Stripe payment integration in test mode for safe testing:
+
+**💳 Stripe Test Card Numbers:**
+- **Successful Payment**: `4242 4242 4242 4242`
+- **Expiration**: Any future date (e.g., `12/25`)
+- **CVC**: Any 3 digits (e.g., `123`)
+- **ZIP**: Any postal code (e.g., `12345`)
+
+**🛡️ Safe Testing**: All payments use Stripe test mode - no real money is charged!
+
+For complete payment testing instructions, see [docs/PAYMENT_TESTING_GUIDE.md](docs/PAYMENT_TESTING_GUIDE.md).
+
 ### Development Commands
 
 ```bash
