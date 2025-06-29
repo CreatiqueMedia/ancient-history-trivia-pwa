@@ -29,6 +29,10 @@ The Ancient History Trivia PWA is a cross-platform, production-grade Progressive
 - **Redundancy Avoidance:** The quarterly release workflow ensures no question is repeated across versions using metadata (e.g., `usedInVersions`).
 
 ### 2. App Features
+- **33 AP-Level HARD Questions:** ⭐ **MAJOR FEATURE** - Free quiz with Advanced Placement level ancient history content
+- **Perfect Format Distribution:** Exactly 11 Multiple Choice + 11 True/False + 11 Fill-in-Blank questions (33/33/33)
+- **Global Ancient History Coverage:** Questions spanning Greece, Rome, Egypt, China, Mesopotamia, India, Persia, and Maya
+- **Enhanced Quiz Service:** Intelligent question selection with format detection and distribution algorithms
 - **Quiz Engine:** Interactive quizzes with timer, progress, and answer feedback.
 - **Achievements & Stats:** Tracks user progress, achievements, and statistics.
 - **Question Store:** Users can browse and unlock bundles.
@@ -36,6 +40,8 @@ The Ancient History Trivia PWA is a cross-platform, production-grade Progressive
 - **Offline Support:** Service worker caches only the current bundle/session for optimal performance.
 - **Dark/Light Mode:** Automatic and user-selectable theme switching.
 - **Accessibility:** Semantic HTML, ARIA roles, keyboard navigation, and screen reader support.
+
+**🎯 LIVE NOW: All 33 AP-level questions available at https://ancient-history-trivia.web.app/quiz**
 
 ### 3. Automation & CLI Workflow
 - **Export Script:** `scripts/export-bundles.ts` generates balanced, non-redundant bundles.
