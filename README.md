@@ -4,7 +4,9 @@ A Progressive Web App (PWA) for testing your knowledge of ancient civilizations 
 
 ## Features
 
-- 🏛️ **Ancient History Questions**: Curated questions about ancient civilizations
+- 🎓 **33 AP-Level HARD Questions**: Free quiz with Advanced Placement level ancient history questions
+- 📝 **Perfect Format Distribution**: 11 Multiple Choice + 11 True/False + 11 Fill-in-Blank questions
+- 🏛️ **Global Ancient History Coverage**: Questions spanning Greece, Rome, Egypt, China, Mesopotamia, India, Persia, and Maya
 - 📱 **Progressive Web App**: Works offline and can be installed on devices
 - 🌙 **Dark/Light Mode**: Automatic theme switching with user preference
 - 📊 **Statistics Tracking**: Track your progress and performance
