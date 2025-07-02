@@ -10,7 +10,8 @@ import {
   XMarkIcon,
   UserIcon,
   ArrowRightOnRectangleIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 import { 
   HomeIcon as HomeIconSolid,
@@ -22,6 +23,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/AuthContext';
 import AuthModal from './AuthModal';
+import FeedbackModal from './FeedbackModal';
 import { Logo } from './Logo';
 
 interface LayoutProps {
@@ -32,6 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const { user, userProfile, logout } = useAuth();
 
   // Close auth modal when user becomes authenticated
@@ -370,6 +373,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         onClose={() => setAuthModalOpen(false)}
         initialMode="login"
       />
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={feedbackModalOpen}
+        onClose={() => setFeedbackModalOpen(false)}
+      />
+
+      {/* Floating Feedback Button */}
+      <button
+        onClick={() => setFeedbackModalOpen(true)}
+        className="fixed bottom-24 lg:bottom-8 right-4 bg-primary-600 hover:bg-primary-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-40"
+        title="Send Feedback"
+      >
+        <ChatBubbleLeftRightIcon className="w-6 h-6" />
+      </button>
     </div>
   );
 };
