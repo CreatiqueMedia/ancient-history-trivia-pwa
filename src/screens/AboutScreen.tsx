@@ -589,6 +589,198 @@ const AboutScreen: React.FC = () => {
           </div>
         </div>
 
+        {/* Privacy Policy Section */}
+        <div className="card p-8 mb-8">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Privacy Policy</h3>
+          <div className="prose prose-sm max-w-none dark:prose-invert">
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              <strong>Last Updated:</strong> January 1, 2025
+            </p>
+            
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Information We Collect</h4>
+            <ul className="text-gray-700 dark:text-gray-300 mb-4 space-y-2">
+              <li>• <strong>Account Information:</strong> Email address, display name, and profile photo (if provided)</li>
+              <li>• <strong>Usage Data:</strong> Quiz scores, progress, achievements, and app usage patterns</li>
+              <li>• <strong>Device Information:</strong> Device type, operating system, and app version for analytics</li>
+              <li>• <strong>Payment Information:</strong> Processed securely through Stripe (we don't store payment details)</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">How We Use Your Information</h4>
+            <ul className="text-gray-700 dark:text-gray-300 mb-4 space-y-2">
+              <li>• Provide and improve our educational services</li>
+              <li>• Track your learning progress and achievements</li>
+              <li>• Send important updates about your account or subscription</li>
+              <li>• Analyze app usage to improve user experience</li>
+              <li>• Process payments and manage subscriptions</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Data Sharing</h4>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              We do not sell, trade, or share your personal information with third parties except:
+            </p>
+            <ul className="text-gray-700 dark:text-gray-300 mb-4 space-y-2">
+              <li>• With service providers (Firebase, Stripe) who help us operate the app</li>
+              <li>• When required by law or to protect our rights</li>
+              <li>• With your explicit consent</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Data Security</h4>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              We implement industry-standard security measures to protect your data, including encryption 
+              and secure authentication through Firebase.
+            </p>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Your Rights</h4>
+            <ul className="text-gray-700 dark:text-gray-300 mb-4 space-y-2">
+              <li>• Access and download your data</li>
+              <li>• Correct inaccurate information</li>
+              <li>• Delete your account and data</li>
+              <li>• Opt out of non-essential communications</li>
+            </ul>
+
+            <p className="text-gray-700 dark:text-gray-300">
+              For privacy-related questions, contact us at: 
+              <a href="mailto:info@theawakenedhybrid.com" className="text-primary-600 dark:text-primary-400 ml-1">
+                info@theawakenedhybrid.com
+              </a>
+            </p>
+          </div>
+        </div>
+
+        {/* Terms of Service Section */}
+        <div className="card p-8 mb-8">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Terms of Service</h3>
+          <div className="prose prose-sm max-w-none dark:prose-invert">
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              <strong>Last Updated:</strong> January 1, 2025
+            </p>
+            
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Acceptance of Terms</h4>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              By using the Ancient History Trivia app, you agree to these Terms of Service. 
+              If you don't agree, please don't use our app.
+            </p>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Description of Service</h4>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Ancient History Trivia is an educational platform providing quiz content about ancient civilizations. 
+              We offer both free and premium content through subscription plans.
+            </p>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">User Accounts</h4>
+            <ul className="text-gray-700 dark:text-gray-300 mb-4 space-y-2">
+              <li>• You must provide accurate information when creating an account</li>
+              <li>• You're responsible for maintaining account security</li>
+              <li>• One account per person</li>
+              <li>• You must be 13+ years old to use our service</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Subscription Terms</h4>
+            <ul className="text-gray-700 dark:text-gray-300 mb-4 space-y-2">
+              <li>• Free trial: 7 days with full access to premium content</li>
+              <li>• Subscriptions auto-renew unless cancelled</li>
+              <li>• Cancel anytime through your account settings</li>
+              <li>• Refunds processed according to platform policies (App Store/Google Play)</li>
+              <li>• Price changes will be communicated 30 days in advance</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Acceptable Use</h4>
+            <p className="text-gray-700 dark:text-gray-300 mb-2">You agree not to:</p>
+            <ul className="text-gray-700 dark:text-gray-300 mb-4 space-y-2">
+              <li>• Share account credentials with others</li>
+              <li>• Attempt to reverse engineer or hack the app</li>
+              <li>• Use the app for any illegal purposes</li>
+              <li>• Submit false or misleading feedback</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Intellectual Property</h4>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              All content, including questions, explanations, and app design, is owned by The Awakened Hybrid 
+              and protected by copyright laws. You may not reproduce or distribute our content without permission.
+            </p>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Limitation of Liability</h4>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              The app is provided "as is" without warranties. We're not liable for any damages arising from 
+              your use of the app, including but not limited to data loss or service interruptions.
+            </p>
+
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Changes to Terms</h4>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              We may update these terms occasionally. Continued use of the app after changes constitutes 
+              acceptance of the new terms.
+            </p>
+
+            <p className="text-gray-700 dark:text-gray-300">
+              For questions about these terms, contact us at: 
+              <a href="mailto:info@theawakenedhybrid.com" className="text-primary-600 dark:text-primary-400 ml-1">
+                info@theawakenedhybrid.com
+              </a>
+            </p>
+          </div>
+        </div>
+
+        {/* Contact & Support Section */}
+        <div className="card p-8 mb-8">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Contact & Support</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📧 Email Support</h4>
+              <p className="text-gray-700 dark:text-gray-300 mb-3">
+                For technical issues, billing questions, or general support:
+              </p>
+              <a 
+                href="mailto:info@theawakenedhybrid.com" 
+                className="text-primary-600 dark:text-primary-400 font-medium hover:underline"
+              >
+                info@theawakenedhybrid.com
+              </a>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                Response time: 24-48 hours
+              </p>
+            </div>
+
+            <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">💬 In-App Feedback</h4>
+              <p className="text-gray-700 dark:text-gray-300 mb-3">
+                Use the feedback button in the app for:
+              </p>
+              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <li>• Bug reports</li>
+                <li>• Feature requests</li>
+                <li>• Content suggestions</li>
+                <li>• General feedback</li>
+              </ul>
+            </div>
+
+            <div className="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">🌐 Business Inquiries</h4>
+              <p className="text-gray-700 dark:text-gray-300 mb-3">
+                For partnerships, licensing, or custom development:
+              </p>
+              <a 
+                href="mailto:business@creatiquemedia.com" 
+                className="text-primary-600 dark:text-primary-400 font-medium hover:underline"
+              >
+                business@creatiquemedia.com
+              </a>
+            </div>
+
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">🔒 Privacy & Legal</h4>
+              <p className="text-gray-700 dark:text-gray-300 mb-3">
+                For privacy or legal concerns:
+              </p>
+              <a 
+                href="mailto:info@theawakenedhybrid.com" 
+                className="text-primary-600 dark:text-primary-400 font-medium hover:underline"
+              >
+                info@theawakenedhybrid.com
+              </a>
+            </div>
+          </div>
+        </div>
+
         {/* Links Section */}
         <div className="card p-8 mb-8">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 text-center">Connect with The Awakened Hybrid</h3>

@@ -29,6 +29,7 @@ import { analyticsService } from './services/AnalyticsService';
 import { notificationService } from './services/NotificationService';
 import { errorHandler } from './services/ErrorHandlingService';
 import { QuestionService } from './services/QuestionService';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // AppContent component to handle auth loading state
 const AppContent = () => {
@@ -180,21 +181,23 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <SettingsProvider>
-          <StatsProvider>
-            <PaymentProvider>
-              <PurchaseProvider>
-                <QuizProvider>
-                  <AppContent />
-                </QuizProvider>
-              </PurchaseProvider>
-            </PaymentProvider>
-          </StatsProvider>
-        </SettingsProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <SettingsProvider>
+            <StatsProvider>
+              <PaymentProvider>
+                <PurchaseProvider>
+                  <QuizProvider>
+                    <AppContent />
+                  </QuizProvider>
+                </PurchaseProvider>
+              </PaymentProvider>
+            </StatsProvider>
+          </SettingsProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 
