@@ -3,5 +3,11 @@
     "default": "ancient-history-trivia"
   },
   "targets": {},
-  "etags": {}
+  "etags": {
+    "ancient-history-trivia": {
+      "extensionInstances": {
+        "firestore-stripe-payments": "1ede1e4bd1c6eb66ecf07542ba62baa2ffc030f0c243b34e0683fb321b92f093"
+      }
+    }
+  }
 }

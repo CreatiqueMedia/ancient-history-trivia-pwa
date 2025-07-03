@@ -1,0 +1,14 @@
+{
+  "name": "invertase/firestore-stripe-payments",
+  "params": {
+    "LOCATION": "us-west3",
+    "PRODUCTS_COLLECTION": "products",
+    "CUSTOMERS_COLLECTION": "users",
+    "SYNC_USERS_ON_CREATE": "yes",
+    "DELETE_STRIPE_CUSTOMERS": "yes",
+    "AUTOMATIC_TAX": "no",
+    "TRIAL_DAYS": "0",
+    "DEFAULT_CURRENCY": "usd",
+    "CUSTOMER_PORTAL_CREATE_ON_SUBSCRIPTION": "yes"
+  }
+}
