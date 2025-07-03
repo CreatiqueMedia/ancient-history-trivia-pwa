@@ -169,28 +169,30 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
 
               {/* Facebook Login Removed - Focusing on Google, Apple, and Email */}
 
-              {/* Apple Sign In */}
-              <button
-                onClick={async () => {
-                  setLoadingStates(prev => ({ ...prev, apple: true }));
-                  try {
-                    await signInWithApple();
-                  } finally {
-                    setLoadingStates(prev => ({ ...prev, apple: false }));
-                  }
-                }}
-                disabled={loadingStates.apple}
-                className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-black hover:bg-gray-900 text-white transition-colors disabled:opacity-50"
-              >
-                {loadingStates.apple ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3" />
-                ) : (
-                  <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12.017 0C8.396 0 8.025.044 8.025.044c0 0-.396.045-.396.045C3.571.134 0 3.728 0 8.25 0 12.963 3.855 16.818 8.568 16.818c1.788 0 3.417-.686 4.625-1.81a6.425 6.425 0 0 0 1.425-2.016c.252-.63.402-1.317.402-2.04 0-1.788-.686-3.417-1.81-4.625A6.425 6.425 0 0 0 11.194.925C10.564.673 9.877.523 9.154.523c0 0-.396-.045-.396-.045S8.381 0 8.025 0h3.992zm2.706 16.706c0 1.255-.978 2.295-2.295 2.295-1.255 0-2.295-.978-2.295-2.295 0-1.255.978-2.295 2.295-2.295 1.255 0 2.295.978 2.295 2.295z"/>
-                  </svg>
-                )}
-                Continue with Apple
-              </button>
+              {/* Apple Sign In - Temporarily disabled until configured in Firebase Console */}
+              {false && (
+                <button
+                  onClick={async () => {
+                    setLoadingStates(prev => ({ ...prev, apple: true }));
+                    try {
+                      await signInWithApple();
+                    } finally {
+                      setLoadingStates(prev => ({ ...prev, apple: false }));
+                    }
+                  }}
+                  disabled={loadingStates.apple}
+                  className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-black hover:bg-gray-900 text-white transition-colors disabled:opacity-50"
+                >
+                  {loadingStates.apple ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3" />
+                  ) : (
+                    <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12.017 0C8.396 0 8.025.044 8.025.044c0 0-.396.045-.396.045C3.571.134 0 3.728 0 8.25 0 12.963 3.855 16.818 8.568 16.818c1.788 0 3.417-.686 4.625-1.81a6.425 6.425 0 0 0 1.425-2.016c.252-.63.402-1.317.402-2.04 0-1.788-.686-3.417-1.81-4.625A6.425 6.425 0 0 0 11.194.925C10.564.673 9.877.523 9.154.523c0 0-.396-.045-.396-.045S8.381 0 8.025 0h3.992zm2.706 16.706c0 1.255-.978 2.295-2.295 2.295-1.255 0-2.295-.978-2.295-2.295 0-1.255.978-2.295 2.295-2.295 1.255 0 2.295.978 2.295 2.295z"/>
+                    </svg>
+                  )}
+                  Continue with Apple
+                </button>
+              )}
 
               {/* Anonymous Sign In */}
               <button

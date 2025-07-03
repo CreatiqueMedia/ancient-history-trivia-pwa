@@ -150,6 +150,9 @@ export const appleProvider = new OAuthProvider('apple.com');
 googleProvider.addScope('profile');
 googleProvider.addScope('email');
 
+// Configure Apple provider with proper scopes and parameters
+appleProvider.addScope('email');
+appleProvider.addScope('name');
 appleProvider.setCustomParameters({
   locale: 'en'
 });

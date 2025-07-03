@@ -24,7 +24,7 @@ export class QuestionService {
       
       // Check if Supabase is configured
       if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-        console.warn('Supabase not configured. QuestionService will work in offline mode only.');
+        console.log('QuestionService initialized in local storage mode (Supabase not configured).');
         this.isInitialized = true;
         this.loadCachedBundlesIntoMemory();
         return true;

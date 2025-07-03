@@ -62,9 +62,10 @@ const FirebaseAuthUI: React.FC<FirebaseAuthUIProps> = ({ onSignInSuccess }) => {
             prompt: 'select_account'
           }
         },
-        {
-          provider: 'apple.com'
-        },
+        // Apple provider temporarily disabled - not configured in Firebase Console
+        // {
+        //   provider: 'apple.com'
+        // },
         {
           provider: 'anonymous'
         }
