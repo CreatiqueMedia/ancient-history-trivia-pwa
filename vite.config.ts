@@ -63,7 +63,8 @@ export default defineConfig(({ command, mode }) => {
     plugins,
     server: {
       host: true,
-      port: 3000
+      port: 3000,
+      historyApiFallback: true
     }
   };
 });
