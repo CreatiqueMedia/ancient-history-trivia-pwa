@@ -180,7 +180,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Apple sign in error:', error);
       
       let userError = error.message;
-      if (error.code === 'auth/unauthorized-domain') {
+      if (error.code === 'auth/operation-not-allowed') {
+        userError = 'Apple Sign-In is not enabled for this app. Please use Google Sign-In or email authentication instead.';
+      } else if (error.code === 'auth/unauthorized-domain') {
         userError = 'This domain is not authorized for authentication. Please contact support or try the Firebase Hosting version at ancient-history-trivia.web.app';
       } else if (error.code === 'auth/popup-closed-by-user') {
         userError = 'Sign-in was cancelled. Please try again.';
