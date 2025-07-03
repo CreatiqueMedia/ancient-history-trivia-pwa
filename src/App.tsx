@@ -121,9 +121,6 @@ const AppContent = () => {
         {/* Specific route for auth handlers only */}
         <Route path="/__/auth/*" element={<HomeScreen />} />
       </Routes>
-      
-      {/* Payment Modal for handling purchases */}
-      <PaymentModal />
     </Layout>
   );
 };
