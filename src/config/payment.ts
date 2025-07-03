@@ -5,8 +5,10 @@ import {
   isWebEnvironment 
 } from '../utils/platform';
 
-// Replace with your actual Stripe publishable key
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_51NxSampleKeyForTestingPurposesOnly';
+// Stripe publishable key - switches between test and live based on environment
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.PROD 
+  ? import.meta.env.VITE_STRIPE_LIVE_PUBLISHABLE_KEY || 'pk_live_YOUR_LIVE_KEY_HERE'
+  : 'pk_test_51NxSampleKeyForTestingPurposesOnly';
 
 // RevenueCat API keys (to be used when packaged for app stores)
 const REVENUECAT_API_KEYS = {

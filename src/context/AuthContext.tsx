@@ -15,11 +15,10 @@ import {
   isSignInWithEmailLink,
   signInWithEmailLink,
   GoogleAuthProvider,
-  FacebookAuthProvider,
   OAuthProvider
 } from 'firebase/auth';
 // FIRESTORE IMPORTS REMOVED - App now operates in pure offline mode
-import { auth, googleProvider, facebookProvider, appleProvider } from '../config/firebase';
+import { auth, googleProvider, appleProvider } from '../config/firebase';
 import type { UserProfile, AuthProvider, SubscriptionTier } from '../types';
 
 interface AuthContextType {
@@ -27,7 +26,6 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   signInWithGoogle: () => Promise<any>;
-  signInWithFacebook: () => Promise<void>;
   signInWithApple: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
@@ -169,31 +167,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  // Sign in with Facebook
-  const signInWithFacebook = async () => {
-    try {
-      setError(null);
-      setLoading(true);
-      const result = await signInWithPopup(auth, facebookProvider);
-      const profile = await createUserProfile(result.user, 'facebook');
-      setUserProfile(profile);
-    } catch (error: any) {
-      console.error('Facebook sign in error:', error);
-      
-      let userError = error.message;
-      if (error.code === 'auth/unauthorized-domain') {
-        userError = 'This domain is not authorized for authentication. Please contact support or try the Firebase Hosting version at ancient-history-trivia.web.app';
-      } else if (error.code === 'auth/popup-closed-by-user') {
-        userError = 'Sign-in was cancelled. Please try again.';
-      } else if (error.code === 'auth/popup-blocked') {
-        userError = 'Pop-up blocked. Please allow pop-ups for this site and try again.';
-      }
-      
-      setError(userError);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Sign in with Apple
   const signInWithApple = async () => {
@@ -398,7 +371,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (result && result.user) {
           try {
             const provider = result.providerId?.includes('google') ? 'google' :
-                            result.providerId?.includes('facebook') ? 'facebook' :
                             result.providerId?.includes('apple') ? 'apple' : 'email';
             const profile = await createUserProfile(result.user, provider);
             setUserProfile(profile);
@@ -426,7 +398,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Since Firestore is disabled, always create profile from auth data
         try {
           const provider = user.providerData[0]?.providerId.includes('google') ? 'google' :
-                          user.providerData[0]?.providerId.includes('facebook') ? 'facebook' :
                           user.providerData[0]?.providerId.includes('apple') ? 'apple' :
                           user.isAnonymous ? 'anonymous' : 'email';
           
@@ -483,7 +454,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     userProfile,
     loading,
     signInWithGoogle,
-    signInWithFacebook,
     signInWithApple,
     signInWithEmail,
     signUpWithEmail,

@@ -19,7 +19,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
   // Individual loading states for each authentication method
   const [loadingStates, setLoadingStates] = useState({
     google: false,
-    facebook: false,
     apple: false,
     anonymous: false,
     email: false
@@ -27,7 +26,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
   
   const {
     signInWithGoogle,
-    signInWithFacebook,
     signInWithApple,
     signInWithEmail,
     signUpWithEmail,
@@ -69,16 +67,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
     }
   };
 
-  const handleSocialAuth = async (provider: 'google' | 'facebook' | 'apple' | 'anonymous') => {
+  const handleSocialAuth = async (provider: 'google' | 'apple' | 'anonymous') => {
     try {
       setLoadingStates(prev => ({ ...prev, [provider]: true }));
 
       switch (provider) {
         case 'google':
           await signInWithGoogle();
-          break;
-        case 'facebook':
-          await signInWithFacebook();
           break;
         case 'apple':
           await signInWithApple();
@@ -172,28 +167,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
                 Continue with Google
               </button>
 
-              {/* Facebook Sign In */}
-              <button
-                onClick={async () => {
-                  setLoadingStates(prev => ({ ...prev, facebook: true }));
-                  try {
-                    await signInWithFacebook();
-                  } finally {
-                    setLoadingStates(prev => ({ ...prev, facebook: false }));
-                  }
-                }}
-                disabled={loadingStates.facebook}
-                className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-[#1877F2] hover:bg-[#166FE5] text-white transition-colors disabled:opacity-50"
-              >
-                {loadingStates.facebook ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3" />
-                ) : (
-                  <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                  </svg>
-                )}
-                Continue with Facebook
-              </button>
+              {/* Facebook Login Removed - Focusing on Google, Apple, and Email */}
 
               {/* Apple Sign In */}
               <button

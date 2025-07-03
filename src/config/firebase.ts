@@ -1,8 +1,8 @@
 // Firebase Configuration - FIRESTORE COMPLETELY REMOVED
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, connectAuthEmulator } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, OAuthProvider, connectAuthEmulator } from 'firebase/auth';
 // FIRESTORE IMPORTS COMPLETELY REMOVED TO PREVENT ANY SDK INITIALIZATION
-import { getAnalytics } from 'firebase/analytics';
+// Google Analytics completely removed
 
 // TypeScript types for compatibility (but no actual Firestore functionality)
 type Firestore = null;
@@ -14,8 +14,8 @@ const firebaseConfig = {
   projectId: "ancient-history-trivia",
   storageBucket: "ancient-history-trivia.firebasestorage.app",
   messagingSenderId: "778256162112",
-  appId: "1:778256162112:web:ee31ff85689d2fe722aea5",
-  measurementId: "G-P9L2L1ZGEM"
+  appId: "1:778256162112:web:ee31ff85689d2fe722aea5"
+  // measurementId removed - Google Analytics completely disabled
 };
 
 // Initialize Firebase
@@ -23,7 +23,7 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
 export const auth = getAuth(app);
-export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+// Google Analytics completely removed
 
 // KILL SWITCH: Firestore is COMPLETELY DISABLED by design
 const FIRESTORE_COMPLETELY_DISABLED = true;
@@ -143,17 +143,12 @@ export const recoverFirestoreConnection = async (): Promise<boolean> => {
 
 // Auth providers
 export const googleProvider = new GoogleAuthProvider();
-export const facebookProvider = new FacebookAuthProvider();
 export const appleProvider = new OAuthProvider('apple.com');
 
 // Configure providers
 // Simplified Google provider configuration to avoid redirect issues
 googleProvider.addScope('profile');
 googleProvider.addScope('email');
-
-facebookProvider.setCustomParameters({
-  display: 'popup'
-});
 
 appleProvider.setCustomParameters({
   locale: 'en'
