@@ -3,39 +3,39 @@
 
 export const STRIPE_PAYMENT_LINKS = {
   // Subscription Plans
-  monthly: 'https://buy.stripe.com/test_dRm4gy4Sxdzr5NPcH79oc00',
-  annual: 'https://buy.stripe.com/test_cNibJ098N66Zb89ePf9oc01',
+  monthly: 'https://buy.stripe.com/test_4gMbJ0bgV7b3fop5eF9oc07',
+  annual: 'https://buy.stripe.com/test_aFa00i1GlgLD3FH22t9oc08',
   
   // Individual Bundles
   bundles: {
-    egypt: 'https://buy.stripe.com/test_dRm7sK98NfHz4JL7mN9oc02',
-    rome: 'https://buy.stripe.com/test_7sY14m84J0MFdgh9uV9oc03',
-    greece: 'https://buy.stripe.com/test_cNieVcdp3eDvfop5eF9oc04',
-    mesopotamia: 'https://buy.stripe.com/test_dRm9ASfxb1QJdgh0Yp9oc05',
-    china: 'https://buy.stripe.com/test_4gMbJ0bgVgLD2BD5eF9oc06'
+    egypt: 'https://buy.stripe.com/test_28E4gy3Otdzrfop5eF9oc09',
+    rome: 'https://buy.stripe.com/test_3cI5kC3Ot8f7ccdePf9oc0a',
+    greece: 'https://buy.stripe.com/test_dRm8wO2Kp1QJ0tv6iJ9oc0b',
+    mesopotamia: 'https://buy.stripe.com/test_3cI4gyacRdzrb8922t9oc0c',
+    china: 'https://buy.stripe.com/test_6oU00ickZgLD6RT9uV9oc0d'
   }
 };
 
 // Pricing information for display
 export const PRICING = {
   monthly: {
-    price: 29.99,
+    price: 9.99,
     currency: 'USD',
     interval: 'month',
     description: 'Unlock all quiz bundles and premium features'
   },
   annual: {
-    price: 199.99,
+    price: 99.99,
     currency: 'USD',
     interval: 'year',
-    description: 'Unlock all quiz bundles and premium features - Save $159/year!'
+    description: 'Unlock all quiz bundles and premium features - Save $20/year!'
   },
   bundles: {
-    egypt: { price: 4.99, currency: 'USD', name: 'Ancient Egypt Bundle' },
-    rome: { price: 4.99, currency: 'USD', name: 'Roman Empire Bundle' },
-    greece: { price: 4.99, currency: 'USD', name: 'Ancient Greece Bundle' },
-    mesopotamia: { price: 4.99, currency: 'USD', name: 'Mesopotamia Bundle' },
-    china: { price: 4.99, currency: 'USD', name: 'Ancient China Bundle' }
+    egypt: { price: 2.99, currency: 'USD', name: 'Ancient Egypt Bundle' },
+    rome: { price: 2.99, currency: 'USD', name: 'Roman Empire Bundle' },
+    greece: { price: 2.99, currency: 'USD', name: 'Ancient Greece Bundle' },
+    mesopotamia: { price: 2.99, currency: 'USD', name: 'Mesopotamia Bundle' },
+    china: { price: 2.99, currency: 'USD', name: 'Ancient China Bundle' }
   }
 };
 
