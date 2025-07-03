@@ -8,7 +8,7 @@
     ],
     "rewrites": [
       {
-        "source": "!debug-auth-simple.html",
+        "source": "**",
         "destination": "/index.html"
       }
     ],
