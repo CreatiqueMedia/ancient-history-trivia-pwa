@@ -18,7 +18,6 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
-  signInWithFacebook: () => Promise<void>;
   signInWithApple: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
@@ -109,24 +108,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setLoading(false);
   };
 
-  const signInWithFacebook = async () => {
-    setLoading(true);
-    setError(null);
-    
-    const mockUser: MockUser = {
-      uid: `facebook_${Date.now()}`,
-      email: 'user@facebook.com',
-      displayName: 'Facebook User',
-      photoURL: 'https://via.placeholder.com/150',
-      isAnonymous: false,
-      providerData: [{ providerId: 'facebook.com' }]
-    };
-
-    const profile = createUserProfile(mockUser, 'facebook');
-    setUser(mockUser);
-    setUserProfile(profile);
-    setLoading(false);
-  };
 
   const signInWithApple = async () => {
     setLoading(true);
@@ -275,7 +256,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     userProfile,
     loading,
     signInWithGoogle,
-    signInWithFacebook,
     signInWithApple,
     signInWithEmail,
     signUpWithEmail,

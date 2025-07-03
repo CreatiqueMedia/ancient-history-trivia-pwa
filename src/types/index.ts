@@ -90,7 +90,7 @@ export interface NotificationPreferences {
   reminderTime: string; // HH:MM format
 }
 
-export type AuthProvider = 'google' | 'facebook' | 'apple' | 'email' | 'anonymous';
+export type AuthProvider = 'google' | 'apple' | 'email' | 'anonymous';
 
 export type SubscriptionTier = 'free' | 'pro_monthly' | 'pro_annual';
 

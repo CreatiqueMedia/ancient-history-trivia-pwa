@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { auth } from '../config/firebase';
-import { GoogleAuthProvider, FacebookAuthProvider, OAuthProvider } from 'firebase/auth';
+import { GoogleAuthProvider, OAuthProvider } from 'firebase/auth';
 import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
 
@@ -29,9 +29,6 @@ const FirebaseAuthUI: React.FC<FirebaseAuthUIProps> = ({ onSignInSuccess }) => {
           customParameters: {
             prompt: 'select_account'
           }
-        },
-        {
-          provider: FacebookAuthProvider.PROVIDER_ID
         },
         {
           provider: 'apple.com'
