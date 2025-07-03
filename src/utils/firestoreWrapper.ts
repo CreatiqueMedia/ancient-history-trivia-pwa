@@ -11,11 +11,11 @@ import {
   WithFieldValue,
   PartialWithFieldValue
 } from 'firebase/firestore';
-import { getFirestore, isFirestoreAvailable, recordFirestoreError } from '../config/firebase';
+import { isFirestoreAvailable, getFirestoreInstance } from '../config/firebase';
 
 // Safe wrapper for doc() that returns null when Firestore is blocked
 export const safeDoc = (path: string, ...pathSegments: string[]): DocumentReference | null => {
-  const firestore = getFirestore();
+  const firestore = getFirestoreInstance();
   if (!firestore || !isFirestoreAvailable()) {
     return null;
   }
@@ -31,7 +31,7 @@ export const safeGetDoc = async (docRef: DocumentReference | null): Promise<Docu
   try {
     return await getDoc(docRef);
   } catch (error: any) {
-    recordFirestoreError(error);
+    console.error('Firestore error:', error);
     throw error;
   }
 };
@@ -48,7 +48,7 @@ export const safeSetDoc = async (
   try {
     return await setDoc(docRef, data);
   } catch (error: any) {
-    recordFirestoreError(error);
+    console.error('Firestore error:', error);
     throw error;
   }
 };
@@ -65,7 +65,7 @@ export const safeUpdateDoc = async (
   try {
     return await updateDoc(docRef, data);
   } catch (error: any) {
-    recordFirestoreError(error);
+    console.error('Firestore error:', error);
     throw error;
   }
 };
