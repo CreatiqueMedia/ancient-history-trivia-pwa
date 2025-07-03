@@ -20,6 +20,7 @@ import SettingsScreen from './screens/SettingsScreen.tsx';
 import AchievementsScreen from './screens/AchievementsScreen.tsx';
 // SubscriptionScreen import removed
 import UserProfileScreen from './screens/UserProfileScreen.tsx';
+import BillingHistoryScreen from './screens/BillingHistoryScreen.tsx';
 import AboutScreen from './screens/AboutScreen.tsx';
 import EmailLinkHandler from './screens/EmailLinkHandler.tsx';
 import Layout from './components/Layout.tsx';
@@ -110,6 +111,11 @@ const AppContent = () => {
         } />
         {/* /subscription route removed */}
         <Route path="/profile" element={<UserProfileScreen />} />
+        <Route path="/billing" element={
+          <ProtectedRoute>
+            <BillingHistoryScreen />
+          </ProtectedRoute>
+        } />
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/auth/signin" element={<EmailLinkHandler />} />
         {/* Catch-all route to redirect auth handlers back to home */}
