@@ -169,7 +169,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
 
               {/* Facebook Login Removed - Focusing on Google, Apple, and Email */}
 
-              {/* Apple Sign In - Temporarily disabled until configured in Firebase Console */}
+              {/* Apple Sign In - Temporarily disabled due to Team ID issue */}
               {false && (
                 <button
                   onClick={async () => {

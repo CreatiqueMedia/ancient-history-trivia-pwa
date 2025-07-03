@@ -9,7 +9,10 @@ Apple Sign-In is currently disabled due to the `auth/operation-not-allowed` erro
 
 ## 🔧 How to Enable Apple Sign-In
 
-### Step 1: Firebase Console Configuration
+### ⚠️ Important Note: Firebase Console Required
+**The Firebase CLI does not support configuring authentication providers.** You must use the Firebase Console web interface to enable Apple Sign-In.
+
+### Step 1: Firebase Console Configuration (REQUIRED)
 
 1. **Go to Firebase Console**
    - Visit: https://console.firebase.google.com/project/ancient-history-trivia/authentication/providers
@@ -19,6 +22,12 @@ Apple Sign-In is currently disabled due to the `auth/operation-not-allowed` erro
    - Click on "Apple" in the Sign-in providers list
    - Toggle "Enable" to ON
    - You'll need to configure the following:
+
+### 🚫 Why Not Firebase CLI?
+- Firebase CLI focuses on deployment and data management
+- Authentication provider configuration requires OAuth credentials and certificates
+- Firebase Console provides the secure interface for managing sensitive auth data
+- No current CLI commands exist for: `firebase auth:providers:enable` or similar
 
 ### Step 2: Apple Developer Account Setup
 
@@ -129,6 +138,20 @@ Once Apple Sign-In is configured in Firebase, update the code:
 - **Cause**: Apple provider not enabled in Firebase
 - **Solution**: Complete Steps 1-3 above
 
+### "Unable to find a team with the given Team ID" Error
+- **Cause**: Incorrect Team ID or new Apple Developer Account not fully activated
+- **Solutions**:
+  1. **Find your correct Team ID**:
+     - Go to: https://developer.apple.com/account#MembershipDetailsCard
+     - Look for "Team ID" in Membership Details (10-character string)
+  2. **Wait for account activation**:
+     - New Apple Developer Accounts can take 24-48 hours to fully activate
+     - All services may not be immediately available
+  3. **Check account status**:
+     - Ensure payment has been processed
+     - Verify account is in good standing
+     - Contact Apple Developer Support if needed
+
 ### "unauthorized-domain" Error
 - **Cause**: Domain not configured in Apple Developer Console
 - **Solution**: Add domain to Service ID configuration
@@ -136,6 +159,12 @@ Once Apple Sign-In is configured in Firebase, update the code:
 ### "popup-blocked" Error
 - **Cause**: Browser blocking popup
 - **Solution**: Already handled with fallback to redirect
+
+### New Apple Developer Account Issues
+- **Account Activation**: Can take 24-48 hours
+- **Team ID Assignment**: May be delayed for new accounts
+- **Service Availability**: Some features may not be immediately accessible
+- **Payment Processing**: Ensure payment has been fully processed
 
 ## 💰 Cost Considerations
 
