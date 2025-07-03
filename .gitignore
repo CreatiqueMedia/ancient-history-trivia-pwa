@@ -3,6 +3,16 @@ node_modules/
 .pnp
 .pnp.js
 
+# NPM blocking and logs (yarn-only project)
+package-lock.json
+.npm-block.log
+npm-shrinkwrap.json
+
+# Yarn cache and offline mirror
+yarn-cache/
+.yarn-cache/
+.yarn/
+
 # Production builds
 dist/
 build/
