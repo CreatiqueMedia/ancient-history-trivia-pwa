@@ -46,6 +46,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [subscriptionPeriod, setSubscriptionPeriod] = useState<'none' | 'monthly' | 'annual' | 'biennial'>('none');
   const [subscriptionExpiry, setSubscriptionExpiry] = useState<string>();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingItems, setProcessingItems] = useState<Set<string>>(new Set());
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [currentPurchase, setCurrentPurchase] = useState<{ type: 'bundle' | 'subscription', id: string } | null>(null);
 
