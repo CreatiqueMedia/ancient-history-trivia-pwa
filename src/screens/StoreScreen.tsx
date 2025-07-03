@@ -583,21 +583,19 @@ const StoreScreen: React.FC = () => {
               >
                 Premium Subscription
               </button>
-              {legacyBundles.length > 0 && (
-                <button
-                  onClick={() => setActiveTab('legacy')}
-                  className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${
-                    activeTab === 'legacy'
-                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  <span>Previous Versions</span>
-                  <span className="bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full text-xs">
-                    {legacyBundles.length}
-                  </span>
-                </button>
-              )}
+              <button
+                onClick={() => setActiveTab('legacy')}
+                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${
+                  activeTab === 'legacy'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <span>Previous Versions</span>
+                <span className="bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full text-xs">
+                  {legacyBundles.length > 0 ? legacyBundles.length : 'Coming Soon'}
+                </span>
+              </button>
             </div>
           </div>
 
@@ -643,6 +641,45 @@ const StoreScreen: React.FC = () => {
                     </div>
                   )
                 ))}
+            </div>
+
+            {/* Purchase Previous Versions Section */}
+            <div className="mt-16 mb-12">
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-8 border border-amber-200 dark:border-amber-800">
+                <div className="text-center">
+                  <div className="flex justify-center mb-4">
+                    <div className="bg-amber-100 dark:bg-amber-900/30 rounded-full p-3">
+                      <BookOpenIcon className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+                    </div>
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                    Purchase Previous Versions to Build Your Library of Knowledge
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+                    Expand your learning with archived question packs from previous releases. Each version offers unique questions and perspectives to deepen your understanding of ancient history.
+                  </p>
+                  
+                  {legacyBundles.length > 0 ? (
+                    <button
+                      onClick={() => setActiveTab('legacy')}
+                      className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors shadow-lg hover:shadow-xl flex items-center space-x-3 mx-auto"
+                    >
+                      <BookOpenIcon className="w-5 h-5" />
+                      <span>Browse {legacyBundles.length} Previous Version{legacyBundles.length !== 1 ? 's' : ''}</span>
+                    </button>
+                  ) : (
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 max-w-md mx-auto">
+                      <div className="text-center">
+                        <div className="text-4xl mb-3">🏛️</div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Coming Soon</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Previous versions will be available here when Version 2 is released. Start building your collection now!
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Empty State */}
