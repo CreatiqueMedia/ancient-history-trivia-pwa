@@ -123,17 +123,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setLoading(true);
       
       try {
-        // Try popup first
+        // Try popup first with improved error handling
         const result = await signInWithPopup(auth, googleProvider);
         const profile = await createUserProfile(result.user, 'google');
         setUserProfile(profile);
         return result;
       } catch (popupError: any) {
-        // If popup fails due to COOP or similar issues, fall back to redirect
+        console.warn('🔄 Popup authentication failed, trying redirect...', popupError.code);
+        
+        // If popup fails due to COOP, popup blocking, or other issues, fall back to redirect
         if (popupError.code === 'auth/popup-blocked' || 
+            popupError.code === 'auth/popup-closed-by-user' ||
             popupError.message?.includes('Cross-Origin-Opener-Policy') ||
-            popupError.message?.includes('window.close')) {
-          console.log('🔄 Popup blocked or COOP issue, falling back to redirect...');
+            popupError.message?.includes('window.close') ||
+            popupError.message?.includes('window.closed')) {
+          
+          console.log('🔄 Using redirect method due to popup restrictions...');
+          setError('Redirecting for sign-in...');
           await signInWithRedirect(auth, googleProvider);
           return; // Redirect will handle the rest
         }
@@ -145,9 +151,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Provide user-friendly error messages
       let userError = error.message;
       if (error.code === 'auth/popup-closed-by-user') {
-        userError = 'Sign-in was cancelled. Please try again.';
+        userError = 'Sign-in was cancelled. Trying redirect method...';
       } else if (error.code === 'auth/popup-blocked') {
-        userError = 'Pop-up blocked. Trying redirect method...';
+        userError = 'Pop-up blocked. Using redirect method...';
       } else if (error.code === 'auth/operation-not-allowed') {
         userError = 'Google sign-in is not enabled. Please contact support.';
       } else if (error.code === 'auth/invalid-api-key') {
@@ -157,7 +163,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else if (error.code === 'auth/account-exists-with-different-credential') {
         userError = 'An account already exists with this email address using a different sign-in method.';
       } else if (error.message?.includes('Cross-Origin-Opener-Policy')) {
-        userError = 'Browser security settings are preventing sign-in. Trying alternative method...';
+        userError = 'Browser security detected. Using redirect method...';
+        // Automatically try redirect for COOP issues
+        try {
+          await signInWithRedirect(auth, googleProvider);
+          return;
+        } catch (redirectError) {
+          userError = 'Authentication failed. Please try again or use email sign-in.';
+        }
       }
       
       setError(userError);
