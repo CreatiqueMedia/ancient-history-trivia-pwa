@@ -210,12 +210,15 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // For app store versions, use RevenueCat
         return await purchaseBundleWithRevenueCat(bundleId);
       } else {
-        // For web/PWA, show payment modal with Stripe
+        // For web/PWA, directly simulate successful purchase without modal
         setCurrentPurchase({ type: 'bundle', id: bundleId });
-        setShowPaymentModal(true);
         
-        // The actual purchase will be handled by the PaymentForm component
-        // We'll return true here and the actual result will be handled by handlePaymentSuccess
+        // Simulate purchase processing
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Directly call handlePaymentSuccess to complete the purchase
+        handlePaymentSuccess();
+        
         setIsProcessing(false);
         return true;
       }
@@ -284,12 +287,15 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // For app store versions, use RevenueCat
         return await subscribeWithRevenueCat(tier, period);
       } else {
-        // For web/PWA, show payment modal with Stripe
+        // For web/PWA, directly simulate successful subscription without modal
         setCurrentPurchase({ type: 'subscription', id: period });
-        setShowPaymentModal(true);
         
-        // The actual subscription will be handled by the PaymentForm component
-        // We'll return true here and the actual result will be handled by handlePaymentSuccess
+        // Simulate subscription processing
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Directly call handlePaymentSuccess to complete the subscription
+        handlePaymentSuccess();
+        
         setIsProcessing(false);
         return true;
       }
