@@ -18,6 +18,7 @@ import {
   isAppStoreEnvironment,
   isWebEnvironment
 } from '../utils/platform';
+import { redirectToStripeCheckout } from '../config/stripe';
 
 interface PurchaseContextType {
   ownedBundles: string[];
@@ -211,17 +212,18 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // For app store versions, use RevenueCat
         return await purchaseBundleWithRevenueCat(bundleId);
       } else {
-        // For web/PWA, directly simulate successful purchase without modal
-        setCurrentPurchase({ type: 'bundle', id: bundleId });
+        // For web/PWA, redirect to Stripe Checkout
+        console.log('Redirecting to Stripe checkout for bundle:', bundleId);
         
-        // Simulate purchase processing
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Store user ID for tracking
+        localStorage.setItem('userId', user.uid);
         
-        // Directly call handlePaymentSuccess to complete the purchase
-        handlePaymentSuccess();
+        // Redirect to Stripe payment link
+        redirectToStripeCheckout(bundleId);
         
+        // Return false since we're redirecting (purchase will complete on return)
         setIsProcessing(false);
-        return true;
+        return false;
       }
     } catch (error) {
       console.error('Purchase failed:', error);
@@ -288,17 +290,18 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // For app store versions, use RevenueCat
         return await subscribeWithRevenueCat(tier, period);
       } else {
-        // For web/PWA, directly simulate successful subscription without modal
-        setCurrentPurchase({ type: 'subscription', id: period });
+        // For web/PWA, redirect to Stripe Checkout
+        console.log('Redirecting to Stripe checkout for subscription:', period);
         
-        // Simulate subscription processing
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Store user ID for tracking
+        localStorage.setItem('userId', user.uid);
         
-        // Directly call handlePaymentSuccess to complete the subscription
-        handlePaymentSuccess();
+        // Redirect to Stripe payment link for subscription
+        redirectToStripeCheckout(period);
         
+        // Return false since we're redirecting (subscription will complete on return)
         setIsProcessing(false);
-        return true;
+        return false;
       }
     } catch (error) {
       console.error('Subscription failed:', error);
