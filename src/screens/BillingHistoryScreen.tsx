@@ -71,13 +71,12 @@ const BillingHistoryScreen: React.FC = () => {
     try {
       setLoading(true);
       
-      // In a real app, this would fetch from your backend/Stripe
-      // For now, we'll simulate with localStorage data
-      const mockPaymentHistory = generateMockPaymentHistory();
-      setPaymentHistory(mockPaymentHistory);
+      // Load real purchase history from localStorage and purchase context
+      const realPaymentHistory = generateRealPaymentHistory();
+      setPaymentHistory(realPaymentHistory);
       
       // Calculate billing stats
-      const stats = calculateBillingStats(mockPaymentHistory);
+      const stats = calculateBillingStats(realPaymentHistory);
       setBillingStats(stats);
       
     } catch (error) {
@@ -87,62 +86,102 @@ const BillingHistoryScreen: React.FC = () => {
     }
   };
 
-  const generateMockPaymentHistory = (): PaymentRecord[] => {
-    // This would be replaced with actual Stripe/backend data
-    const mockData: PaymentRecord[] = [
-      {
-        id: 'pay_1',
-        date: new Date('2025-01-15'),
-        type: 'subscription',
-        description: 'Pro Monthly Subscription',
-        amount: 9.99,
+  const generateRealPaymentHistory = (): PaymentRecord[] => {
+    const history: PaymentRecord[] = [];
+    
+    // Get purchase history from localStorage
+    const purchaseHistoryStr = localStorage.getItem('purchaseHistory');
+    const purchaseHistory = purchaseHistoryStr ? JSON.parse(purchaseHistoryStr) : [];
+    
+    // Add purchase history records
+    purchaseHistory.forEach((purchase: any) => {
+      history.push({
+        id: purchase.id || `purchase_${Date.now()}_${Math.random()}`,
+        date: new Date(purchase.date),
+        type: purchase.type,
+        description: purchase.description,
+        amount: purchase.amount,
         status: 'completed',
-        method: 'Visa ****4242',
-        subscriptionPeriod: 'monthly'
-      },
-      {
-        id: 'pay_2',
-        date: new Date('2024-12-20'),
-        type: 'bundle',
-        description: 'Ancient Egypt Bundle',
-        amount: 2.99,
-        status: 'completed',
-        method: 'Visa ****4242',
-        bundleId: 'egypt'
-      },
-      {
-        id: 'pay_3',
-        date: new Date('2024-12-15'),
-        type: 'subscription',
-        description: 'Pro Monthly Subscription',
-        amount: 9.99,
-        status: 'completed',
-        method: 'Visa ****4242',
-        subscriptionPeriod: 'monthly'
-      },
-      {
-        id: 'pay_4',
-        date: new Date('2024-11-28'),
-        type: 'bundle',
-        description: 'Roman Empire Bundle',
-        amount: 2.99,
-        status: 'completed',
-        method: 'Visa ****4242',
-        bundleId: 'rome'
-      },
-      {
-        id: 'pay_5',
-        date: new Date('2024-11-15'),
-        type: 'subscription',
-        description: 'Pro Monthly Subscription',
-        amount: 9.99,
-        status: 'completed',
-        method: 'Visa ****4242',
-        subscriptionPeriod: 'monthly'
+        method: purchase.method || 'Stripe Payment',
+        bundleId: purchase.bundleId,
+        subscriptionPeriod: purchase.subscriptionPeriod
+      });
+    });
+    
+    // Get current subscription from localStorage
+    const subscriptionStr = localStorage.getItem('subscription');
+    const subscription = subscriptionStr ? JSON.parse(subscriptionStr) : null;
+    
+    // Add subscription to history if it exists and is not free
+    if (subscription && subscription.tier !== 'free' && subscription.period !== 'none') {
+      const subscriptionAmount = getSubscriptionAmount(subscription.period);
+      if (subscriptionAmount > 0) {
+        history.push({
+          id: `sub_${subscription.period}_${Date.now()}`,
+          date: new Date(), // Current date for active subscription
+          type: 'subscription',
+          description: `Pro ${subscription.period.charAt(0).toUpperCase() + subscription.period.slice(1)} Subscription`,
+          amount: subscriptionAmount,
+          status: 'completed',
+          method: 'Stripe Payment',
+          subscriptionPeriod: subscription.period
+        });
       }
-    ];
+    }
+    
+    // Get owned bundles from localStorage
+    const ownedBundlesStr = localStorage.getItem('ownedBundles');
+    const ownedBundles = ownedBundlesStr ? JSON.parse(ownedBundlesStr) : [];
+    
+    // Add bundle purchases to history (if not already in purchase history)
+    ownedBundles.forEach((bundleId: string) => {
+      // Check if this bundle is already in the purchase history
+      const existingPurchase = history.find(h => h.bundleId === bundleId);
+      if (!existingPurchase) {
+        history.push({
+          id: `bundle_${bundleId}_${Date.now()}`,
+          date: new Date(), // Use current date as fallback
+          type: 'bundle',
+          description: getBundleDisplayName(bundleId),
+          amount: 2.99, // Standard bundle price
+          status: 'completed',
+          method: 'Stripe Payment',
+          bundleId: bundleId
+        });
+      }
+    });
+    
+    // Sort by date (newest first)
+    return history.sort((a, b) => b.date.getTime() - a.date.getTime());
+  };
 
-    return mockData.sort((a, b) => b.date.getTime() - a.date.getTime());
+  const getSubscriptionAmount = (period: string): number => {
+    switch (period) {
+      case 'monthly':
+        return 9.99;
+      case 'annual':
+        return 99.99;
+      case 'biennial':
+        return 199.99;
+      default:
+        return 0;
+    }
+  };
+
+  const getBundleDisplayName = (bundleId: string): string => {
+    const bundleNames: { [key: string]: string } = {
+      'egypt': 'Ancient Egypt Bundle',
+      'rome': 'Roman Empire Bundle',
+      'greece': 'Ancient Greece Bundle',
+      'mesopotamia': 'Mesopotamia Bundle',
+      'china': 'Ancient China Bundle',
+      'india': 'Ancient India Bundle',
+      'maya': 'Maya Civilization Bundle',
+      'aztec': 'Aztec Empire Bundle',
+      'inca': 'Inca Empire Bundle',
+      'persia': 'Persian Empire Bundle'
+    };
+    return bundleNames[bundleId] || `${bundleId.charAt(0).toUpperCase() + bundleId.slice(1)} Bundle`;
   };
 
   const calculateBillingStats = (history: PaymentRecord[]): BillingStats => {
