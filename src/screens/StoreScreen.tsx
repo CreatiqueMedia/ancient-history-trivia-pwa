@@ -37,7 +37,9 @@ import {
 import { QUESTION_BUNDLES, getBundleGroups, SUBSCRIPTION_TIERS } from '../data/bundles';
 import { getSampleQuestionsForBundle } from '../data/sampleQuestions';
 import { usePurchase } from '../context/PurchaseContext';
+import { useAuth } from '../context/AuthContext';
 import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles';
+import AuthModal from '../components/AuthModal';
 
 // Helper function to format subscription period display
 const formatPeriod = (period: string): string => {
@@ -84,6 +86,7 @@ const StoreScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'bundles' | 'subscription' | 'legacy'>(getInitialTab());
   const [showSampleQuiz, setShowSampleQuiz] = useState<string | null>(null);
   const [processingTiers, setProcessingTiers] = useState<Set<string>>(new Set());
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Listen for custom event to set active tab (keeping for backward compatibility)
   useEffect(() => {
@@ -111,6 +114,9 @@ const StoreScreen: React.FC = () => {
     subscriptionPeriod,
     subscriptionExpiry
   } = usePurchase();
+
+  // Get authentication state
+  const { user } = useAuth();
 
   // Get version information
   const currentBundles = QUESTION_BUNDLES.filter(bundle => bundle.isCurrentVersion !== false);
@@ -235,6 +241,12 @@ const StoreScreen: React.FC = () => {
   const handlePurchaseBundle = async (bundle: QuestionBundle) => {
     if (hasAccessToBundle(bundle.id)) return;
     
+    // Check if user is authenticated
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     try {
       const success = await purchaseBundle(bundle.id);
       if (success) {
@@ -246,6 +258,12 @@ const StoreScreen: React.FC = () => {
   };
 
   const handlePurchaseGroup = async (group: BundleGroup) => {
+    // Check if user is authenticated
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     const bundleIds = group.bundles.map(b => b.id);
     try {
       const success = await purchaseGroup(bundleIds);
@@ -258,6 +276,12 @@ const StoreScreen: React.FC = () => {
   };
 
   const handleSubscribe = async (tier: SubscriptionTier) => {
+    // Check if user is authenticated
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     // Add this tier to processing state
     setProcessingTiers(prev => new Set([...prev, tier.id]));
     
@@ -859,6 +883,13 @@ const StoreScreen: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Authentication Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+        initialMode="signup"
+      />
     </div>
   );
 };
