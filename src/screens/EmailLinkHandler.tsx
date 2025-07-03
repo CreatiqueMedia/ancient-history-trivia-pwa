@@ -29,8 +29,20 @@ const EmailLinkHandler: React.FC = () => {
         try {
           await signInWithLink(email, emailLink);
           setStatus('success');
+          
+          // Check for pending purchase and redirect appropriately
           setTimeout(() => {
-            navigate('/', { replace: true });
+            const redirectParam = searchParams.get('redirect');
+            const pendingPurchase = localStorage.getItem('pendingPurchase');
+            
+            if (redirectParam) {
+              navigate(redirectParam, { replace: true });
+            } else if (pendingPurchase) {
+              // If there's a pending purchase, redirect to store
+              navigate('/store', { replace: true });
+            } else {
+              navigate('/', { replace: true });
+            }
           }, 2000);
         } catch (error: any) {
           console.error('Email link sign-in error:', error);
