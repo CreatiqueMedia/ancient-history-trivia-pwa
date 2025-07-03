@@ -11,7 +11,8 @@ import {
   UserIcon,
   ArrowRightOnRectangleIcon,
   InformationCircleIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  CreditCardIcon
 } from '@heroicons/react/24/outline';
 import { 
   HomeIcon as HomeIconSolid,
@@ -19,7 +20,8 @@ import {
   CogIcon as CogIconSolid,
   TrophyIcon as TrophyIconSolid,
   ShoppingBagIcon as ShoppingBagIconSolid,
-  InformationCircleIcon as InformationCircleIconSolid
+  InformationCircleIcon as InformationCircleIconSolid,
+  CreditCardIcon as CreditCardIconSolid
 } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/AuthContext';
 import AuthModal from './AuthModal';
@@ -71,6 +73,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         label: 'Awards', 
         icon: TrophyIcon, 
         iconSolid: TrophyIconSolid
+      },
+      { 
+        path: '/billing', 
+        label: 'Billing', 
+        icon: CreditCardIcon, 
+        iconSolid: CreditCardIconSolid
       }
     ] : []),
     { 
