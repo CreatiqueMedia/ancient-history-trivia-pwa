@@ -63,7 +63,7 @@ const BillingHistoryScreen: React.FC = () => {
     
     // Load payment history for authenticated user
     loadPaymentHistory();
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadPaymentHistory = async () => {
     if (!user) return;
