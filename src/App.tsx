@@ -118,8 +118,8 @@ const AppContent = () => {
         } />
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/auth/signin" element={<EmailLinkHandler />} />
-        {/* Catch-all route to redirect auth handlers back to home */}
-        <Route path="*" element={<HomeScreen />} />
+        {/* Specific route for auth handlers only */}
+        <Route path="/__/auth/*" element={<HomeScreen />} />
       </Routes>
       
       {/* Payment Modal for handling purchases */}
