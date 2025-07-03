@@ -112,6 +112,8 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const handlePaymentSuccess = () => {
     if (!currentPurchase) return;
     
+    const now = new Date();
+    
     if (currentPurchase.type === 'bundle') {
       // Add bundle to owned bundles
       setOwnedBundles(prev => [...prev, currentPurchase.id]);
@@ -120,11 +122,23 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const updatedBundles = [...ownedBundles, currentPurchase.id];
       localStorage.setItem('ownedBundles', JSON.stringify(updatedBundles));
       
+      // Add to purchase history
+      const purchaseRecord = {
+        id: `bundle_${currentPurchase.id}_${now.getTime()}`,
+        date: now.toISOString(),
+        type: 'bundle',
+        description: getBundleName(currentPurchase.id),
+        amount: getBundlePrice(currentPurchase.id),
+        method: 'Stripe Payment',
+        bundleId: currentPurchase.id
+      };
+      
+      savePurchaseToHistory(purchaseRecord);
+      
       console.log(`Successfully purchased ${getBundleName(currentPurchase.id)} bundle`);
     } else {
       // Handle subscription success
       const period = currentPurchase.id;
-      const now = new Date();
       let expiryDate: Date;
       
       switch (period) {
@@ -145,11 +159,42 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setSubscriptionPeriod(period as any);
       setSubscriptionExpiry(expiryDate.toISOString());
       
+      // Add to purchase history
+      const subscriptionRecord = {
+        id: `sub_${period}_${now.getTime()}`,
+        date: now.toISOString(),
+        type: 'subscription',
+        description: `Pro ${period.charAt(0).toUpperCase() + period.slice(1)} Subscription`,
+        amount: getSubscriptionPrice(period),
+        method: 'Stripe Payment',
+        subscriptionPeriod: period
+      };
+      
+      savePurchaseToHistory(subscriptionRecord);
+      
       console.log(`Successfully subscribed to ${period} plan`);
     }
     
     // Close the payment modal
     closePaymentModal();
+  };
+
+  const savePurchaseToHistory = (purchaseRecord: any) => {
+    try {
+      // Get existing purchase history
+      const existingHistoryStr = localStorage.getItem('purchaseHistory');
+      const existingHistory = existingHistoryStr ? JSON.parse(existingHistoryStr) : [];
+      
+      // Add new purchase to history
+      const updatedHistory = [purchaseRecord, ...existingHistory];
+      
+      // Save back to localStorage
+      localStorage.setItem('purchaseHistory', JSON.stringify(updatedHistory));
+      
+      console.log('Purchase saved to history:', purchaseRecord);
+    } catch (error) {
+      console.error('Error saving purchase to history:', error);
+    }
   };
 
   const purchaseBundle = async (bundleId: string): Promise<boolean> => {
