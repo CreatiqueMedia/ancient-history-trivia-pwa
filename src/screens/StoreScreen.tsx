@@ -57,7 +57,7 @@ const getPlanTagline = (planId: string) => {
   switch (planId) {
     // Free plan removed for paid-only subscription model
     case 'scholar':
-      return 'Unlock all question bundles and advanced features. Try free for 7 days!';
+      return 'Unlock all question bundles and advanced features. Try free for 3 days!';
     case 'historian':
       return 'Go deeper with exclusive content, analytics, and offline access. 14-day free trial!';
     case 'academy':

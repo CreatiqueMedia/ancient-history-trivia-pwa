@@ -10,6 +10,7 @@ import {
 import { TrialStatus } from '../types/enhancements';
 import { TrialService } from '../services/TrialService';
 import { useAuth } from '../context/AuthContext';
+import AuthModal from './AuthModal';
 
 interface TrialBannerProps {
   className?: string;
@@ -27,6 +28,7 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
   const [trialStatus, setTrialStatus] = useState<TrialStatus | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [isStartingTrial, setIsStartingTrial] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [conversionMessage, setConversionMessage] = useState<{
     title: string;
     message: string;
@@ -62,10 +64,14 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
     if (!trialStatus && conversionMessage?.title.includes('Start')) {
       e.preventDefault(); // Prevent navigation
       
-      // Always require proper authentication for trial - redirect to auth
+      // Show AuthModal instead of navigating away
       if (!user || user.isAnonymous) {
-        // Navigate to auth page to sign in/sign up for trial
-        navigate('/auth/signin?redirect=/store&action=start_trial');
+        // Store the intended action for after authentication
+        localStorage.setItem('pendingAction', JSON.stringify({
+          type: 'start_trial',
+          redirect: '/store?tab=subscription&action=start_trial'
+        }));
+        setShowAuthModal(true);
         return;
       } else {
         // User is authenticated but we still want them to go through the store/subscription flow
@@ -126,7 +132,7 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
 
   const getProgressPercentage = (): number => {
     if (!trialStatus) return 0;
-    const totalDays = 7; // Trial duration
+    const totalDays = 3; // Trial duration
     const daysUsed = totalDays - trialStatus.daysRemaining;
     return Math.min(100, (daysUsed / totalDays) * 100);
   };
@@ -140,6 +146,28 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
   }
 
   const styles = getUrgencyStyles(conversionMessage.urgency);
+
+  // Handle authentication success
+  useEffect(() => {
+    if (user && !user.isAnonymous && showAuthModal) {
+      // User successfully authenticated, close modal and handle pending action
+      setShowAuthModal(false);
+      
+      const pendingActionStr = localStorage.getItem('pendingAction');
+      if (pendingActionStr) {
+        try {
+          const pendingAction = JSON.parse(pendingActionStr);
+          localStorage.removeItem('pendingAction');
+          
+          if (pendingAction.type === 'start_trial' && pendingAction.redirect) {
+            navigate(pendingAction.redirect);
+          }
+        } catch (error) {
+          console.error('Error processing pending action:', error);
+        }
+      }
+    }
+  }, [user, showAuthModal, navigate]);
 
   return (
     <div className={`relative overflow-hidden rounded-lg border shadow-lg ${styles.container} ${className}`}>
@@ -400,6 +428,13 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
           <div className="absolute inset-0 rounded-lg animate-pulse bg-white opacity-5"></div>
         )}
       </div>
+
+      {/* Authentication Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+        initialMode="signup"
+      />
     </div>
   );
 };

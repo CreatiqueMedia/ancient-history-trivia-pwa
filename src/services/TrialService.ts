@@ -8,7 +8,7 @@ import { notificationService } from './NotificationService';
  */
 export class TrialService {
   private static readonly STORAGE_KEY = 'trial_status';
-  private static readonly TRIAL_DURATION_DAYS = 7;
+  private static readonly TRIAL_DURATION_DAYS = 3;
 
   /**
    * Start a free trial for a new user
@@ -119,7 +119,7 @@ export class TrialService {
     if (!trialStatus) {
       return {
         title: 'Start Your Free Trial',
-        message: 'Get 7 days of unlimited access to all premium content.',
+        message: 'Get 3 days of unlimited access to all premium content.',
         urgency: 'low',
         cta: 'Start Free Trial'
       };

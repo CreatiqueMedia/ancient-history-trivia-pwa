@@ -677,7 +677,7 @@ const AboutScreen: React.FC = () => {
 
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Subscription Terms</h4>
             <ul className="text-gray-700 dark:text-gray-300 mb-4 space-y-2">
-              <li>• Free trial: 7 days with full access to premium content</li>
+              <li>• Free trial: 3 days with full access to premium content</li>
               <li>• Subscriptions auto-renew unless cancelled</li>
               <li>• Cancel anytime through your account settings</li>
               <li>• Refunds processed according to platform policies (App Store/Google Play)</li>
