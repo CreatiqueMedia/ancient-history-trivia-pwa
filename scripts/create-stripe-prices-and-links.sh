@@ -130,7 +130,7 @@ create_payment_link() {
         --line-items[0][price]="$price_id" \
         --line-items[0][quantity]=1 \
         --after_completion[type]=redirect \
-        --after_completion[redirect][url]="https://ancient-history-pwa.web.app/success" \
+        --after_completion[redirect][url]="https://ancient-history-trivia.web.app/success" \
         --metadata source=ancient_history_app | grep '"url":' | sed 's/.*"url": "\([^"]*\)".*/\1/'
 }
 
