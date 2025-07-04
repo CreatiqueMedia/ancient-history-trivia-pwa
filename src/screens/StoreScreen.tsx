@@ -284,13 +284,13 @@ const StoreScreen: React.FC = () => {
     
     // Check if user is authenticated
     if (!user) {
-      // Store the intended purchase and redirect to auth
+      // Store the intended purchase and show auth modal
       localStorage.setItem('pendingPurchase', JSON.stringify({
         type: 'bundle',
         id: bundle.id,
         name: bundle.name
       }));
-      navigate('/auth/signin?redirect=/store');
+      setShowAuthModal(true);
       return;
     }
     
@@ -341,13 +341,13 @@ const StoreScreen: React.FC = () => {
   const handleSubscribe = async (tier: SubscriptionTier) => {
     // Check if user is authenticated
     if (!user) {
-      // Store the intended subscription and redirect to auth
+      // Store the intended subscription and show auth modal
       localStorage.setItem('pendingPurchase', JSON.stringify({
         type: 'subscription',
         id: tier.id,
         name: tier.name
       }));
-      navigate('/auth/signin?redirect=/store');
+      setShowAuthModal(true);
       return;
     }
     
