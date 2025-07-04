@@ -51,17 +51,40 @@ const AppContent = () => {
       }, 3000);
     }
 
-    // Add global error handler
+    // Add global error handler with Firebase auth domain error filtering
     const handleError = (event: ErrorEvent) => {
-      console.error('[App] Global error:', event.error);
+      const error = event.error;
+      console.error('[App] Global error:', error);
+      
+      // Filter out Firebase auth domain errors - these are handled by AuthContext
+      if (error?.code === 'auth/unauthorized-domain' || 
+          error?.message?.includes('unauthorized-domain') ||
+          error?.message?.includes('OAuth redirect domains')) {
+        console.log('🔒 Firebase auth domain error caught and suppressed');
+        // Don't show error to user - AuthContext handles this gracefully
+        return;
+      }
+      
       setHasError(true);
-      setErrorMessage(event.error?.message || 'Unknown error');
+      setErrorMessage(error?.message || 'Unknown error');
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('[App] Unhandled promise rejection:', event.reason);
+      const error = event.reason;
+      console.error('[App] Unhandled promise rejection:', error);
+      
+      // Filter out Firebase auth domain errors - these are handled by AuthContext
+      if (error?.code === 'auth/unauthorized-domain' || 
+          error?.message?.includes('unauthorized-domain') ||
+          error?.message?.includes('OAuth redirect domains')) {
+        console.log('🔒 Firebase auth domain promise rejection caught and suppressed');
+        // Don't show error to user - AuthContext handles this gracefully
+        event.preventDefault(); // Prevent the default unhandled rejection behavior
+        return;
+      }
+      
       setHasError(true);
-      setErrorMessage(event.reason?.message || 'Promise rejection');
+      setErrorMessage(error?.message || 'Promise rejection');
     };
 
     window.addEventListener('error', handleError);
