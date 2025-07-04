@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { trackSubscriptionEvent } from '../config/stripe';
 import { useAuth } from '../context/AuthContext';
 import { usePurchase } from '../context/PurchaseContext';
+import AuthModal from '../components/AuthModal';
 
 export const SuccessScreen: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -10,6 +11,8 @@ export const SuccessScreen: React.FC = () => {
   const [countdown, setCountdown] = useState(5);
   const [authRestored, setAuthRestored] = useState(false);
   const [paymentProcessed, setPaymentProcessed] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [needsAuthentication, setNeedsAuthentication] = useState(false);
   const { user, loading, updateUserProfile } = useAuth();
   const { ownedBundles, subscriptionTier, subscriptionPeriod } = usePurchase();
   
@@ -20,12 +23,28 @@ export const SuccessScreen: React.FC = () => {
   useEffect(() => {
     if (!loading) {
       setAuthRestored(true);
+      
+      // CRITICAL: Check if user is authenticated after Stripe redirect
+      if (!user) {
+        console.log('🚨 User not authenticated after Stripe payment - forcing login');
+        setNeedsAuthentication(true);
+        setShowAuthModal(true);
+        return;
+      }
     }
-  }, [loading]);
+  }, [loading, user]);
 
-  // Process payment and update user profile once auth is restored
+  // Process payment and update user profile once auth is restored AND user is authenticated
   useEffect(() => {
-    if (!authRestored || paymentProcessed) return;
+    if (!authRestored || paymentProcessed || needsAuthentication) return;
+    
+    // Double-check user is authenticated before processing payment
+    if (!user) {
+      console.log('🚨 Cannot process payment - user not authenticated');
+      setNeedsAuthentication(true);
+      setShowAuthModal(true);
+      return;
+    }
 
     const processPayment = async () => {
       try {
@@ -157,6 +176,16 @@ export const SuccessScreen: React.FC = () => {
     navigate('/');
   };
 
+  const handleAuthModalClose = () => {
+    setShowAuthModal(false);
+    // Check if user is now authenticated after modal closes
+    if (user) {
+      console.log('✅ User authenticated successfully after payment');
+      setNeedsAuthentication(false);
+      // The useEffect will now process the payment since user is authenticated
+    }
+  };
+
   const getPlanDisplayName = (planName: string) => {
     switch (planName) {
       case 'monthly': return 'Pro Monthly Subscription';
@@ -210,6 +239,62 @@ export const SuccessScreen: React.FC = () => {
           </div>
         </div>
       </div>
+    );
+  }
+
+  // Show authentication required screen
+  if (needsAuthentication) {
+    return (
+      <>
+        <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-100 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+            {/* Warning Icon */}
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              🔐 Authentication Required
+            </h1>
+            
+            <p className="text-gray-700 mb-4">
+              Your payment for <span className="font-semibold text-amber-600">{getPlanDisplayName(plan)}</span> was successful!
+            </p>
+            
+            <p className="text-gray-600 mb-6">
+              To complete your purchase and add it to your account, please sign in or create an account.
+            </p>
+
+            <div className="bg-amber-50 rounded-lg p-4 mb-6">
+              <p className="text-amber-800 text-sm">
+                💳 Your payment is secure and will be linked to your account once you authenticate.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 mb-4"
+            >
+              Sign In / Create Account
+            </button>
+
+            {sessionId && (
+              <p className="text-xs text-gray-500">
+                Reference: {sessionId.slice(-8)}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Authentication Modal */}
+        <AuthModal 
+          isOpen={showAuthModal} 
+          onClose={handleAuthModalClose}
+          initialMode="login"
+        />
+      </>
     );
   }
 

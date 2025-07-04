@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Fix Stripe Payment Links to use correct redirect domain
-# Update old payment links from ancient-history-pwa.web.app to ancient-history-trivia.web.app
+# Update payment links to use the correct domain: ancient-history-trivia.web.app
 
 echo "🔧 FIXING STRIPE PAYMENT LINK REDIRECT DOMAINS"
 echo "=============================================="

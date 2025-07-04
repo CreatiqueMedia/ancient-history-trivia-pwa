@@ -1,56 +1,46 @@
-# 🔐 Firebase Authentication Domains Fix
+# 🔐 Firebase Authentication Domains Configuration
 
-## ❌ PROBLEM
-Getting `auth/unauthorized-domain` error when trying to sign in.
+## ✅ CORRECT CONFIGURATION
 
-## ✅ SOLUTION
-Add the missing domains to Firebase Authentication authorized domains.
+Your Firebase project should ONLY use:
 
-## 🚀 IMMEDIATE ACTION REQUIRED
+**Primary Domain**: `ancient-history-trivia.web.app`
+
+## 🎯 AUTHORIZED DOMAINS SHOULD BE:
+- `ancient-history-trivia.firebaseapp.com` (default Firebase domain)
+- `ancient-history-trivia.web.app` (your primary domain)
+- `localhost` (for local development)
+- `127.0.0.1` (for local development)
+
+## 🚨 IMPORTANT: DO NOT ADD
+- ❌ `ancient-history-pwa.web.app` (this domain should NOT be used)
+
+## 🔧 HOW TO VERIFY/FIX
 
 ### Step 1: Open Firebase Console
-The Firebase Console should have opened automatically. If not, go to:
-**https://console.firebase.google.com/project/ancient-history-trivia/authentication/settings**
+Go to: **https://console.firebase.google.com/project/ancient-history-trivia/authentication/settings**
 
-### Step 2: Navigate to Authorized Domains
-1. In the Firebase Console, go to **Authentication**
-2. Click on **Settings** tab
-3. Scroll down to **Authorized domains** section
+### Step 2: Check Authorized Domains
+In the **Authorized domains** section, ensure you have:
+- ✅ `ancient-history-trivia.firebaseapp.com`
+- ✅ `ancient-history-trivia.web.app`
+- ✅ `localhost`
+- ✅ `127.0.0.1`
 
-### Step 3: Add These Domains
-Click **"Add domain"** for each of these domains:
+### Step 3: Remove Unwanted Domain (if present)
+If you see `ancient-history-pwa.web.app` in the list:
+1. Click the **X** next to it
+2. Confirm removal
 
-#### ✅ REQUIRED DOMAINS TO ADD:
-1. **`ancient-history-pwa.web.app`** ← This is the main one causing the error
-2. **`ancient-history-trivia.web.app`** ← Your primary domain
-3. **`localhost`** ← For local development
-4. **`127.0.0.1`** ← For local development
+## 🎯 CORRECT APP URL
+Always use: **https://ancient-history-trivia.web.app**
 
-### Step 4: Save Changes
-After adding all domains, the changes take effect immediately.
-
-## 🎯 CURRENT DOMAINS THAT SHOULD BE AUTHORIZED:
-- `ancient-history-trivia.firebaseapp.com` (default)
-- `ancient-history-pwa.web.app` ← ADD THIS
-- `ancient-history-trivia.web.app` ← ADD THIS  
-- `localhost` ← ADD THIS
-- `127.0.0.1` ← ADD THIS
-
-## ⚡ QUICK VERIFICATION
-After adding the domains:
-1. Go to your app: `https://ancient-history-pwa.web.app`
-2. Try to sign in with Google
-3. The `auth/unauthorized-domain` error should be gone!
-
-## 🔧 WHY THIS HAPPENED
-Your app is deployed to `ancient-history-pwa.web.app` but Firebase Authentication was only configured for `ancient-history-trivia.firebaseapp.com`. When users try to sign in from the `.web.app` domain, Firebase blocks it because it's not in the authorized domains list.
-
-## ✅ AFTER FIXING
-- Authentication will work on all your domains
-- Users can sign in from any authorized domain
-- Payment flow will work seamlessly
-- No more authentication errors
+## ✅ AFTER CORRECT CONFIGURATION
+- Authentication works on the correct domain
+- No unauthorized domain errors
+- Payment flow works seamlessly
+- Clean, single-domain setup
 
 ---
 
-**🚨 URGENT: This must be done in the Firebase Console as the Firebase CLI doesn't support managing auth domains programmatically.**
+**🎯 REMEMBER: Only use `ancient-history-trivia.web.app` - this is your primary and only domain!**

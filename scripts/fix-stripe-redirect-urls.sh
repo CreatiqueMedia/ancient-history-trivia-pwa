@@ -31,12 +31,11 @@ echo -e "${GREEN}✅ Stripe CLI ready!${NC}"
 
 # Define the correct redirect URL
 CORRECT_URL="https://ancient-history-trivia.web.app/success"
-WRONG_URL="https://ancient-history-pwa.web.app/success"
 
 echo -e "${BLUE}🔍 Finding payment links with wrong redirect URL...${NC}"
 
-# Get all payment links and extract IDs of those with wrong URL
-PAYMENT_LINK_IDS=$(stripe payment_links list --limit 50 | jq -r --arg wrong_url "$WRONG_URL" '.data[] | select(.after_completion.redirect.url == $wrong_url) | .id')
+# Get all payment links and extract IDs that need updating
+PAYMENT_LINK_IDS=$(stripe payment_links list --limit 50 | jq -r --arg correct_url "$CORRECT_URL" '.data[] | select(.after_completion.redirect.url != $correct_url) | .id')
 
 if [ -z "$PAYMENT_LINK_IDS" ]; then
     echo -e "${GREEN}✅ No payment links found with wrong redirect URL!${NC}"
@@ -68,7 +67,7 @@ echo ""
 echo -e "${GREEN}🎉 Payment link redirect URLs updated!${NC}"
 echo ""
 echo -e "${BLUE}📊 Summary:${NC}"
-echo "✅ Updated redirect URLs from: $WRONG_URL"
+echo "✅ Updated redirect URLs to use correct domain"
 echo "✅ Updated redirect URLs to: $CORRECT_URL"
 echo ""
 echo -e "${YELLOW}🧪 Test the fix:${NC}"

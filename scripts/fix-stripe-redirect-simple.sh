@@ -16,8 +16,8 @@ echo -e "${BLUE}📋 Stripe Payment Link Update Instructions${NC}"
 echo ""
 
 echo -e "${YELLOW}🎯 The Problem:${NC}"
-echo "Your Stripe payment links redirect to: https://ancient-history-pwa.web.app/success"
-echo "But your app is actually at: https://ancient-history-trivia.web.app/success"
+echo "Your Stripe payment links should redirect to: https://ancient-history-trivia.web.app/success"
+echo "This is your correct app domain: https://ancient-history-trivia.web.app/success"
 echo ""
 
 echo -e "${YELLOW}🔧 The Solution:${NC}"
