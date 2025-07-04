@@ -23,6 +23,7 @@ import UserProfileScreen from './screens/UserProfileScreen.tsx';
 import BillingHistoryScreen from './screens/BillingHistoryScreen.tsx';
 import AboutScreen from './screens/AboutScreen.tsx';
 import EmailLinkHandler from './screens/EmailLinkHandler.tsx';
+import SuccessScreen from './screens/SuccessScreen.tsx';
 import Layout from './components/Layout.tsx';
 import LoadingSpinner from './components/LoadingSpinner.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
@@ -117,6 +118,7 @@ const AppContent = () => {
           </ProtectedRoute>
         } />
         <Route path="/about" element={<AboutScreen />} />
+        <Route path="/success" element={<SuccessScreen />} />
         <Route path="/auth/signin" element={<EmailLinkHandler />} />
         {/* Specific route for auth handlers only */}
         <Route path="/__/auth/*" element={<HomeScreen />} />
