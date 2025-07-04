@@ -38,7 +38,7 @@ echo -e "${YELLOW}🔧 Step 3: Update Stripe Payment Links${NC}"
 echo "After the domain is active, you'll need to update your Stripe payment links"
 echo "to redirect to: https://ancient-history-trivia.app/success"
 echo ""
-echo "Current Stripe redirect: https://ancient-history-pwa.web.app/success"
+echo "Current Stripe redirect: https://ancient-history-trivia.web.app/success"
 echo "New Stripe redirect: https://ancient-history-trivia.app/success"
 echo ""
 

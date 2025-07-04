@@ -88,7 +88,7 @@ Here's why the Firebase .web.app domain is actually excellent for your use case:
 ## 🎯 **SOLUTION FOR STRIPE REDIRECT ISSUE**
 
 ### **The Real Problem:**
-Your Stripe payment links redirect to `ancient-history-pwa.web.app/success` but your app is at `ancient-history-trivia.web.app/success`.
+Your Stripe payment links should redirect to `ancient-history-trivia.web.app/success` which is your correct app domain.
 
 ### **Simple Solution (No Custom Domain Needed):**
 Just update your Stripe payment links to redirect to the correct domain:
