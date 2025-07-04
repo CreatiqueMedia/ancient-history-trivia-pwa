@@ -2,22 +2,6 @@
   "projects": {
     "default": "ancient-history-trivia"
   },
-  "targets": {
-    "ancient-history-trivia": {
-      "hosting": {
-        "main": [
-          "ancient-history-trivia"
-        ]
-      }
-    },
-    "ancient-history-pwa": {
-      "hosting": {
-        "main": [
-          "ancient-history-trivia"
-        ]
-      }
-    }
-  },
   "etags": {
     "ancient-history-trivia": {
       "extensionInstances": {
