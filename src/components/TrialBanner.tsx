@@ -62,37 +62,16 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
     if (!trialStatus && conversionMessage?.title.includes('Start')) {
       e.preventDefault(); // Prevent navigation
       
-      // Check if user is properly logged in (not anonymous)
+      // Always require proper authentication for trial - redirect to auth
       if (!user || user.isAnonymous) {
-        // User needs to sign in first
-        alert('Please sign in to start your free trial. This helps us track your trial period and ensure you don\'t lose access.');
-        
-        // Navigate to home page where they can sign in
-        navigate('/');
+        // Navigate to auth page to sign in/sign up for trial
+        navigate('/auth/signin?redirect=/store&action=start_trial');
         return;
-      }
-      
-      setIsStartingTrial(true);
-      
-      try {
-        // Start the trial with the authenticated user
-        const newTrialStatus = TrialService.startTrial(user.uid);
-        setTrialStatus(newTrialStatus);
-        
-        // Update the conversion message
-        const newMessage = TrialService.getConversionMessage();
-        setConversionMessage(newMessage);
-        
-        // Show success message and navigate to store
-        alert('🎉 Your 7-day free trial has started! You now have access to all premium content.');
-        
-        // Force a page refresh to update all contexts
-        window.location.reload();
-      } catch (error) {
-        console.error('Error starting trial:', error);
-        alert('Sorry, there was an error starting your trial. Please try again.');
-      } finally {
-        setIsStartingTrial(false);
+      } else {
+        // User is authenticated but we still want them to go through the store/subscription flow
+        // instead of automatically starting a trial
+        navigate('/store?tab=subscription&action=start_trial');
+        return;
       }
     } else {
       // For existing trials or subscription prompts, just mark conversion offered and navigate
