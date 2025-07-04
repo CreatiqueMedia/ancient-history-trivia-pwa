@@ -6,13 +6,32 @@ export const STRIPE_PAYMENT_LINKS = {
   monthly: 'https://buy.stripe.com/test_4gMbJ0bgV7b3fop5eF9oc07',
   annual: 'https://buy.stripe.com/test_aFa00i1GlgLD3FH22t9oc08',
   
-  // Individual Bundles
+  // Individual Bundles - Updated to match actual bundle IDs
   bundles: {
-    egypt: 'https://buy.stripe.com/test_28E4gy3Otdzrfop5eF9oc09',
-    rome: 'https://buy.stripe.com/test_3cI5kC3Ot8f7ccdePf9oc0a',
-    greece: 'https://buy.stripe.com/test_dRm8wO2Kp1QJ0tv6iJ9oc0b',
-    mesopotamia: 'https://buy.stripe.com/test_3cI4gyacRdzrb8922t9oc0c',
-    china: 'https://buy.stripe.com/test_6oU00ickZgLD6RT9uV9oc0d'
+    // Region Packs
+    region_pack_egypt: 'https://buy.stripe.com/test_28E4gy3Otdzrfop5eF9oc09',
+    region_pack_rome: 'https://buy.stripe.com/test_3cI5kC3Ot8f7ccdePf9oc0a',
+    region_pack_greece: 'https://buy.stripe.com/test_dRm8wO2Kp1QJ0tv6iJ9oc0b',
+    region_pack_mesopotamia: 'https://buy.stripe.com/test_3cI4gyacRdzrb8922t9oc0c',
+    region_pack_china: 'https://buy.stripe.com/test_6oU00ickZgLD6RT9uV9oc0d',
+    region_pack_india: 'https://buy.stripe.com/test_28E4gy3Otdzrfop5eF9oc09', // Reuse Egypt link for now
+    region_pack_americas: 'https://buy.stripe.com/test_3cI5kC3Ot8f7ccdePf9oc0a', // Reuse Rome link for now
+    region_pack_europe: 'https://buy.stripe.com/test_dRm8wO2Kp1QJ0tv6iJ9oc0b', // Reuse Greece link for now
+    
+    // Difficulty Packs
+    difficulty_pack_easy: 'https://buy.stripe.com/test_28E4gy3Otdzrfop5eF9oc09', // Reuse Egypt link for now
+    difficulty_pack_medium: 'https://buy.stripe.com/test_3cI5kC3Ot8f7ccdePf9oc0a', // Reuse Rome link for now
+    difficulty_pack_hard: 'https://buy.stripe.com/test_dRm8wO2Kp1QJ0tv6iJ9oc0b', // Reuse Greece link for now
+    
+    // Age Packs
+    age_pack_bronze_age: 'https://buy.stripe.com/test_3cI4gyacRdzrb8922t9oc0c', // Reuse Mesopotamia link for now
+    age_pack_iron_age: 'https://buy.stripe.com/test_6oU00ickZgLD6RT9uV9oc0d', // Reuse China link for now
+    age_pack_prehistoric: 'https://buy.stripe.com/test_28E4gy3Otdzrfop5eF9oc09', // Reuse Egypt link for now
+    
+    // Format Packs
+    format_pack_multiple_choice: 'https://buy.stripe.com/test_3cI5kC3Ot8f7ccdePf9oc0a', // Reuse Rome link for now
+    format_pack_true_false: 'https://buy.stripe.com/test_dRm8wO2Kp1QJ0tv6iJ9oc0b', // Reuse Greece link for now
+    format_pack_fill_blank: 'https://buy.stripe.com/test_3cI4gyacRdzrb8922t9oc0c' // Reuse Mesopotamia link for now
   }
 };
 

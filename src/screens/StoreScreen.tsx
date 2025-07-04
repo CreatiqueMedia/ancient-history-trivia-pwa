@@ -86,6 +86,7 @@ const StoreScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'bundles' | 'subscription' | 'legacy'>(getInitialTab());
   const [showSampleQuiz, setShowSampleQuiz] = useState<string | null>(null);
   const [processingTiers, setProcessingTiers] = useState<Set<string>>(new Set());
+  const [processingBundles, setProcessingBundles] = useState<Set<string>>(new Set());
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Listen for custom event to set active tab (keeping for backward compatibility)
@@ -293,6 +294,9 @@ const StoreScreen: React.FC = () => {
       return;
     }
     
+    // Add this bundle to processing state
+    setProcessingBundles(prev => new Set([...prev, bundle.id]));
+    
     try {
       const success = await purchaseBundle(bundle.id);
       if (success) {
@@ -300,6 +304,13 @@ const StoreScreen: React.FC = () => {
       }
     } catch (error) {
       alert('Purchase failed. Please try again.');
+    } finally {
+      // Remove this bundle from processing state
+      setProcessingBundles(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(bundle.id);
+        return newSet;
+      });
     }
   };
 
@@ -464,11 +475,11 @@ const StoreScreen: React.FC = () => {
             ) : (
               <button
                 onClick={() => handlePurchaseBundle(bundle)}
-                disabled={isProcessing}
+                disabled={processingBundles.has(bundle.id)}
                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors"
               >
                 <ShoppingCartIcon className="w-4 h-4" />
-                <span>{isProcessing ? 'Processing...' : 'Purchase'}</span>
+                <span>{processingBundles.has(bundle.id) ? 'Processing...' : 'Purchase'}</span>
               </button>
             )}
           </div>
