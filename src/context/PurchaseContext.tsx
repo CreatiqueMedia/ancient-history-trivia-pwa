@@ -215,8 +215,9 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // For web/PWA, redirect to Stripe Checkout
         console.log('Redirecting to Stripe checkout for bundle:', bundleId);
         
-        // Store user ID for tracking
+        // Store user ID and bundle ID for tracking
         localStorage.setItem('userId', user.uid);
+        localStorage.setItem('pendingBundlePurchase', bundleId);
         
         // Redirect to Stripe payment link
         redirectToStripeCheckout(bundleId);

@@ -92,7 +92,7 @@ export interface NotificationPreferences {
 
 export type AuthProvider = 'google' | 'apple' | 'email' | 'anonymous';
 
-export type SubscriptionTier = 'free' | 'pro_monthly' | 'pro_annual';
+export type SubscriptionTier = 'free' | 'pro_monthly' | 'pro_annual' | 'pro_biennial';
 
 export interface SubscriptionPlan {
   id: SubscriptionTier;
