@@ -322,10 +322,15 @@ const StoreScreen: React.FC = () => {
   };
 
   const handlePurchaseBundle = async (bundle: QuestionBundle) => {
+    console.log('🛒 Purchase button clicked for bundle:', bundle.name);
+    console.log('👤 Current user state:', user ? 'authenticated' : 'not authenticated');
+    console.log('🔐 User object:', user);
+    
     if (hasAccessToBundle(bundle.id)) return;
     
     // Check if user is authenticated
     if (!user) {
+      console.log('🚫 User not authenticated, showing auth modal');
       // Store the intended purchase and show auth modal
       localStorage.setItem('pendingPurchase', JSON.stringify({
         type: 'bundle',
@@ -335,6 +340,8 @@ const StoreScreen: React.FC = () => {
       setShowAuthModal(true);
       return;
     }
+    
+    console.log('✅ User is authenticated, proceeding with purchase');
     
     // Add this bundle to processing state
     setProcessingBundles(prev => new Set([...prev, bundle.id]));
