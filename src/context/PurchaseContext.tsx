@@ -202,7 +202,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const purchaseBundle = async (bundleId: string): Promise<boolean> => {
     if (!user) {
       console.error('User must be logged in to make purchases');
-      return false;
+      throw new Error('Authentication required for purchase');
     }
     
     setIsProcessing(true);
@@ -219,7 +219,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         localStorage.setItem('userId', user.uid);
         localStorage.setItem('pendingBundlePurchase', bundleId);
         
-        // Redirect to Stripe payment link
+        // Redirect to Stripe payment link (this will throw if user not authenticated)
         redirectToStripeCheckout(bundleId);
         
         // Return false since we're redirecting (purchase will complete on return)
@@ -229,7 +229,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch (error) {
       console.error('Purchase failed:', error);
       setIsProcessing(false);
-      return false;
+      throw error; // Re-throw to let the calling component handle the error
     }
   };
 
@@ -281,7 +281,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const subscribe = async (tier: string, period: string): Promise<boolean> => {
     if (!user) {
       console.error('User must be logged in to subscribe');
-      return false;
+      throw new Error('Authentication required for subscription');
     }
     
     setIsProcessing(true);
@@ -297,7 +297,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // Store user ID for tracking
         localStorage.setItem('userId', user.uid);
         
-        // Redirect to Stripe payment link for subscription
+        // Redirect to Stripe payment link for subscription (this will throw if user not authenticated)
         redirectToStripeCheckout(period);
         
         // Return false since we're redirecting (subscription will complete on return)
@@ -307,7 +307,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch (error) {
       console.error('Subscription failed:', error);
       setIsProcessing(false);
-      return false;
+      throw error; // Re-throw to let the calling component handle the error
     }
   };
 
