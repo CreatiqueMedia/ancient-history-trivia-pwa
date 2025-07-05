@@ -193,7 +193,7 @@ const HomeScreen = () => {
                   Quick Quiz
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Start a random quiz with 10 questions
+                  Start a random quiz with 33 questions
                 </p>
               </div>
             </div>
