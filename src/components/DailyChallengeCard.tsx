@@ -23,7 +23,35 @@ const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({ className = '' 
 
   useEffect(() => {
     loadDailyChallenge();
-  }, []);
+    
+    // Set up interval to check for date changes every minute
+    const checkForNewDay = () => {
+      const now = new Date();
+      const currentDate = now.toISOString().split('T')[0];
+      
+      // Check if we have a challenge and if the date has changed
+      if (challenge && challenge.date !== currentDate) {
+        loadDailyChallenge();
+      }
+    };
+    
+    // Check every minute for date changes
+    const interval = setInterval(checkForNewDay, 60000);
+    
+    // Also check when the component becomes visible again (tab focus)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        checkForNewDay();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [challenge?.date]); // Re-run when challenge date changes
 
   const loadDailyChallenge = () => {
     try {
