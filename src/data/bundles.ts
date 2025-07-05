@@ -16,7 +16,19 @@ export const PRICING = {
 };
 
 export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
-  // Free plan removed for paid-only subscription model
+  {
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    period: 'forever',
+    features: [
+      'Access to sample quizzes (10 questions each)',
+      'Basic daily challenges',
+      'Limited statistics',
+      'Community features',
+      'Ad-supported experience'
+    ]
+  },
   {
     id: 'pro_monthly',
     name: 'Pro Monthly',

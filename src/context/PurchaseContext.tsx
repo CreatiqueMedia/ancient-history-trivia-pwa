@@ -51,9 +51,28 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [currentPurchase, setCurrentPurchase] = useState<{ type: 'bundle' | 'subscription', id: string } | null>(null);
 
+  // Reset subscription state when user logs out
+  useEffect(() => {
+    if (!user) {
+      setOwnedBundles([]);
+      setSubscriptionTier('free');
+      setSubscriptionPeriod('none');
+      setSubscriptionExpiry(undefined);
+      
+      // Clear localStorage data when user logs out
+      localStorage.removeItem('ownedBundles');
+      localStorage.removeItem('subscription');
+      localStorage.removeItem('purchaseHistory');
+      console.log('PurchaseContext: Cleared all purchase data on logout');
+    }
+  }, [user]);
+
   // Load saved purchase data on initialization
   useEffect(() => {
     const loadPurchaseData = async () => {
+      // Only load data if user is authenticated
+      if (!user) return;
+      
       try {
         const savedBundles = localStorage.getItem('ownedBundles');
         const savedSubscription = localStorage.getItem('subscription');
@@ -91,20 +110,24 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
 
     loadPurchaseData();
-  }, []);
+  }, [user]);
 
   // Save purchase data whenever it changes
   useEffect(() => {
-    localStorage.setItem('ownedBundles', JSON.stringify(ownedBundles));
-  }, [ownedBundles]);
+    if (user) {
+      localStorage.setItem('ownedBundles', JSON.stringify(ownedBundles));
+    }
+  }, [ownedBundles, user]);
 
   useEffect(() => {
-    localStorage.setItem('subscription', JSON.stringify({
-      tier: subscriptionTier,
-      period: subscriptionPeriod,
-      expiry: subscriptionExpiry
-    }));
-  }, [subscriptionTier, subscriptionPeriod, subscriptionExpiry]);
+    if (user) {
+      localStorage.setItem('subscription', JSON.stringify({
+        tier: subscriptionTier,
+        period: subscriptionPeriod,
+        expiry: subscriptionExpiry
+      }));
+    }
+  }, [subscriptionTier, subscriptionPeriod, subscriptionExpiry, user]);
 
   const closePaymentModal = () => {
     setShowPaymentModal(false);
@@ -360,6 +383,11 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const isPremiumUser = (() => {
+    // User must be authenticated to be premium
+    if (!user) {
+      return false;
+    }
+    
     // Check if user has an active trial
     if (TrialService.isInTrial()) {
       return true;

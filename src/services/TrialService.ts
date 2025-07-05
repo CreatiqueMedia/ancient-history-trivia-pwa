@@ -399,10 +399,23 @@ export class TrialService {
    * Check if user is eligible for trial (hasn't had one before)
    */
   static isEligibleForTrial(userId: string): boolean {
+    // If no userId provided, user is not eligible
+    if (!userId) return false;
+    
     // In a real app, this would check against a backend database
     // For now, we'll check if there's any trial data in localStorage
     const existingTrial = this.getTrialStatus();
     return existingTrial === null;
+  }
+
+  /**
+   * Clear all trial and subscription data (called on logout)
+   */
+  static clearAllUserData(): void {
+    localStorage.removeItem(this.STORAGE_KEY);
+    localStorage.removeItem('subscription');
+    localStorage.removeItem('purchaseHistory');
+    console.log('All user trial and subscription data cleared');
   }
 
   /**

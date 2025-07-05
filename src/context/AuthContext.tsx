@@ -20,6 +20,7 @@ import {
 // FIRESTORE IMPORTS REMOVED - App now operates in pure offline mode
 import { auth, googleProvider, appleProvider } from '../config/firebase';
 import type { UserProfile, AuthProvider, SubscriptionTier } from '../types';
+import { TrialService } from '../services/TrialService';
 
 interface AuthContextType {
   user: User | null;
@@ -321,6 +322,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setError(null);
       await signOut(auth);
+      
+      // Clear all user data from localStorage
+      TrialService.clearAllUserData();
+      
       setUser(null);
       setUserProfile(null);
     } catch (error: any) {

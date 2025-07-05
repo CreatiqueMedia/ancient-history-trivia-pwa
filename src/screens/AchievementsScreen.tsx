@@ -22,6 +22,8 @@ import {
 } from '@heroicons/react/24/solid';
 import { useStats } from '../context/StatsContext';
 import { AchievementType } from '../types';
+import TrialBanner from '../components/TrialBanner';
+import ManageSubscription from '../components/ManageSubscription';
 
 // Icon mapping function to convert string icon names to React components
 const getAchievementIcon = (iconName: string) => {
@@ -296,6 +298,12 @@ const AchievementsScreen: React.FC = () => {
 
       {/* Achievements Grid */}
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Trial Banner and Manage Subscription */}
+        <div className="mb-8">
+          <TrialBanner variant="compact" className="mb-4" />
+          <ManageSubscription variant="compact" />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAchievements.map(achievement => renderAchievementCard(achievement))}
         </div>

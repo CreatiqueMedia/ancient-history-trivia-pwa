@@ -80,7 +80,7 @@ export interface SubscriptionTier {
   id: string;
   name: string;
   price: number;
-  period: 'monthly' | 'annual' | 'biennial';
+  period: 'monthly' | 'annual' | 'biennial' | 'forever';
   features: string[];
   savings?: string;
   isPopular?: boolean;

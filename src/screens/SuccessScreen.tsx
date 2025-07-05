@@ -178,12 +178,19 @@ export const SuccessScreen: React.FC = () => {
 
   const handleAuthModalClose = () => {
     setShowAuthModal(false);
-    // Check if user is now authenticated after modal closes
-    if (user) {
-      console.log('✅ User authenticated successfully after payment');
-      setNeedsAuthentication(false);
-      // The useEffect will now process the payment since user is authenticated
-    }
+    // Give a small delay to ensure auth state has updated
+    setTimeout(() => {
+      if (user) {
+        console.log('✅ User authenticated successfully after payment');
+        setNeedsAuthentication(false);
+        // Reset payment processed to allow the useEffect to run again
+        setPaymentProcessed(false);
+      } else {
+        console.log('⚠️ User still not authenticated after modal close');
+        // Keep the authentication requirement active
+        setNeedsAuthentication(true);
+      }
+    }, 500); // Give auth context time to update
   };
 
   const getPlanDisplayName = (planName: string) => {
