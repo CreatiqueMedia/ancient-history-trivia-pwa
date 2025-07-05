@@ -87,6 +87,24 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
     const score = Math.round((correctAnswers / totalQuestions) * 100);
     const timeSpent = Math.round((Date.now() - currentQuiz.startTime.getTime()) / 1000);
 
+    // Determine bundle ID from current URL or context
+    let bundleId = 'default';
+    try {
+      const currentPath = window.location.pathname;
+      if (currentPath.includes('/quiz/daily-challenge')) {
+        bundleId = 'daily-challenge';
+        
+        // Complete the daily challenge if this is a daily challenge quiz
+        const { DailyChallengeService } = require('../services/DailyChallengeService');
+        DailyChallengeService.completeDailyChallenge(score);
+      } else if (currentPath.includes('/quiz/')) {
+        const pathParts = currentPath.split('/');
+        bundleId = pathParts[pathParts.length - 1] || 'default';
+      }
+    } catch (error) {
+      console.error('Error determining bundle ID:', error);
+    }
+
     const result: QuizResult = {
       score,
       totalQuestions,
@@ -95,7 +113,7 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
       timeSpent,
       questionResults: currentQuiz.results,
       completedAt: new Date(),
-      bundleId: 'default' // This would come from the selected bundle
+      bundleId
     };
 
     return result;
