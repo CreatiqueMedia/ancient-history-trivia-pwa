@@ -72,6 +72,28 @@ const getPlanTagline = (planId: string) => {
 const StoreScreen: React.FC = () => {
   const navigate = useNavigate();
   
+  // Function to get purchase date from localStorage
+  const getPurchaseDate = (bundleId: string): string => {
+    try {
+      const purchaseHistoryStr = localStorage.getItem('purchaseHistory');
+      if (!purchaseHistoryStr) return 'Unknown';
+      
+      const purchaseHistory = JSON.parse(purchaseHistoryStr);
+      const bundlePurchase = purchaseHistory.find((purchase: any) => 
+        purchase.type === 'bundle' && purchase.bundleId === bundleId
+      );
+      
+      if (bundlePurchase && bundlePurchase.date) {
+        return new Date(bundlePurchase.date).toLocaleDateString();
+      }
+      
+      return 'Unknown';
+    } catch (error) {
+      console.error('Error getting purchase date:', error);
+      return 'Unknown';
+    }
+  };
+  
   // Check URL parameters for initial tab state
   const getInitialTab = (): 'bundles' | 'subscription' | 'legacy' => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -455,7 +477,8 @@ const StoreScreen: React.FC = () => {
 
   const renderBundleCard = (bundle: QuestionBundle, showVersion: boolean = true) => {
     const isOwned = hasAccessToBundle(bundle.id);
-    const canAccess = isOwned || isPremiumUser;
+    // Only allow access if user is authenticated AND (owns bundle OR is premium)
+    const canAccess = user && (isOwned || isPremiumUser);
 
     return (
       <div 
@@ -546,14 +569,21 @@ const StoreScreen: React.FC = () => {
             </span>
             
             {canAccess ? (
-              <Link 
-                to="/quiz" 
-                state={{ bundleId: bundle.id }}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors"
-              >
-                <PlayIcon className="w-4 h-4" />
-                <span>Start Full Quiz</span>
-              </Link>
+              <div className="flex flex-col items-end space-y-1">
+                <Link 
+                  to="/quiz" 
+                  state={{ bundleId: bundle.id }}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors"
+                >
+                  <PlayIcon className="w-4 h-4" />
+                  <span>Start Full Quiz</span>
+                </Link>
+                {isOwned && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    Purchased: {getPurchaseDate(bundle.id)}
+                  </span>
+                )}
+              </div>
             ) : (
               <button
                 onClick={() => handlePurchaseBundle(bundle)}
