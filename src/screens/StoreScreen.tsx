@@ -225,23 +225,29 @@ const StoreScreen: React.FC = () => {
 
   // Organize bundles into the sections you requested
   const organizeBundles = (bundleList: QuestionBundle[] = currentBundles) => {
+    console.log('organizeBundles called with:', bundleList.length, 'bundles');
+    console.log('Bundle list:', bundleList.map(b => ({ id: b.id, category: b.category, subcategory: b.subcategory })));
+    
     // Age Bundle Packs
     const ageBundles = bundleList.filter(bundle => 
       bundle.category === 'historical_age' && 
       ['Prehistoric', 'Bronze Age', 'Iron Age'].includes(bundle.subcategory)
     );
+    console.log('Age bundles found:', ageBundles.length, ageBundles.map(b => b.name));
 
     // Format Bundle Packs  
     const formatBundles = bundleList.filter(bundle => 
       bundle.category === 'format' && 
       ['Multiple Choice', 'True/False', 'Fill-in-the-Blank'].includes(bundle.subcategory)
     );
+    console.log('Format bundles found:', formatBundles.length, formatBundles.map(b => b.name));
 
     // Region Bundle Packs
     const regionBundles = bundleList.filter(bundle => 
       bundle.category === 'region' && 
       ['Roman', 'Egyptian', 'Greek', 'Mesopotamian', 'Chinese', 'Indian', 'American', 'European'].includes(bundle.subcategory)
     );
+    console.log('Region bundles found:', regionBundles.length, regionBundles.map(b => b.name));
 
     // Difficulty Packs (specifically difficulty category bundles in Easy, Medium, Hard order)
     const difficultyBundles = bundleList
@@ -252,13 +258,17 @@ const StoreScreen: React.FC = () => {
         const bIndex = order.indexOf(b.subcategory);
         return aIndex - bIndex;
       });
+    console.log('Difficulty bundles found:', difficultyBundles.length, difficultyBundles.map(b => b.name));
 
-    return {
+    const result = {
       'Age Bundle Packs': ageBundles,
       'Difficulty Packs': difficultyBundles,
       'Format Bundle Packs': formatBundles, 
       'Region Bundle Packs': regionBundles
     };
+    
+    console.log('Final organized bundles:', result);
+    return result;
   };
 
   const bundleSections = organizeBundles();
@@ -802,8 +812,8 @@ const StoreScreen: React.FC = () => {
                   // Sort sections alphabetically
                   return a.localeCompare(b);
                 })
-                .map(([sectionName, bundles]) => (
-                  bundles.length > 0 && (
+                .map(([sectionName, bundles]) => {
+                  return bundles.length > 0 ? (
                     <div key={sectionName} className="space-y-6">
                       <div className="text-center">
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -812,12 +822,17 @@ const StoreScreen: React.FC = () => {
                         <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
                       </div>
                       
+                      {/* Debug: Show bundle count */}
+                      <div className="text-center text-sm text-gray-500 mb-4">
+                        Found {bundles.length} bundles in this section
+                      </div>
+                      
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {bundles.map(bundle => renderBundleCard(bundle))}
                       </div>
                     </div>
-                  )
-                ))}
+                  ) : null;
+                })}
             </div>
 
             {/* Purchase Previous Versions Section */}
