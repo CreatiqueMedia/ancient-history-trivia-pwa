@@ -20,6 +20,9 @@ export class DailyChallengeService {
     const today = this.getTodayString();
     const stored = this.getStoredChallenges();
     
+    // Clean up old challenges (keep only last 30 days)
+    this.cleanupOldChallenges(stored, today);
+    
     // Check if we already have today's challenge
     if (stored[today]) {
       return stored[today];
@@ -410,6 +413,22 @@ export class DailyChallengeService {
     }
 
     return shuffled;
+  }
+
+  /**
+   * Clean up old challenges (keep only last 30 days)
+   */
+  private static cleanupOldChallenges(challenges: { [date: string]: DailyChallenge }, currentDate: string): void {
+    const cutoffDate = new Date(currentDate);
+    cutoffDate.setDate(cutoffDate.getDate() - 30);
+    const cutoffString = this.getDateString(cutoffDate);
+    
+    const datesToRemove = Object.keys(challenges).filter(date => date < cutoffString);
+    
+    if (datesToRemove.length > 0) {
+      datesToRemove.forEach(date => delete challenges[date]);
+      this.storeChallenges(challenges);
+    }
   }
 
   /**
