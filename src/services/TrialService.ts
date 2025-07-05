@@ -57,6 +57,9 @@ export class TrialService {
       // Check if trial has expired
       if (trialStatus.daysRemaining <= 0) {
         trialStatus.isActive = false;
+        
+        // Auto-convert to Pro Monthly subscription when trial expires
+        this.convertTrialToSubscription();
       }
 
       // Store updated status
@@ -66,6 +69,29 @@ export class TrialService {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * Convert expired trial to Pro Monthly subscription
+   */
+  static convertTrialToSubscription(): void {
+    const now = new Date();
+    const monthlyExpiry = new Date(now.setMonth(now.getMonth() + 1));
+    
+    // Set up Pro Monthly subscription
+    const subscription = {
+      tier: 'pro',
+      period: 'monthly',
+      expiry: monthlyExpiry.toISOString()
+    };
+    
+    // Save subscription to localStorage
+    localStorage.setItem('subscription', JSON.stringify(subscription));
+    
+    // Track the conversion
+    analyticsService.trackFeatureUsage('trial_auto_converted', 'pro_monthly');
+    
+    console.log('Trial automatically converted to Pro Monthly subscription');
   }
 
   /**

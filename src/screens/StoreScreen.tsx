@@ -597,13 +597,19 @@ const StoreScreen: React.FC = () => {
                   </span>
                 )}
               </div>
+            ) : isPremiumUser ? (
+              <div className="flex flex-col items-end space-y-1">
+                <div className="bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2">
+                  <CheckCircleIcon className="w-4 h-4" />
+                  <span>Included with Subscription</span>
+                </div>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  Access via {subscriptionTier === 'pro' ? 'Pro' : 'Premium'} plan
+                </span>
+              </div>
             ) : (
               <button
-                onClick={() => {
-                  console.log('🔥 BUTTON CLICKED! Bundle:', bundle.name);
-                  alert(`Button clicked for ${bundle.name}!`);
-                  handlePurchaseBundle(bundle);
-                }}
+                onClick={() => handlePurchaseBundle(bundle)}
                 disabled={processingBundles.has(bundle.id)}
                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors"
               >
