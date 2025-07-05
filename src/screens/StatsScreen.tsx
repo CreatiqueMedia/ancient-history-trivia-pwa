@@ -7,6 +7,8 @@ import {
   QuestionMarkCircleIcon 
 } from '@heroicons/react/24/solid';
 import { useStats } from '../context/StatsContext';
+import TrialBanner from '../components/TrialBanner';
+import ManageSubscription from '../components/ManageSubscription';
 
 const StatsScreen: React.FC = () => {
   const { stats } = useStats();
@@ -46,6 +48,12 @@ const StatsScreen: React.FC = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Trial Banner and Manage Subscription */}
+        <div className="mb-8">
+          <TrialBanner variant="compact" className="mb-4" />
+          <ManageSubscription variant="compact" />
+        </div>
+
         {/* Overview Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="card p-6 text-center">

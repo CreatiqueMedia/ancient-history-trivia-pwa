@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { Logo } from '../components/Logo';
 import DailyChallengeCard from '../components/DailyChallengeCard';
 import TrialBanner from '../components/TrialBanner';
+import ManageSubscription from '../components/ManageSubscription';
 
 const HomeScreen = () => {
   const { stats } = useStats();
@@ -151,9 +152,10 @@ const HomeScreen = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6 lg:py-8">
-        {/* Trial Banner */}
+        {/* Trial Banner and Manage Subscription */}
         <div className="mb-6">
           <TrialBanner />
+          <ManageSubscription />
         </div>
 
         {/* Daily Challenge Card */}

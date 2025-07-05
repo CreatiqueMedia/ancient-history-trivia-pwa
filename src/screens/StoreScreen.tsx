@@ -41,6 +41,8 @@ import { useAuth } from '../context/AuthContext';
 import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles';
 import AuthModal from '../components/AuthModal';
 import TrialSuccessModal from '../components/TrialSuccessModal';
+import TrialBanner from '../components/TrialBanner';
+import ManageSubscription from '../components/ManageSubscription';
 import { TrialService } from '../services/TrialService';
 
 // Helper function to format subscription period display
@@ -591,21 +593,15 @@ const StoreScreen: React.FC = () => {
                   <PlayIcon className="w-4 h-4" />
                   <span>Start Full Quiz</span>
                 </Link>
-                {isOwned && (
+                {isOwned ? (
                   <span className="text-xs text-gray-500 dark:text-gray-400">
                     Purchased: {getPurchaseDate(bundle.id)}
                   </span>
-                )}
-              </div>
-            ) : isPremiumUser ? (
-              <div className="flex flex-col items-end space-y-1">
-                <div className="bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2">
-                  <CheckCircleIcon className="w-4 h-4" />
-                  <span>Included with Subscription</span>
-                </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  Access via {subscriptionTier === 'pro' ? 'Pro' : 'Premium'} plan
-                </span>
+                ) : isPremiumUser ? (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    Access via {subscriptionTier === 'pro' ? 'Pro' : 'Premium'} plan
+                  </span>
+                ) : null}
               </div>
             ) : (
               <button
@@ -715,30 +711,36 @@ const StoreScreen: React.FC = () => {
           ))}
         </ul>
 
-        <button
-          onClick={() => handleSubscribe(tier)}
-          disabled={isThisTierProcessing || isCurrentTier}
-          className={`w-full mt-6 py-3 px-4 rounded-lg font-medium transition-colors ${
-            isCurrentTier
-              ? 'bg-green-600 text-white cursor-not-allowed'
-              : tier.isPopular 
-                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
-          } disabled:bg-gray-400 disabled:cursor-not-allowed`}
-        >
-          {isCurrentTier 
-            ? 'Current Plan' 
-            : isThisTierProcessing 
-              ? 'Processing...' 
-              : tier.id === 'pro_monthly' 
-                ? 'Start Pro Monthly' 
-                : tier.id === 'pro_annual' 
-                  ? 'Start Pro Annual' 
-                  : tier.id === 'pro_biennial' 
-                    ? 'Unlock 2 Years – Best Value!' 
-                    : `Get ${tier.name}`
-          }
-        </button>
+        {tier.id === 'free' ? (
+          <div className="w-full mt-6 py-3 px-4 rounded-lg font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-center">
+            {!user ? 'Sign up to get started' : isCurrentTier ? 'Current Plan' : 'Your Current Plan'}
+          </div>
+        ) : (
+          <button
+            onClick={() => handleSubscribe(tier)}
+            disabled={isThisTierProcessing || isCurrentTier}
+            className={`w-full mt-6 py-3 px-4 rounded-lg font-medium transition-colors ${
+              isCurrentTier
+                ? 'bg-green-600 text-white cursor-not-allowed'
+                : tier.isPopular 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                  : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
+            } disabled:bg-gray-400 disabled:cursor-not-allowed`}
+          >
+            {isCurrentTier 
+              ? 'Current Plan' 
+              : isThisTierProcessing 
+                ? 'Processing...' 
+                : tier.id === 'pro_monthly' 
+                  ? 'Start Pro Monthly' 
+                  : tier.id === 'pro_annual' 
+                    ? 'Start Pro Annual' 
+                    : tier.id === 'pro_biennial' 
+                      ? 'Unlock 2 Years – Best Value!' 
+                      : `Get ${tier.name}`
+            }
+          </button>
+        )}
       </div>
     );
   };
@@ -842,9 +844,15 @@ const StoreScreen: React.FC = () => {
       </div>
 
       {/* Content Area */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8 min-h-screen">
         {activeTab === 'bundles' ? (
           <>
+            {/* Trial Banner and Manage Subscription */}
+            <div className="mb-8">
+              <TrialBanner className="mb-6" />
+              <ManageSubscription className="mb-6" />
+            </div>
+
             {/* Organized Bundle Sections */}
             <div className="space-y-12">
               {/* Loop through sections in alphabetical order */}
@@ -936,30 +944,88 @@ const StoreScreen: React.FC = () => {
           </>
         ) : activeTab === 'subscription' ? (
           <>
-            {/* FOMO/Urgency Banner */}
-            {activeTab === 'subscription' && (
-              <div className="mb-8 text-center">
-                <span className="inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-2 rounded-full shadow-sm">
-                  Limited-time: Free trials and exclusive savings available now!
-                </span>
-              </div>
-            )}
+          {/* Trial Banner or Manage Subscription */}
+          <div className="mb-8">
+            <TrialBanner className="mb-6" />
+            <ManageSubscription className="mb-6" />
+          </div>
 
-            {/* Subscription Plans */}
-            <div className="mb-8">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                  Choose Your Plan
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Unlock all premium features and question bundles, and future releases
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {SUBSCRIPTION_TIERS.map(tier => renderSubscriptionCard(tier))}
+          {/* Current Subscription Status */}
+          {user && (
+            <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 text-center">
+                Current Plan Status
+              </h3>
+              <div className="text-center">
+                {isPremiumUser ? (
+                  <div className="flex items-center justify-center space-x-3">
+                    <CheckCircleIcon className="w-6 h-6 text-green-500" />
+                    <div>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {TrialService.isInTrial() 
+                          ? `3-Day Trial (${TrialService.getTrialStatus()?.daysRemaining || 0} days left)`
+                          : subscriptionPeriod === 'monthly' 
+                            ? 'Pro Monthly' 
+                            : subscriptionPeriod === 'annual' 
+                              ? 'Pro Annual' 
+                              : subscriptionPeriod === 'biennial' 
+                                ? 'Pro Biennial' 
+                                : 'Premium Plan'
+                        }
+                      </p>
+                      {subscriptionExpiry && !TrialService.isInTrial() && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Renews on {new Date(subscriptionExpiry).toLocaleDateString()}
+                        </p>
+                      )}
+                      {TrialService.isInTrial() && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Converts to Pro Monthly on {new Date(TrialService.getTrialStatus()?.endDate || new Date()).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center space-x-3">
+                    <div className="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                      <span className="text-xs font-bold text-gray-600 dark:text-gray-300">F</span>
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">Free Plan</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Access to sample quizzes and basic features
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
+          )}
+
+          {/* FOMO/Urgency Banner */}
+          {activeTab === 'subscription' && (
+            <div className="mb-8 text-center">
+              <span className="inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-2 rounded-full shadow-sm">
+                Limited-time: Free trials and exclusive savings available now!
+              </span>
+            </div>
+          )}
+
+          {/* Subscription Plans */}
+          <div className="mb-8">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                Choose Your Plan
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                Unlock all premium features and question bundles, and future releases
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {SUBSCRIPTION_TIERS.map(tier => renderSubscriptionCard(tier))}
+            </div>
+          </div>
 
             {/* Premium Benefits */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">

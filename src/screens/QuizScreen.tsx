@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeftIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { useQuiz } from '../context/QuizContext';
 import { useSettings } from '../context/SettingsContext';
+import { useAuth } from '../context/AuthContext';
+import { usePurchase } from '../context/PurchaseContext';
 import { getBundleById, getRandomQuestions, getQuestionsForBundle } from '../data/questions';
 import { QUESTION_BUNDLES } from '../data/bundles';
 import { Question } from '../types';
@@ -13,6 +15,8 @@ const QuizScreen: React.FC = () => {
   const navigate = useNavigate();
   const { currentQuiz, startQuiz, selectAnswer, nextQuestion, finishQuiz } = useQuiz();
   const { settings } = useSettings();
+  const { user } = useAuth();
+  const { isPremiumUser, hasAccessToBundle } = usePurchase();
   const [timer, setTimer] = useState<number>(settings.questionTimeLimit || 0);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentBundle, setCurrentBundle] = useState<any>(null);
@@ -88,16 +92,32 @@ const QuizScreen: React.FC = () => {
       bundle = QUESTION_BUNDLES.find(b => b.id === bundleId);
       setCurrentBundle(bundle);
       
-      // Use Enhanced Quiz Service for bundle sample quizzes
-      quizQuestions = EnhancedQuizService.generateBundleSampleQuiz(bundleId, 10);
+      // Determine question count based on user access level
+      const userHasFullAccess = user && (isPremiumUser || hasAccessToBundle(bundleId));
       
-      if (quizQuestions.length === 0) {
-        // Fallback to enhanced quick quiz with all 33 AP-level questions
-        quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
+      if (userHasFullAccess) {
+        // Premium users get full 100 questions with same format as 33-question structure
+        quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
+      } else {
+        // Free users and unauthenticated users get 33 questions (sample)
+        quizQuestions = EnhancedQuizService.generateBundleSampleQuiz(bundleId, 10);
+        
+        if (quizQuestions.length === 0) {
+          // Fallback to enhanced quick quiz with 33 AP-level questions
+          quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
+        }
       }
     } else {
-      // Use Enhanced Quiz Service for quick quiz with all 33 AP-level questions
-      quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
+      // Determine question count based on user access level for general quiz
+      const userHasFullAccess = user && isPremiumUser;
+      
+      if (userHasFullAccess) {
+        // Premium users get full 100 questions
+        quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
+      } else {
+        // Free users and unauthenticated users get 33 questions
+        quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
+      }
       setCurrentBundle(null);
     }
     
