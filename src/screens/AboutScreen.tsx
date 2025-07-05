@@ -318,7 +318,7 @@ const AboutScreen: React.FC = () => {
 
           <div className="space-y-6">
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-6 rounded-lg">
-              <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4">🎁 7-Day Free Trial</h4>
+              <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4">🎁 3-Day Free Trial</h4>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
                 Experience the full power of our educational platform with unlimited access to all premium content:
               </p>
