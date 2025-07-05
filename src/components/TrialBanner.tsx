@@ -36,6 +36,28 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
     cta: string;
   } | null>(null);
 
+  // Handle authentication success
+  useEffect(() => {
+    if (user && !user.isAnonymous && showAuthModal) {
+      // User successfully authenticated, close modal and handle pending action
+      setShowAuthModal(false);
+      
+      const pendingActionStr = localStorage.getItem('pendingAction');
+      if (pendingActionStr) {
+        try {
+          const pendingAction = JSON.parse(pendingActionStr);
+          localStorage.removeItem('pendingAction');
+          
+          if (pendingAction.type === 'start_trial' && pendingAction.redirect) {
+            navigate(pendingAction.redirect);
+          }
+        } catch (error) {
+          console.error('Error processing pending action:', error);
+        }
+      }
+    }
+  }, [user, showAuthModal, navigate]);
+
   useEffect(() => {
     loadTrialStatus();
     
@@ -146,28 +168,6 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
   }
 
   const styles = getUrgencyStyles(conversionMessage.urgency);
-
-  // Handle authentication success
-  useEffect(() => {
-    if (user && !user.isAnonymous && showAuthModal) {
-      // User successfully authenticated, close modal and handle pending action
-      setShowAuthModal(false);
-      
-      const pendingActionStr = localStorage.getItem('pendingAction');
-      if (pendingActionStr) {
-        try {
-          const pendingAction = JSON.parse(pendingActionStr);
-          localStorage.removeItem('pendingAction');
-          
-          if (pendingAction.type === 'start_trial' && pendingAction.redirect) {
-            navigate(pendingAction.redirect);
-          }
-        } catch (error) {
-          console.error('Error processing pending action:', error);
-        }
-      }
-    }
-  }, [user, showAuthModal, navigate]);
 
   return (
     <div className={`relative overflow-hidden rounded-lg border shadow-lg ${styles.container} ${className}`}>

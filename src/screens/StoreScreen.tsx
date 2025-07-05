@@ -40,6 +40,8 @@ import { usePurchase } from '../context/PurchaseContext';
 import { useAuth } from '../context/AuthContext';
 import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles';
 import AuthModal from '../components/AuthModal';
+import TrialSuccessModal from '../components/TrialSuccessModal';
+import { TrialService } from '../services/TrialService';
 
 // Helper function to format subscription period display
 const formatPeriod = (period: string): string => {
@@ -88,6 +90,8 @@ const StoreScreen: React.FC = () => {
   const [processingTiers, setProcessingTiers] = useState<Set<string>>(new Set());
   const [processingBundles, setProcessingBundles] = useState<Set<string>>(new Set());
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showTrialSuccessModal, setShowTrialSuccessModal] = useState(false);
+  const [trialDaysRemaining, setTrialDaysRemaining] = useState(3);
 
   // Listen for custom event to set active tab (keeping for backward compatibility)
   useEffect(() => {
@@ -119,10 +123,11 @@ const StoreScreen: React.FC = () => {
   // Get authentication state
   const { user } = useAuth();
 
-  // Handle pending purchases after authentication
+  // Handle pending purchases after authentication and start trial action
   useEffect(() => {
-    const handlePendingPurchase = async () => {
+    const handlePendingActions = async () => {
       if (user) {
+        // Handle pending purchases
         const pendingPurchaseStr = localStorage.getItem('pendingPurchase');
         if (pendingPurchaseStr) {
           try {
@@ -153,11 +158,44 @@ const StoreScreen: React.FC = () => {
             console.error('Error processing pending purchase:', error);
           }
         }
+
+        // Handle start trial action from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action');
+        
+        if (action === 'start_trial') {
+          // Check if user is eligible for trial
+          if (TrialService.isEligibleForTrial(user.uid)) {
+            try {
+              // Start the free trial
+              const trialStatus = TrialService.startTrial(user.uid);
+              
+              // Set trial data and show custom modal
+              setTrialDaysRemaining(trialStatus.daysRemaining);
+              setShowTrialSuccessModal(true);
+              
+              // Clear the action parameter from URL
+              const newUrl = window.location.pathname + window.location.search.replace(/[?&]action=start_trial/, '');
+              window.history.replaceState({}, '', newUrl);
+              
+            } catch (error) {
+              console.error('Error starting trial:', error);
+              alert('Sorry, there was an error starting your free trial. Please try again.');
+            }
+          } else {
+            // User already had a trial
+            alert('You have already used your free trial. Please choose a subscription plan to continue.');
+            
+            // Clear the action parameter from URL
+            const newUrl = window.location.pathname + window.location.search.replace(/[?&]action=start_trial/, '');
+            window.history.replaceState({}, '', newUrl);
+          }
+        }
       }
     };
 
-    handlePendingPurchase();
-  }, [user, purchaseBundle, subscribe]);
+    handlePendingActions();
+  }, [user, purchaseBundle, subscribe, navigate]);
 
   // Get version information
   const currentBundles = QUESTION_BUNDLES.filter(bundle => bundle.isCurrentVersion !== false);
@@ -300,10 +338,25 @@ const StoreScreen: React.FC = () => {
     try {
       const success = await purchaseBundle(bundle.id);
       if (success) {
-        alert(`Successfully purchased ${bundle.name}!`);
+        // Success handled by redirect to Stripe or in-app purchase
+        console.log(`Purchase initiated for ${bundle.name}`);
       }
-    } catch (error) {
-      alert('Purchase failed. Please try again.');
+    } catch (error: any) {
+      console.error('Purchase error:', error);
+      
+      // Handle authentication errors gracefully
+      if (error.message?.includes('Authentication required')) {
+        // Store the intended purchase and show auth modal
+        localStorage.setItem('pendingPurchase', JSON.stringify({
+          type: 'bundle',
+          id: bundle.id,
+          name: bundle.name
+        }));
+        setShowAuthModal(true);
+      } else {
+        // Show generic error for other issues
+        alert('Purchase failed. Please try again.');
+      }
     } finally {
       // Remove this bundle from processing state
       setProcessingBundles(prev => {
@@ -357,10 +410,25 @@ const StoreScreen: React.FC = () => {
     try {
       const success = await subscribe('pro', tier.period);
       if (success) {
-        alert(`Successfully subscribed to ${tier.name}!`);
+        // Success handled by redirect to Stripe or in-app purchase
+        console.log(`Subscription initiated for ${tier.name}`);
       }
-    } catch (error) {
-      alert('Subscription failed. Please try again.');
+    } catch (error: any) {
+      console.error('Subscription error:', error);
+      
+      // Handle authentication errors gracefully
+      if (error.message?.includes('Authentication required')) {
+        // Store the intended subscription and show auth modal
+        localStorage.setItem('pendingPurchase', JSON.stringify({
+          type: 'subscription',
+          id: tier.id,
+          name: tier.name
+        }));
+        setShowAuthModal(true);
+      } else {
+        // Show generic error for other issues
+        alert('Subscription failed. Please try again.');
+      }
     } finally {
       // Remove this tier from processing state
       setProcessingTiers(prev => {
@@ -958,6 +1026,17 @@ const StoreScreen: React.FC = () => {
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)} 
         initialMode="signup"
+      />
+
+      {/* Trial Success Modal */}
+      <TrialSuccessModal
+        isOpen={showTrialSuccessModal}
+        onClose={() => setShowTrialSuccessModal(false)}
+        daysRemaining={trialDaysRemaining}
+        onStartExploring={() => {
+          setShowTrialSuccessModal(false);
+          navigate('/');
+        }}
       />
     </div>
   );
