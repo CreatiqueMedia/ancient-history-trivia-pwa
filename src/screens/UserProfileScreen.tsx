@@ -140,7 +140,7 @@ const UserProfileScreen: React.FC = () => {
     if (trialStatus && trialStatus.isActive) {
       return {
         id: 'trial',
-        name: '7-Day Free Trial',
+        name: '3-Day Free Trial',
         price: 0,
         period: 'trial',
         features: [
