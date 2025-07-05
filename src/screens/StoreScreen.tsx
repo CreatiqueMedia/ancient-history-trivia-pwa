@@ -370,13 +370,13 @@ const StoreScreen: React.FC = () => {
   const handlePurchaseGroup = async (group: BundleGroup) => {
     // Check if user is authenticated
     if (!user) {
-      // Store the intended purchase and redirect to auth
+      // Store the intended purchase and show auth modal
       localStorage.setItem('pendingPurchase', JSON.stringify({
         type: 'group',
         id: group.groupType,
         name: group.groupName
       }));
-      navigate('/auth/signin?redirect=/store');
+      setShowAuthModal(true);
       return;
     }
     
@@ -386,8 +386,22 @@ const StoreScreen: React.FC = () => {
       if (success) {
         alert(`Successfully purchased ${group.groupName} bundle!`);
       }
-    } catch (error) {
-      alert('Purchase failed. Please try again.');
+    } catch (error: any) {
+      console.error('Group purchase error:', error);
+      
+      // Handle authentication errors gracefully
+      if (error.message?.includes('Authentication required')) {
+        // Store the intended purchase and show auth modal
+        localStorage.setItem('pendingPurchase', JSON.stringify({
+          type: 'group',
+          id: group.groupType,
+          name: group.groupName
+        }));
+        setShowAuthModal(true);
+      } else {
+        // Show generic error for other issues
+        alert('Purchase failed. Please try again.');
+      }
     }
   };
 
@@ -1026,6 +1040,7 @@ const StoreScreen: React.FC = () => {
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)} 
         initialMode="signup"
+        context="purchase"
       />
 
       {/* Trial Success Modal */}
