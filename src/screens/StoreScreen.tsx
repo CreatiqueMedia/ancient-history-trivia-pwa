@@ -823,8 +823,13 @@ const StoreScreen: React.FC = () => {
                       </div>
                       
                       {/* Debug: Show bundle count */}
-                      <div className="text-center text-sm text-gray-500 mb-4">
-                        Found {bundles.length} bundles in this section
+                      <div className="text-center text-lg font-bold text-red-500 bg-yellow-200 p-4 mb-4 rounded">
+                        Found {bundles.length} bundles in this section: {bundles.map(b => b.name).join(', ')}
+                      </div>
+                      
+                      {/* Test: Simple visible card */}
+                      <div className="bg-red-500 text-white p-4 mb-4 rounded">
+                        TEST: This should be visible - {bundles.length} bundles found
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
