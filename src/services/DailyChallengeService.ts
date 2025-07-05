@@ -58,8 +58,8 @@ export class DailyChallengeService {
     const category = categories[seed % categories.length];
     const difficulty = this.getDifficultyForDate(seed);
 
-    // Select 5 questions for the daily challenge
-    const selectedQuestions = this.selectQuestionsForChallenge(category, difficulty, 5, seed);
+    // Select 10 questions for the daily challenge (max limit)
+    const selectedQuestions = this.selectQuestionsForChallenge(category, difficulty, 10, seed);
 
     const rewards: DailyChallengeReward[] = [
       {

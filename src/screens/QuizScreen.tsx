@@ -17,9 +17,17 @@ const QuizScreen: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentBundle, setCurrentBundle] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
-  // Memoize the quiz initialization to prevent re-renders
-  const initializeQuiz = useCallback(() => {
+  // Initialize quiz only once when component mounts or bundleId changes
+  useEffect(() => {
+    // Prevent re-initialization if already initialized for this bundleId
+    if (initialized && currentQuiz && questions.length > 0) {
+      return;
+    }
+
+    setIsLoading(true);
+    
     // Check if this is a sample quiz
     const urlParams = new URLSearchParams(window.location.search);
     const mode = urlParams.get('mode');
@@ -37,18 +45,7 @@ const QuizScreen: React.FC = () => {
       }
     }
     
-    // Prevent reinitialization if quiz is already loaded for this bundle
-    if (currentQuiz && questions.length > 0 && (
-      (sampleQuiz && bundleId === sampleQuiz.bundleId) ||
-      (!sampleQuiz && bundleId === currentBundle?.id)
-    )) {
-      setIsLoading(false);
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    // Load questions based on sample quiz, bundle, or use enhanced quiz generation
+    // Load questions based on sample quiz, bundle, daily challenge, or use enhanced quiz generation
     let quizQuestions: Question[];
     let bundle = null;
     
@@ -57,6 +54,35 @@ const QuizScreen: React.FC = () => {
       quizQuestions = sampleQuiz.questions;
       bundle = QUESTION_BUNDLES.find(b => b.id === sampleQuiz.bundleId);
       setCurrentBundle(bundle);
+    } else if (bundleId === 'daily-challenge') {
+      // Handle daily challenge
+      try {
+        const { DailyChallengeService } = require('../services/DailyChallengeService');
+        const dailyChallenge = DailyChallengeService.getTodaysChallenge();
+        
+        // Get the actual question objects from the daily challenge question IDs
+        const { sampleQuestions } = require('../data/questions');
+        quizQuestions = dailyChallenge.questions.map((questionId: string) => 
+          sampleQuestions.find((q: Question) => q.id === questionId)
+        ).filter(Boolean);
+        
+        // Create a virtual bundle for daily challenge display
+        bundle = {
+          id: 'daily-challenge',
+          name: dailyChallenge.theme,
+          description: `Daily Challenge - ${dailyChallenge.category}`,
+          themeColors: {
+            primary: '#f59e0b',
+            background: '#fef3c7'
+          }
+        };
+        setCurrentBundle(bundle);
+      } catch (error) {
+        console.error('Failed to load daily challenge:', error);
+        // Fallback to regular quiz with max 10 questions for daily challenge
+        quizQuestions = EnhancedQuizService.generateQuickQuiz(10);
+        setCurrentBundle(null);
+      }
     } else if (bundleId) {
       // Find the bundle for UI display
       bundle = QUESTION_BUNDLES.find(b => b.id === bundleId);
@@ -77,12 +103,9 @@ const QuizScreen: React.FC = () => {
     
     setQuestions(quizQuestions);
     startQuiz(quizQuestions);
+    setInitialized(true);
     setIsLoading(false);
-  }, [bundleId, currentQuiz, questions.length, currentBundle?.id, startQuiz]);
 
-  useEffect(() => {
-    initializeQuiz();
-    
     // Cleanup function to clear sample quiz data when leaving the quiz
     return () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -91,7 +114,7 @@ const QuizScreen: React.FC = () => {
         localStorage.removeItem('sampleQuiz');
       }
     };
-  }, [bundleId, initializeQuiz]);
+  }, [bundleId]); // Only depend on bundleId, not on startQuiz or other functions
 
   useEffect(() => {
     // Only run timer if there's a time limit set
