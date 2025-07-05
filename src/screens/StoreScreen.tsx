@@ -145,41 +145,13 @@ const StoreScreen: React.FC = () => {
   // Get authentication state
   const { user } = useAuth();
 
-  // Handle pending purchases after authentication and start trial action
+  // Handle start trial action from URL parameters (removed automatic pending purchase processing)
   useEffect(() => {
     const handlePendingActions = async () => {
       if (user) {
-        // Handle pending purchases
-        const pendingPurchaseStr = localStorage.getItem('pendingPurchase');
-        if (pendingPurchaseStr) {
-          try {
-            const pendingPurchase = JSON.parse(pendingPurchaseStr);
-            
-            // Clear the pending purchase first
-            localStorage.removeItem('pendingPurchase');
-            
-            // Process the pending purchase
-            if (pendingPurchase.type === 'bundle') {
-              const success = await purchaseBundle(pendingPurchase.id);
-              if (success) {
-                alert(`Successfully purchased ${pendingPurchase.name}!`);
-              }
-            } else if (pendingPurchase.type === 'subscription') {
-              const tier = SUBSCRIPTION_TIERS.find(t => t.id === pendingPurchase.id);
-              if (tier) {
-                const success = await subscribe('pro', tier.period);
-                if (success) {
-                  alert(`Successfully subscribed to ${pendingPurchase.name}!`);
-                }
-              }
-            } else if (pendingPurchase.type === 'group') {
-              // Handle group purchases if needed
-              console.log('Group purchase pending:', pendingPurchase);
-            }
-          } catch (error) {
-            console.error('Error processing pending purchase:', error);
-          }
-        }
+        // Clear any pending purchases without processing them
+        // User must manually click Purchase again after authentication
+        localStorage.removeItem('pendingPurchase');
 
         // Handle start trial action from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -217,7 +189,7 @@ const StoreScreen: React.FC = () => {
     };
 
     handlePendingActions();
-  }, [user, purchaseBundle, subscribe, navigate]);
+  }, [user, navigate]);
 
   // Get version information
   const currentBundles = QUESTION_BUNDLES.filter(bundle => bundle.isCurrentVersion !== false);
