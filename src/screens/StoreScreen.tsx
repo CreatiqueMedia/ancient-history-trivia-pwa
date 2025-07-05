@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   PlayIcon, 
@@ -271,8 +271,8 @@ const StoreScreen: React.FC = () => {
     return result;
   };
 
-  const bundleSections = organizeBundles();
-  const legacyBundleSections = organizeBundles(legacyBundles);
+  const bundleSections = useMemo(() => organizeBundles(), []);
+  const legacyBundleSections = useMemo(() => organizeBundles(legacyBundles), []);
 
   // Get icon component by name
   const getIconComponent = (iconName: string, className: string = "w-6 h-6") => {
@@ -325,19 +325,42 @@ const StoreScreen: React.FC = () => {
     console.log('🛒 Purchase button clicked for bundle:', bundle.name);
     console.log('👤 Current user state:', user ? 'authenticated' : 'not authenticated');
     console.log('🔐 User object:', user);
+    console.log('🎯 showAuthModal current state:', showAuthModal);
+    console.log('🔍 hasAccessToBundle result:', hasAccessToBundle(bundle.id));
     
-    if (hasAccessToBundle(bundle.id)) return;
+    // Early return if user already has access
+    if (hasAccessToBundle(bundle.id)) {
+      console.log('⚠️ User already has access to bundle, returning early');
+      return;
+    }
     
     // Check if user is authenticated
     if (!user) {
       console.log('🚫 User not authenticated, showing auth modal');
+      console.log('📦 Storing pending purchase:', { type: 'bundle', id: bundle.id, name: bundle.name });
+      
       // Store the intended purchase and show auth modal
       localStorage.setItem('pendingPurchase', JSON.stringify({
         type: 'bundle',
         id: bundle.id,
         name: bundle.name
       }));
+      
+      console.log('🎭 Setting showAuthModal to true...');
+      console.log('🎭 showAuthModal BEFORE setState:', showAuthModal);
       setShowAuthModal(true);
+      console.log('🎭 setShowAuthModal(true) called');
+      
+      // Add a small delay to ensure state update
+      setTimeout(() => {
+        console.log('🎭 showAuthModal state after timeout - should be true');
+        // Force re-render to ensure modal shows
+        setShowAuthModal(prev => {
+          console.log('🎭 showAuthModal in timeout callback:', prev);
+          return true;
+        });
+      }, 100);
+      
       return;
     }
     
@@ -357,6 +380,7 @@ const StoreScreen: React.FC = () => {
       
       // Handle authentication errors gracefully
       if (error.message?.includes('Authentication required')) {
+        console.log('🔐 Authentication error caught, showing auth modal');
         // Store the intended purchase and show auth modal
         localStorage.setItem('pendingPurchase', JSON.stringify({
           type: 'bundle',
@@ -575,7 +599,11 @@ const StoreScreen: React.FC = () => {
               </div>
             ) : (
               <button
-                onClick={() => handlePurchaseBundle(bundle)}
+                onClick={() => {
+                  console.log('🔥 BUTTON CLICKED! Bundle:', bundle.name);
+                  alert(`Button clicked for ${bundle.name}!`);
+                  handlePurchaseBundle(bundle);
+                }}
                 disabled={processingBundles.has(bundle.id)}
                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors"
               >
@@ -820,6 +848,7 @@ const StoreScreen: React.FC = () => {
                   return a.localeCompare(b);
                 })
                 .map(([sectionName, bundles]) => {
+                  console.log(`Rendering section: ${sectionName} with ${bundles.length} bundles`);
                   return bundles.length > 0 ? (
                     <div key={sectionName} className="space-y-6">
                       <div className="text-center">
@@ -830,10 +859,20 @@ const StoreScreen: React.FC = () => {
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {bundles.map(bundle => renderBundleCard(bundle))}
+                        {bundles.map(bundle => {
+                          console.log(`Rendering bundle card for: ${bundle.name}`);
+                          const card = renderBundleCard(bundle);
+                          console.log(`Card rendered:`, card ? 'SUCCESS' : 'FAILED');
+                          return card;
+                        })}
                       </div>
                     </div>
-                  ) : null;
+                  ) : (
+                    <div key={sectionName} className="bg-red-100 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                      <h3 className="font-semibold text-red-800 dark:text-red-200">Empty Section: {sectionName}</h3>
+                      <p className="text-sm text-red-700 dark:text-red-300">No bundles found for this section</p>
+                    </div>
+                  );
                 })}
             </div>
 

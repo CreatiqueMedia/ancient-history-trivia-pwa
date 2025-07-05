@@ -337,6 +337,11 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const hasAccessToBundle = (bundleId: string): boolean => {
+    // User must be authenticated to have access to any premium content
+    if (!user) {
+      return false;
+    }
+    
     // Check if user has an active trial (gives access to all bundles)
     if (TrialService.isInTrial()) {
       return true;
