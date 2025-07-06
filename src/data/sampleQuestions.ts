@@ -2193,6 +2193,423 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
       explanation: 'The Maya developed sophisticated calendar systems that were remarkably accurate and complex.',
       tags: ['maya', 'calendar', 'astronomy']
     }
+  ],
+
+  // All Bundle Packs - Mega Bundle Sample Quiz (33 questions from all bundles)
+  all_bundle_packs: [
+    // Rome (2 questions)
+    {
+      id: 'mega-rome-1',
+      question: 'What was the capital city of the Roman Empire?',
+      options: ['Athens', 'Rome', 'Alexandria', 'Constantinople'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Geography',
+      region: 'Rome',
+      period: 'Empire',
+      explanation: 'Rome was the capital and largest city of the Roman Empire.',
+      tags: ['capital', 'city', 'empire']
+    },
+    {
+      id: 'mega-rome-2',
+      question: 'Which Roman leader was assassinated on the Ides of March?',
+      options: ['Augustus', 'Julius Caesar', 'Mark Antony', 'Pompey'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Politics',
+      region: 'Rome',
+      period: 'Late Republic',
+      explanation: 'Julius Caesar was assassinated on March 15, 44 BCE by a group of senators.',
+      tags: ['caesar', 'assassination', 'ides']
+    },
+    // Egypt (2 questions)
+    {
+      id: 'mega-egypt-1',
+      question: 'What river was most important to ancient Egypt?',
+      options: ['Tigris', 'Euphrates', 'Nile', 'Jordan'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Geography',
+      region: 'Egypt',
+      period: 'All Periods',
+      explanation: 'The Nile River was the lifeblood of ancient Egypt, providing water and fertile soil.',
+      tags: ['nile', 'river', 'geography']
+    },
+    {
+      id: 'mega-egypt-2',
+      question: 'Which pharaoh built the Great Pyramid?',
+      options: ['Tutankhamun', 'Khufu', 'Ramesses II', 'Cleopatra'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Architecture',
+      region: 'Egypt',
+      period: 'Old Kingdom',
+      explanation: 'Khufu (also known as Cheops) commissioned the Great Pyramid around 2580 BCE.',
+      tags: ['khufu', 'pyramid', 'builder']
+    },
+    // Greece (2 questions)
+    {
+      id: 'mega-greece-1',
+      question: 'What city-state was known for its warriors?',
+      options: ['Athens', 'Sparta', 'Corinth', 'Thebes'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Military',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'Sparta was famous for its military culture and warrior society.',
+      tags: ['sparta', 'warriors', 'military']
+    },
+    {
+      id: 'mega-greece-2',
+      question: 'Who was the teacher of Alexander the Great?',
+      options: ['Socrates', 'Plato', 'Aristotle', 'Homer'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Philosophy',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'Aristotle tutored young Alexander in Macedonia.',
+      tags: ['aristotle', 'alexander', 'tutor']
+    },
+    // Mesopotamia (2 questions)
+    {
+      id: 'mega-mesopotamia-1',
+      question: 'Mesopotamia was located between which two rivers?',
+      options: ['Nile and Jordan', 'Tigris and Euphrates', 'Indus and Ganges', 'Yellow and Yangtze'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Geography',
+      region: 'Mesopotamia',
+      period: 'Bronze Age',
+      explanation: 'Mesopotamia means "between rivers" and refers to the land between the Tigris and Euphrates.',
+      tags: ['tigris', 'euphrates', 'rivers']
+    },
+    {
+      id: 'mega-mesopotamia-2',
+      question: 'Which king created the first known law code?',
+      options: ['Sargon', 'Hammurabi', 'Nebuchadnezzar', 'Gilgamesh'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Law',
+      region: 'Mesopotamia',
+      period: 'Bronze Age',
+      explanation: 'The Code of Hammurabi is one of the earliest and most complete legal documents.',
+      tags: ['hammurabi', 'law code', 'justice']
+    },
+    // China (2 questions)
+    {
+      id: 'mega-china-1',
+      question: 'What famous structure was built to protect China from invaders?',
+      options: ['Forbidden City', 'Great Wall', 'Terracotta Army', 'Summer Palace'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Architecture',
+      region: 'China',
+      period: 'Imperial',
+      explanation: 'The Great Wall of China was built to protect against northern invasions.',
+      tags: ['great wall', 'defense', 'protection']
+    },
+    {
+      id: 'mega-china-2',
+      question: 'Which dynasty unified China for the first time?',
+      options: ['Han Dynasty', 'Qin Dynasty', 'Tang Dynasty', 'Ming Dynasty'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Politics',
+      region: 'China',
+      period: 'Imperial',
+      explanation: 'The Qin Dynasty under Emperor Qin Shi Huang first unified China in 221 BCE.',
+      tags: ['qin', 'unification', 'dynasty']
+    },
+    // India (2 questions)
+    {
+      id: 'mega-india-1',
+      question: 'Which river was most important to ancient Indian civilization?',
+      options: ['Ganges', 'Indus', 'Brahmaputra', 'Yamuna'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Geography',
+      region: 'India',
+      period: 'Ancient',
+      explanation: 'The Indus River gave its name to the Indus Valley Civilization.',
+      tags: ['indus', 'river', 'civilization']
+    },
+    {
+      id: 'mega-india-2',
+      question: 'What religion was founded by Siddhartha Gautama?',
+      options: ['Hinduism', 'Buddhism', 'Jainism', 'Sikhism'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Religion',
+      region: 'India',
+      period: 'Ancient',
+      explanation: 'Siddhartha Gautama became the Buddha and founded Buddhism.',
+      tags: ['buddha', 'buddhism', 'siddhartha']
+    },
+    // Europe (2 questions)
+    {
+      id: 'mega-europe-1',
+      question: 'Which ancient Celtic priests were known for their knowledge of astronomy and law?',
+      options: ['Bards', 'Druids', 'Warriors', 'Chieftains'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Religion',
+      region: 'Europe',
+      period: 'Iron Age',
+      explanation: 'Druids were Celtic priests who served as judges, teachers, and astronomers in ancient Celtic society.',
+      tags: ['druids', 'celts', 'priests']
+    },
+    {
+      id: 'mega-europe-2',
+      question: 'What type of ships did the Vikings use for their voyages?',
+      options: ['Galleys', 'Longships', 'Caravels', 'Triremes'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Technology',
+      region: 'Scandinavia',
+      period: 'Viking Age',
+      explanation: 'Vikings used longships, which were fast, shallow-draft vessels perfect for both sea and river travel.',
+      tags: ['vikings', 'longships', 'technology']
+    },
+    // Americas (2 questions)
+    {
+      id: 'mega-americas-1',
+      question: 'Which ancient civilization built Machu Picchu?',
+      options: ['Maya', 'Aztec', 'Inca', 'Olmec'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Architecture',
+      region: 'South America',
+      period: 'Pre-Columbian',
+      explanation: 'The Inca Empire built Machu Picchu, a remarkable mountain citadel in modern-day Peru.',
+      tags: ['inca', 'machu picchu', 'peru']
+    },
+    {
+      id: 'mega-americas-2',
+      question: 'What type of writing system did the Maya develop?',
+      options: ['Alphabetic', 'Hieroglyphic', 'Cuneiform', 'Pictographic'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Writing Systems',
+      region: 'Mesoamerica',
+      period: 'Pre-Columbian',
+      explanation: 'The Maya developed a sophisticated hieroglyphic writing system with over 800 symbols.',
+      tags: ['maya', 'hieroglyphs', 'writing']
+    },
+    // Bronze Age (2 questions)
+    {
+      id: 'mega-bronze-1',
+      question: 'Which ancient Mesopotamian civilization built the first cities during the Bronze Age?',
+      options: ['Babylonians', 'Sumerians', 'Assyrians', 'Persians'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Civilization',
+      region: 'Mesopotamia',
+      period: 'Bronze Age',
+      explanation: 'The Sumerians built the first cities like Ur and Uruk around 3500-3000 BCE.',
+      tags: ['sumerians', 'cities', 'mesopotamia']
+    },
+    {
+      id: 'mega-bronze-2',
+      question: 'The Indus Valley Civilization was notable for which urban planning feature?',
+      options: ['Pyramids', 'Advanced drainage systems', 'Defensive walls', 'Temples'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Urban Planning',
+      region: 'India',
+      period: 'Bronze Age',
+      explanation: 'Harappa and Mohenjo-daro had sophisticated sewage and drainage systems.',
+      tags: ['indus valley', 'drainage', 'urban planning']
+    },
+    // Iron Age (2 questions)
+    {
+      id: 'mega-iron-1',
+      question: 'Which ancient Greek city-state was known for its powerful military during the Iron Age?',
+      options: ['Athens', 'Sparta', 'Corinth', 'Thebes'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Military',
+      region: 'Greece',
+      period: 'Iron Age',
+      explanation: 'Sparta was renowned for its disciplined military society and powerful warriors.',
+      tags: ['sparta', 'military', 'greece']
+    },
+    {
+      id: 'mega-iron-2',
+      question: 'The Phoenicians contributed which major innovation to world civilization?',
+      options: ['Democracy', 'The alphabet', 'Mathematics', 'Philosophy'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Writing Systems',
+      region: 'Levant',
+      period: 'Iron Age',
+      explanation: 'The Phoenician alphabet became the basis for Greek, Latin, and many modern alphabets.',
+      tags: ['phoenicians', 'alphabet', 'writing']
+    },
+    // Prehistoric (2 questions)
+    {
+      id: 'mega-prehistoric-1',
+      question: 'Where did modern humans (Homo sapiens) first evolve?',
+      options: ['Asia', 'Europe', 'Africa', 'Australia'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Human Evolution',
+      region: 'Africa',
+      period: 'Prehistoric',
+      explanation: 'Modern humans first evolved in Africa around 200,000-300,000 years ago.',
+      tags: ['homo sapiens', 'africa', 'evolution']
+    },
+    {
+      id: 'mega-prehistoric-2',
+      question: 'What major discovery changed human life during the Neolithic period?',
+      options: ['Fire', 'Agriculture', 'The wheel', 'Writing'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Technology',
+      region: 'Global',
+      period: 'Neolithic',
+      explanation: 'The development of agriculture (farming) revolutionized human society during the Neolithic period.',
+      tags: ['agriculture', 'neolithic', 'farming']
+    },
+    // Easy Pack (2 questions)
+    {
+      id: 'mega-easy-1',
+      question: 'What did early humans use to make fire?',
+      options: ['Matches', 'Flint stones', 'Candles', 'Electricity'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Technology',
+      region: 'Global',
+      period: 'Prehistoric',
+      explanation: 'Early humans learned to make fire by striking flint stones together to create sparks.',
+      tags: ['fire', 'flint', 'prehistoric']
+    },
+    {
+      id: 'mega-easy-2',
+      question: 'Ancient Greece was famous for its:',
+      options: ['Pyramids', 'Great Wall', 'Olympic Games', 'Hanging Gardens'],
+      correctAnswer: 2,
+      difficulty: 'easy',
+      category: 'Culture',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'The Olympic Games began in ancient Greece and were held every four years.',
+      tags: ['olympics', 'greece', 'games']
+    },
+    // Medium Pack (2 questions)
+    {
+      id: 'mega-medium-1',
+      question: 'The Neolithic Revolution marked the transition from hunting-gathering to:',
+      options: ['Metalworking', 'Agriculture', 'Writing', 'City-building'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Revolution',
+      region: 'Global',
+      period: 'Neolithic',
+      explanation: 'The Neolithic Revolution was the transition from nomadic hunting-gathering to settled agriculture.',
+      tags: ['neolithic', 'agriculture', 'revolution']
+    },
+    {
+      id: 'mega-medium-2',
+      question: 'Which Bronze Age civilization developed Linear B script?',
+      options: ['Egyptians', 'Mycenaeans', 'Hittites', 'Babylonians'],
+      correctAnswer: 1,
+      difficulty: 'medium',
+      category: 'Writing',
+      region: 'Greece',
+      period: 'Bronze Age',
+      explanation: 'The Mycenaean civilization used Linear B script, an early form of Greek writing.',
+      tags: ['linear b', 'mycenaeans', 'writing']
+    },
+    // Hard Pack (2 questions)
+    {
+      id: 'mega-hard-1',
+      question: 'The Aurignacian culture is associated with which major prehistoric development?',
+      options: ['First agriculture', 'Earliest modern human art in Europe', 'Bronze working', 'Urban civilization'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Culture',
+      region: 'Europe',
+      period: 'Prehistoric',
+      explanation: 'The Aurignacian culture (43,000-28,000 years ago) produced the earliest modern human art in Europe.',
+      tags: ['aurignacian', 'prehistoric art', 'modern humans']
+    },
+    {
+      id: 'mega-hard-2',
+      question: 'The Nebra sky disc represents advanced Bronze Age knowledge of:',
+      options: ['Metallurgy techniques', 'Astronomical observations', 'Trade networks', 'Military strategy'],
+      correctAnswer: 1,
+      difficulty: 'hard',
+      category: 'Astronomy',
+      region: 'Europe',
+      period: 'Bronze Age',
+      explanation: 'The Nebra sky disc shows sophisticated Bronze Age understanding of celestial movements.',
+      tags: ['nebra disc', 'astronomy', 'bronze age']
+    },
+    // Multiple Choice Pack (2 questions)
+    {
+      id: 'mega-mc-1',
+      question: 'Which river valley civilization is known as the "cradle of civilization"?',
+      options: ['Nile Valley', 'Mesopotamia', 'Indus Valley', 'Yellow River'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Civilization',
+      region: 'Mesopotamia',
+      period: 'Classical',
+      explanation: 'Mesopotamia, between the Tigris and Euphrates rivers, is often called the cradle of civilization.',
+      tags: ['mesopotamia', 'civilization', 'rivers']
+    },
+    {
+      id: 'mega-mc-2',
+      question: 'The ancient Egyptian practice of mummification was primarily for:',
+      options: ['Medical research', 'Religious beliefs', 'Artistic expression', 'Trade purposes'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Religion',
+      region: 'Egypt',
+      period: 'Classical',
+      explanation: 'Mummification was done to preserve the body for the afterlife, reflecting Egyptian religious beliefs.',
+      tags: ['mummification', 'religion', 'afterlife']
+    },
+    // True/False Pack (2 questions)
+    {
+      id: 'mega-tf-1',
+      question: 'The Great Wall of China was built entirely during the Ming Dynasty.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Architecture',
+      region: 'China',
+      period: 'Classical',
+      explanation: 'False. While the Ming Dynasty rebuilt and extended much of the Great Wall, construction began during earlier dynasties, including the Qin.',
+      tags: ['great wall', 'ming dynasty', 'construction']
+    },
+    {
+      id: 'mega-tf-2',
+      question: 'Ancient Sparta had a democratic government similar to Athens.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Politics',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'False. Sparta had a dual monarchy and military-focused oligarchy, very different from Athenian democracy.',
+      tags: ['sparta', 'government', 'democracy']
+    },
+    // Fill-in-the-Blank Pack (1 question to reach 33 total)
+    {
+      id: 'mega-fib-1',
+      question: 'The ancient wonder of the world, the Colossus of _____, was a giant statue located on a Greek island.',
+      options: ['Rhodes', 'Crete', 'Cyprus', 'Delos'],
+      correctAnswer: 0,
+      difficulty: 'medium',
+      category: 'Architecture',
+      region: 'Greece',
+      period: 'Classical',
+      explanation: 'The Colossus of Rhodes was a giant statue of the god Helios erected on the Greek island of Rhodes.',
+      tags: ['colossus', 'rhodes', 'wonder']
+    }
   ]
 };
 

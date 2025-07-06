@@ -6,6 +6,7 @@ export const PRICING = {
   pack: 2.99,
   groupDiscount: 0.8, // 20% off
   allDiscount: 0.7,   // 30% off
+  allBundleDiscount: 0.6, // 40% off for the mega bundle
   subscription: {
     pro: {
       monthly: 4.99,
@@ -578,8 +579,44 @@ const RAW_BUNDLES = [
   }
 ];
 
+// Create the mega bundle after RAW_BUNDLES is defined
+const MEGA_BUNDLE = {
+  id: 'all_bundle_packs',
+  name: 'All Bundle Packs',
+  description: 'The ultimate collection! Get all 17 question bundles in one mega pack. 1,700 questions covering every region, age, format, and difficulty. Complete your ancient history mastery!',
+  category: 'mega',
+  subcategory: 'Complete Collection',
+  price: PRICING.pack * 17 * PRICING.allBundleDiscount, // 40% off all bundles
+  questionCount: 1700, // 17 bundles × 100 questions each
+  questions: [],
+  isPremium: true,
+  isOwned: false,
+  difficulty: 'mixed',
+  difficultyBreakdown: {
+    easy: 425,   // 17 × 25
+    medium: 850, // 17 × 50  
+    hard: 425    // 17 × 25
+  },
+  format: 'Mixed',
+  releaseDate: '2025-05-02',
+  version: 'v1',
+  isCurrentVersion: true,
+  bpType: 'MegaPackType',
+  iconName: 'sparkles', // Premium sparkles icon
+  themeColors: {
+    primary: '#B45309', // Metallic copper color
+    background: 'linear-gradient(135deg, #B45309 0%, #D97706 50%, #F59E0B 100%)', // Copper gradient
+    text: '#FFFFFF'
+  },
+  isMegaBundle: true, // Special flag for mega bundle
+  includedBundles: RAW_BUNDLES.map((b: any) => b.id) // All other bundle IDs
+};
+
+// Combine all bundles
+const ALL_RAW_BUNDLES = [...RAW_BUNDLES, MEGA_BUNDLE];
+
 // Export bundles with required properties added
-export const QUESTION_BUNDLES: QuestionBundle[] = RAW_BUNDLES.map((bundle, index) => {
+export const QUESTION_BUNDLES: QuestionBundle[] = ALL_RAW_BUNDLES.map((bundle: any, index: number) => {
   const sampleQuestions = getSampleQuestionsForBundle(bundle.id);
   // Create numeric IDs for sample questions (starting from bundle index * 100)
   const baseId = (index + 1) * 100;

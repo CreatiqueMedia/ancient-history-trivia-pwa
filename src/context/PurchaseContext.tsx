@@ -36,6 +36,8 @@ interface PurchaseContextType {
   isPremiumUser: boolean;
   closePaymentModal: () => void;
   handlePaymentSuccess: () => void;
+  calculateLoyaltyDiscount: () => { discount: number; message: string };
+  getDiscountedSubscriptionPrice: (originalPrice: number) => { price: number; discount: number; message: string };
 }
 
 const PurchaseContext = createContext<PurchaseContextType | undefined>(undefined);
@@ -378,8 +380,45 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     }
     
+    // Check if user owns the All Bundle Pack (gives access to all individual bundles)
+    if (ownedBundles.includes('all_bundle_packs')) {
+      return true;
+    }
+    
     // Check if bundle is individually owned
     return ownedBundles.includes(bundleId);
+  };
+
+  // Calculate loyalty discount for subscription based on previous purchases
+  const calculateLoyaltyDiscount = (): { discount: number; message: string } => {
+    if (!user) return { discount: 0, message: '' };
+    
+    const purchaseHistory = JSON.parse(localStorage.getItem('purchaseHistory') || '[]');
+    const bundlePurchases = purchaseHistory.filter((p: any) => p.type === 'bundle');
+    const totalSpent = bundlePurchases.reduce((sum: number, p: any) => sum + (p.amount || 0), 0);
+    
+    if (totalSpent >= 50) {
+      return { discount: 0.25, message: 'Loyal Customer: 25% off subscription!' };
+    } else if (totalSpent >= 30) {
+      return { discount: 0.20, message: 'Valued Customer: 20% off subscription!' };
+    } else if (totalSpent >= 15) {
+      return { discount: 0.15, message: 'Thank You: 15% off subscription!' };
+    } else if (totalSpent >= 5) {
+      return { discount: 0.10, message: 'Welcome Back: 10% off subscription!' };
+    }
+    
+    return { discount: 0, message: '' };
+  };
+
+  // Get discounted subscription price
+  const getDiscountedSubscriptionPrice = (originalPrice: number): { price: number; discount: number; message: string } => {
+    const loyalty = calculateLoyaltyDiscount();
+    const discountedPrice = originalPrice * (1 - loyalty.discount);
+    return {
+      price: discountedPrice,
+      discount: loyalty.discount,
+      message: loyalty.message
+    };
   };
 
   const isPremiumUser = (() => {
@@ -413,7 +452,9 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     hasAccessToBundle,
     isPremiumUser,
     closePaymentModal,
-    handlePaymentSuccess
+    handlePaymentSuccess,
+    calculateLoyaltyDiscount,
+    getDiscountedSubscriptionPrice
   };
 
   return (

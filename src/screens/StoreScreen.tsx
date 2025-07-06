@@ -75,10 +75,10 @@ const StoreScreen: React.FC = () => {
   const navigate = useNavigate();
   
   // Function to get purchase date from localStorage
-  const getPurchaseDate = (bundleId: string): string => {
+  const getPurchaseDate = (bundleId: string): string | null => {
     try {
       const purchaseHistoryStr = localStorage.getItem('purchaseHistory');
-      if (!purchaseHistoryStr) return 'Unknown';
+      if (!purchaseHistoryStr) return null;
       
       const purchaseHistory = JSON.parse(purchaseHistoryStr);
       const bundlePurchase = purchaseHistory.find((purchase: any) => 
@@ -89,10 +89,10 @@ const StoreScreen: React.FC = () => {
         return new Date(bundlePurchase.date).toLocaleDateString();
       }
       
-      return 'Unknown';
+      return null;
     } catch (error) {
       console.error('Error getting purchase date:', error);
-      return 'Unknown';
+      return null;
     }
   };
   
@@ -117,7 +117,7 @@ const StoreScreen: React.FC = () => {
   const [showTrialSuccessModal, setShowTrialSuccessModal] = useState(false);
   const [trialDaysRemaining, setTrialDaysRemaining] = useState(3);
 
-  // Listen for custom event to set active tab (keeping for backward compatibility)
+  // Listen for custom events (keeping for backward compatibility)
   useEffect(() => {
     const handleSetStoreTab = (event: CustomEvent) => {
       if (event.detail === 'subscription') {
@@ -125,10 +125,20 @@ const StoreScreen: React.FC = () => {
       }
     };
 
+    const handleShowAuthModal = (event: CustomEvent) => {
+      console.log('🎭 Custom showAuthModal event received:', event.detail);
+      if (event.detail?.context === 'trial') {
+        console.log('🎭 Showing auth modal for trial context');
+        setShowAuthModal(true);
+      }
+    };
+
     window.addEventListener('setStoreTab', handleSetStoreTab as EventListener);
+    window.addEventListener('showAuthModal', handleShowAuthModal as EventListener);
     
     return () => {
       window.removeEventListener('setStoreTab', handleSetStoreTab as EventListener);
+      window.removeEventListener('showAuthModal', handleShowAuthModal as EventListener);
     };
   }, []);
   
@@ -141,61 +151,160 @@ const StoreScreen: React.FC = () => {
     isProcessing,
     subscriptionTier,
     subscriptionPeriod,
-    subscriptionExpiry
+    subscriptionExpiry,
+    calculateLoyaltyDiscount,
+    getDiscountedSubscriptionPrice
   } = usePurchase();
 
   // Get authentication state
   const { user } = useAuth();
 
-  // Handle start trial action from URL parameters (removed automatic pending purchase processing)
+  // Handle start trial action from URL parameters - IMMEDIATE response
   useEffect(() => {
-    const handlePendingActions = async () => {
-      if (user) {
-        // Clear any pending purchases without processing them
-        // User must manually click Purchase again after authentication
-        localStorage.removeItem('pendingPurchase');
-
-        // Handle start trial action from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const action = urlParams.get('action');
+    console.log('🔍 StoreScreen useEffect triggered - checking URL params');
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    console.log('🔍 URL action parameter:', action);
+    console.log('🔍 Current user state:', user ? 'authenticated' : 'not authenticated');
+    console.log('🔍 Current showAuthModal state:', showAuthModal);
+    
+    if (action === 'start_trial') {
+      console.log('🎯 START_TRIAL action detected!');
+      
+      // Clear the action parameter from URL immediately
+      const newUrl = window.location.pathname + window.location.search.replace(/[?&]action=start_trial/, '');
+      window.history.replaceState({}, '', newUrl);
+      console.log('🔗 URL cleared, new URL:', newUrl);
+      
+      if (!user) {
+        // User not authenticated - show auth modal IMMEDIATELY
+        console.log('🔐 User not authenticated for trial, showing auth modal immediately');
+        console.log('📦 Storing pending purchase...');
+        localStorage.setItem('pendingPurchase', JSON.stringify({
+          type: 'trial',
+          action: 'start_trial'
+        }));
         
-        if (action === 'start_trial') {
-          // Check if user is eligible for trial
-          if (TrialService.isEligibleForTrial(user.uid)) {
-            try {
-              // Start the free trial
-              const trialStatus = TrialService.startTrial(user.uid);
+        console.log('🎭 Setting showAuthModal to TRUE...');
+        setShowAuthModal(true);
+        console.log('🎭 setShowAuthModal(true) called successfully');
+        
+        // Force immediate re-render to ensure modal shows
+        setTimeout(() => {
+          console.log('🎭 Timeout callback - forcing modal state check');
+          setShowAuthModal(prev => {
+            console.log('🎭 Modal state in timeout:', prev);
+            return true;
+          });
+        }, 0);
+      } else {
+        // User is authenticated - proceed with trial
+        console.log('✅ User authenticated, proceeding with trial start');
+        handleAuthenticatedTrialStart();
+      }
+    } else {
+      console.log('🔍 No start_trial action found in URL');
+    }
+  }, [user]);
+
+  // Separate function for handling authenticated trial start
+  const handleAuthenticatedTrialStart = async () => {
+    if (!user) return;
+    
+    if (TrialService.isEligibleForTrial(user.uid)) {
+      try {
+        // Start the free trial
+        const trialStatus = await TrialService.startTrial(user.uid);
+        
+        // Set trial data and show custom modal
+        setTrialDaysRemaining(trialStatus.daysRemaining);
+        setShowTrialSuccessModal(true);
+        
+      } catch (error) {
+        console.error('Error starting trial:', error);
+        alert('Sorry, there was an error starting your free trial. Please try again.');
+      }
+    } else {
+      // User already had a trial - but allow developer to bypass this
+      if (user.email === 'ron@theawakenedhybrid.com') {
+        // Developer override - allow unlimited trials
+        try {
+          const trialStatus = await TrialService.startTrial(user.uid);
+          setTrialDaysRemaining(trialStatus.daysRemaining);
+          setShowTrialSuccessModal(true);
+        } catch (error) {
+          console.error('Error starting developer trial:', error);
+          alert('Sorry, there was an error starting your free trial. Please try again.');
+        }
+      } else {
+        alert('You have already used your free trial. Please choose a subscription plan to continue.');
+      }
+    }
+  };
+  // Handle authentication success and process pending trial
+  useEffect(() => {
+    const processPendingTrial = async () => {
+      if (user) {
+        const pendingPurchase = localStorage.getItem('pendingPurchase');
+        if (pendingPurchase) {
+          try {
+            const parsed = JSON.parse(pendingPurchase);
+            if (parsed.type === 'trial' && parsed.action === 'start_trial') {
+              console.log('🎯 Processing pending trial after authentication');
               
-              // Set trial data and show custom modal
-              setTrialDaysRemaining(trialStatus.daysRemaining);
-              setShowTrialSuccessModal(true);
-              
-              // Clear the action parameter from URL
-              const newUrl = window.location.pathname + window.location.search.replace(/[?&]action=start_trial/, '');
-              window.history.replaceState({}, '', newUrl);
-              
-            } catch (error) {
-              console.error('Error starting trial:', error);
-              alert('Sorry, there was an error starting your free trial. Please try again.');
+              // Check if user is eligible for trial
+              if (TrialService.isEligibleForTrial(user.uid)) {
+                try {
+                  // Start the free trial
+                  const trialStatus = await TrialService.startTrial(user.uid);
+                  
+                  // Set trial data and show custom modal
+                  setTrialDaysRemaining(trialStatus.daysRemaining);
+                  setShowTrialSuccessModal(true);
+                  
+                  // Clear pending purchase
+                  localStorage.removeItem('pendingPurchase');
+                  
+                } catch (error) {
+                  console.error('Error starting trial after auth:', error);
+                  alert('Sorry, there was an error starting your free trial. Please try again.');
+                  localStorage.removeItem('pendingPurchase');
+                }
+              } else {
+                // User already had a trial - but allow developer to bypass this
+                if (user.email === 'ron@theawakenedhybrid.com') {
+                  // Developer override - allow unlimited trials
+                  try {
+                    const trialStatus = await TrialService.startTrial(user.uid);
+                    setTrialDaysRemaining(trialStatus.daysRemaining);
+                    setShowTrialSuccessModal(true);
+                    localStorage.removeItem('pendingPurchase');
+                  } catch (error) {
+                    console.error('Error starting developer trial after auth:', error);
+                    alert('Sorry, there was an error starting your free trial. Please try again.');
+                    localStorage.removeItem('pendingPurchase');
+                  }
+                } else {
+                  alert('You have already used your free trial. Please choose a subscription plan to continue.');
+                  localStorage.removeItem('pendingPurchase');
+                }
+              }
             }
-          } else {
-            // User already had a trial
-            alert('You have already used your free trial. Please choose a subscription plan to continue.');
-            
-            // Clear the action parameter from URL
-            const newUrl = window.location.pathname + window.location.search.replace(/[?&]action=start_trial/, '');
-            window.history.replaceState({}, '', newUrl);
+          } catch (error) {
+            console.error('Error parsing pending purchase:', error);
+            localStorage.removeItem('pendingPurchase');
           }
         }
       }
     };
 
-    handlePendingActions();
-  }, [user, navigate]);
+    processPendingTrial();
+  }, [user]);
 
   // Get version information
-  const currentBundles = QUESTION_BUNDLES.filter(bundle => bundle.isCurrentVersion !== false);
+  const currentBundles = QUESTION_BUNDLES.filter(bundle => bundle.isCurrentVersion !== false && !bundle.isMegaBundle);
   const legacyBundles = QUESTION_BUNDLES.filter(bundle => bundle.isCurrentVersion === false);
+  const megaBundle = QUESTION_BUNDLES.find(bundle => bundle.isMegaBundle);
 
   // Handle sample quiz
   const handleSampleQuiz = (bundle: QuestionBundle) => {
@@ -594,13 +703,21 @@ const StoreScreen: React.FC = () => {
                   <span>Start Full Quiz</span>
                 </Link>
                 {isOwned ? (
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    Purchased: {getPurchaseDate(bundle.id)}
-                  </span>
+                  getPurchaseDate(bundle.id) && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      Purchased: {getPurchaseDate(bundle.id)}
+                    </span>
+                  )
                 ) : isPremiumUser ? (
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    Access via {subscriptionTier === 'pro' ? 'Pro' : 'Premium'} plan
-                  </span>
+                  TrialService.isInTrial() ? (
+                    <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                      Access via 3-Day Trial ({TrialService.getTrialStatus()?.daysRemaining || 0} days left)
+                    </span>
+                  ) : (
+                    <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                      Access via {subscriptionTier === 'pro' ? 'Pro' : 'Premium'} Subscription
+                    </span>
+                  )
                 ) : null}
               </div>
             ) : (
@@ -624,7 +741,7 @@ const StoreScreen: React.FC = () => {
     const allOwned = ownedCount === group.bundles.length;
 
     return (
-      <div key={group.groupType} className="bg-gradient-to-r from-purple-500 to-blue-600 rounded-lg p-6 text-white mb-6">
+      <div key={group.groupType} className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-lg p-6 text-white mb-6 shadow-md border border-emerald-500/20">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-2xl font-bold mb-2">{group.groupName} Bundle</h3>
@@ -654,6 +771,177 @@ const StoreScreen: React.FC = () => {
               {isProcessing ? 'Processing...' : `Buy Bundle (${ownedCount}/${group.bundles.length} owned)`}
             </button>
           )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderMegaBundleCard = (bundle: QuestionBundle) => {
+    const isOwned = hasAccessToBundle(bundle.id);
+    const canAccess = user && (isOwned || isPremiumUser);
+    const originalPrice = 17 * 2.99; // 17 bundles × $2.99 each
+    const savings = originalPrice - bundle.price;
+
+    return (
+      <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+        {/* Metallic Copper Gradient Background */}
+        <div 
+          className="p-8 text-white relative"
+          style={{ 
+            background: 'linear-gradient(135deg, #B45309 0%, #D97706 50%, #F59E0B 100%)',
+            boxShadow: '0 25px 50px -12px rgba(180, 83, 9, 0.25)'
+          }}
+        >
+          {/* Sparkle Effects */}
+          <div className="absolute inset-0 opacity-20">
+            <SparklesIcon className="absolute top-4 right-4 w-6 h-6 animate-pulse" />
+            <SparklesIcon className="absolute top-12 left-8 w-4 h-4 animate-pulse delay-300" />
+            <SparklesIcon className="absolute bottom-8 right-12 w-5 h-5 animate-pulse delay-700" />
+          </div>
+
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <div className="bg-white/20 rounded-full p-4">
+                  <SparklesIcon className="w-12 h-12" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold mb-2">{bundle.name}</h3>
+                  <p className="text-xl opacity-90">{bundle.subcategory}</p>
+                  <div className="flex items-center space-x-3 mt-2">
+                    <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
+                      {bundle.version}
+                    </span>
+                    <span className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">
+                      40% OFF
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {canAccess && (
+                <div className="bg-green-500 rounded-full p-3">
+                  <CheckCircleIcon className="w-8 h-8 text-white" />
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Left Column - Description & Features */}
+              <div>
+                <p className="text-lg mb-6 opacity-95">
+                  {bundle.description}
+                </p>
+
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircleIcon className="w-6 h-6 text-green-300" />
+                    <span className="text-lg">All 17 Question Bundles Included</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircleIcon className="w-6 h-6 text-green-300" />
+                    <span className="text-lg">{bundle.questionCount.toLocaleString()} Total Questions</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircleIcon className="w-6 h-6 text-green-300" />
+                    <span className="text-lg">Every Region, Age & Format</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircleIcon className="w-6 h-6 text-green-300" />
+                    <span className="text-lg">Complete Ancient History Mastery</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column - Pricing & Action */}
+              <div className="flex flex-col justify-center">
+                <div className="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+                  <div className="text-center mb-6">
+                    <div className="text-sm opacity-75 line-through mb-2">
+                      Regular Price: ${originalPrice.toFixed(2)}
+                    </div>
+                    <div className="text-4xl font-bold mb-2">
+                      ${bundle.price.toFixed(2)}
+                    </div>
+                    <div className="text-lg font-semibold text-green-300">
+                      Save ${savings.toFixed(2)}!
+                    </div>
+                  </div>
+
+                  {/* Sample Quiz Button */}
+                  <div className="mb-4">
+                    <button
+                      onClick={() => handleSampleQuiz(bundle)}
+                      className="w-full bg-white/20 hover:bg-white/30 text-white px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-center space-x-2 transition-colors border border-white/30"
+                    >
+                      <FlaskIcon className="w-5 h-5" />
+                      <span>Try Sample Quiz (33 Questions)</span>
+                    </button>
+                  </div>
+
+                  {/* Main Action Button */}
+                  {canAccess ? (
+                    <div className="space-y-3">
+                      <Link 
+                        to="/quiz" 
+                        state={{ bundleId: bundle.id }}
+                        className="w-full bg-white text-orange-600 px-6 py-4 rounded-lg text-lg font-bold flex items-center justify-center space-x-3 transition-colors hover:bg-gray-100 shadow-lg"
+                      >
+                        <PlayIcon className="w-6 h-6" />
+                        <span>Access All Quizzes</span>
+                      </Link>
+                      {isOwned ? (
+                        getPurchaseDate(bundle.id) && (
+                          <p className="text-center text-sm opacity-75">
+                            Purchased: {getPurchaseDate(bundle.id)}
+                          </p>
+                        )
+                      ) : isPremiumUser ? (
+                        TrialService.isInTrial() ? (
+                          <p className="text-center text-sm text-blue-300 font-medium">
+                            Access via 3-Day Trial ({TrialService.getTrialStatus()?.daysRemaining || 0} days left)
+                          </p>
+                        ) : (
+                          <p className="text-center text-sm text-green-300 font-medium">
+                            Access via {subscriptionTier === 'pro' ? 'Pro' : 'Premium'} Subscription
+                          </p>
+                        )
+                      ) : null}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handlePurchaseBundle(bundle)}
+                      disabled={processingBundles.has(bundle.id)}
+                      className="w-full bg-white text-orange-600 px-6 py-4 rounded-lg text-lg font-bold flex items-center justify-center space-x-3 transition-colors hover:bg-gray-100 disabled:bg-gray-300 shadow-lg"
+                    >
+                      <ShoppingCartIcon className="w-6 h-6" />
+                      <span>{processingBundles.has(bundle.id) ? 'Processing...' : 'Get Everything Now'}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Included Bundles Preview */}
+            <div className="mt-8 pt-6 border-t border-white/20">
+              <h4 className="text-xl font-bold mb-4 text-center">
+                🎯 What's Included: All 17 Premium Bundles
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                {currentBundles.slice(0, 16).map((includedBundle, index) => (
+                  <div key={includedBundle.id} className="bg-white/10 rounded-lg p-2 text-center">
+                    <div className="font-medium">{includedBundle.name.replace(' Pack', '')}</div>
+                    <div className="text-xs opacity-75">{includedBundle.questionCount} questions</div>
+                  </div>
+                ))}
+                {currentBundles.length > 16 && (
+                  <div className="bg-white/10 rounded-lg p-2 text-center">
+                    <div className="font-medium">+ More</div>
+                    <div className="text-xs opacity-75">Complete collection</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -712,9 +1000,18 @@ const StoreScreen: React.FC = () => {
         </ul>
 
         {tier.id === 'free' ? (
-          <div className="w-full mt-6 py-3 px-4 rounded-lg font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-center">
-            {!user ? 'Sign up to get started' : isCurrentTier ? 'Current Plan' : 'Your Current Plan'}
-          </div>
+          !user ? (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="w-full mt-6 py-3 px-4 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+            >
+              Sign Up to Get Started
+            </button>
+          ) : (
+            <div className="w-full mt-6 py-3 px-4 rounded-lg font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-center">
+              {isCurrentTier ? 'Current Plan' : 'Your Current Plan'}
+            </div>
+          )
         ) : (
           <button
             onClick={() => handleSubscribe(tier)}
@@ -852,6 +1149,21 @@ const StoreScreen: React.FC = () => {
               <TrialBanner className="mb-6" />
               <ManageSubscription className="mb-6" />
             </div>
+
+            {/* Featured Mega Bundle */}
+            {megaBundle && (
+              <div className="mb-12">
+                <div className="text-center mb-6">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    🏆 Ultimate Collection
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Get everything in one premium mega bundle
+                  </p>
+                </div>
+                {renderMegaBundleCard(megaBundle)}
+              </div>
+            )}
 
             {/* Organized Bundle Sections */}
             <div className="space-y-12">
@@ -1180,7 +1492,8 @@ const StoreScreen: React.FC = () => {
         daysRemaining={trialDaysRemaining}
         onStartExploring={() => {
           setShowTrialSuccessModal(false);
-          navigate('/');
+          // Stay on store page so users can immediately access Full Quiz Mode
+          // No navigation needed - they're already on the store
         }}
       />
     </div>

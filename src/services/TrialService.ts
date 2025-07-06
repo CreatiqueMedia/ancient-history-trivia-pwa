@@ -1,6 +1,8 @@
 import { TrialStatus } from '../types/enhancements';
 import { analyticsService } from './AnalyticsService';
 import { notificationService } from './NotificationService';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 /**
  * Service for managing free trial periods and conversion tracking
@@ -13,7 +15,7 @@ export class TrialService {
   /**
    * Start a free trial for a new user
    */
-  static startTrial(userId: string): TrialStatus {
+  static async startTrial(userId: string): Promise<TrialStatus> {
     const now = new Date();
     const endDate = new Date(now.getTime() + (this.TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000));
 
@@ -26,7 +28,7 @@ export class TrialService {
       conversionOffered: false
     };
 
-    this.storeTrialStatus(trialStatus);
+    await this.storeTrialStatusToFirestore(userId, trialStatus);
 
     // Track trial start
     analyticsService.trackFeatureUsage('trial_started', `${userId}_${now.toISOString()}`);
@@ -362,6 +364,70 @@ export class TrialService {
   }
 
   /**
+   * Store trial status to Firestore
+   */
+  private static async storeTrialStatusToFirestore(userId: string, trialStatus: TrialStatus): Promise<void> {
+    // Always store in localStorage first for immediate access
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(trialStatus));
+    
+    try {
+      // Only attempt Firestore if we're not in localhost development
+      if (window.location.hostname !== 'localhost') {
+        const trialDoc = doc(db, 'trials', userId);
+        await setDoc(trialDoc, {
+          ...trialStatus,
+          startDate: trialStatus.startDate.toISOString(),
+          endDate: trialStatus.endDate.toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        console.log('Trial status saved to Firestore successfully');
+      } else {
+        console.log('Development mode: Trial status saved to localStorage only');
+      }
+    } catch (error) {
+      console.warn('Firestore unavailable, using localStorage only:', error);
+    }
+  }
+
+  /**
+   * Get trial status from Firestore
+   */
+  static async getTrialStatusFromFirestore(userId: string): Promise<TrialStatus | null> {
+    try {
+      const trialDoc = doc(db, 'trials', userId);
+      const docSnap = await getDoc(trialDoc);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const trialStatus: TrialStatus = {
+          isActive: data.isActive,
+          startDate: new Date(data.startDate),
+          endDate: new Date(data.endDate),
+          daysRemaining: this.calculateDaysRemaining(new Date(data.endDate)),
+          accessedBundles: data.accessedBundles || [],
+          conversionOffered: data.conversionOffered || false
+        };
+        
+        // Update days remaining and check if expired
+        if (trialStatus.daysRemaining <= 0) {
+          trialStatus.isActive = false;
+        }
+        
+        // Store in localStorage for offline access
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(trialStatus));
+        
+        return trialStatus;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error getting trial status from Firestore:', error);
+      // Fallback to localStorage
+      return this.getTrialStatus();
+    }
+  }
+
+  /**
    * Store trial status to localStorage
    */
   private static storeTrialStatus(trialStatus: TrialStatus): void {
@@ -401,6 +467,11 @@ export class TrialService {
   static isEligibleForTrial(userId: string): boolean {
     // If no userId provided, user is not eligible
     if (!userId) return false;
+    
+    // Developer override - always allow trials for developer account
+    if (userId === 'ron@theawakenedhybrid.com') {
+      return true;
+    }
     
     // In a real app, this would check against a backend database
     // For now, we'll check if there's any trial data in localStorage

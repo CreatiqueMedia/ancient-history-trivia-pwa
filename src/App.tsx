@@ -32,6 +32,7 @@ import { notificationService } from './services/NotificationService';
 import { errorHandler } from './services/ErrorHandlingService';
 import { QuestionService } from './services/QuestionService';
 import ErrorBoundary from './components/ErrorBoundary';
+import FirestoreInitializer from './components/FirestoreInitializer';
 
 // AppContent component to handle auth loading state
 const AppContent = () => {
@@ -146,6 +147,9 @@ const AppContent = () => {
         {/* Specific route for auth handlers only */}
         <Route path="/__/auth/*" element={<HomeScreen />} />
       </Routes>
+      
+      {/* Firestore Initializer - only runs in development */}
+      <FirestoreInitializer />
     </Layout>
   );
 };

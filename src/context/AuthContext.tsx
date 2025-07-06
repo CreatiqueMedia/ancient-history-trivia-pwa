@@ -323,8 +323,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setError(null);
       await signOut(auth);
       
-      // Clear all user data from localStorage
-      TrialService.clearAllUserData();
+      // Clear user profile and purchase data, but preserve trial data
+      if (user) {
+        localStorage.removeItem(`userProfile_${user.uid}`);
+        localStorage.removeItem('subscription');
+        localStorage.removeItem('purchaseHistory');
+      }
       
       setUser(null);
       setUserProfile(null);
@@ -415,7 +419,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (user) {
         setLoading(true);
         
-        // Since Firestore is disabled, always create profile from auth data
+        // Load user profile and trial data from Firestore
         try {
           const provider = user.providerData[0]?.providerId.includes('google') ? 'google' :
                           user.providerData[0]?.providerId.includes('apple') ? 'apple' :
@@ -423,6 +427,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
           
           const profile = await createUserProfile(user, provider);
           setUserProfile(profile);
+          
+          // Load trial data from Firestore when user logs in
+          try {
+            const trialStatus = await TrialService.getTrialStatusFromFirestore(user.uid);
+            if (trialStatus) {
+              console.log('Trial data loaded from Firestore:', trialStatus);
+            }
+          } catch (trialError) {
+            console.warn('Could not load trial data from Firestore:', trialError);
+          }
         } catch (error: any) {
           console.warn('[AuthContext] Error creating user profile:', error);
           

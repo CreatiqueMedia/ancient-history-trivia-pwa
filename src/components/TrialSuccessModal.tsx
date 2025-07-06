@@ -63,7 +63,7 @@ const TrialSuccessModal: React.FC<TrialSuccessModalProps> = ({
           {/* Content */}
           <div className="px-6 py-6">
             {/* Trial info */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 mb-6 border border-blue-200 dark:border-blue-800">
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 mb-6 border border-emerald-200 dark:border-emerald-800">
               <div className="flex items-center justify-center mb-3">
                 <div className="bg-blue-100 dark:bg-blue-900/30 rounded-full p-2 mr-3">
                   <ClockIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -88,11 +88,15 @@ const TrialSuccessModal: React.FC<TrialSuccessModalProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
                   <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>All Premium Question Bundles</span>
+                  <span><strong>Full Question Sets:</strong> 100 questions per bundle</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
                   <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>Unlimited Quiz Attempts</span>
+                  <span><strong>Mega Bundle:</strong> 1,700 total questions unlocked</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                  <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span>All 17 Premium Question Bundles</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
                   <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />

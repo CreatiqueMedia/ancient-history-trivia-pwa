@@ -1,11 +1,8 @@
-// Firebase Configuration - FIRESTORE COMPLETELY REMOVED
+// Firebase Configuration - FIRESTORE RE-ENABLED
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, OAuthProvider, connectAuthEmulator } from 'firebase/auth';
-// FIRESTORE IMPORTS COMPLETELY REMOVED TO PREVENT ANY SDK INITIALIZATION
+import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
 // Google Analytics completely removed
-
-// TypeScript types for compatibility (but no actual Firestore functionality)
-type Firestore = null;
 
 // Firebase Configuration for Ancient History Trivia PWA
 const firebaseConfig = {
@@ -24,13 +21,18 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase services
 export const auth = getAuth(app);
 
-// Firestore is completely disabled - export null
-export const db: Firestore = null;
+// Initialize Firestore
+export const db: Firestore = getFirestore(app);
 
-// For development, you can uncomment these lines to use Firebase emulators
-// if (process.env.NODE_ENV === 'development') {
-//   connectAuthEmulator(auth, 'http://localhost:9099');
-// }
+// For development, use Firestore emulator to avoid connection issues
+if (process.env.NODE_ENV === 'development' && window.location.hostname === 'localhost') {
+  try {
+    connectFirestoreEmulator(db, 'localhost', 8080);
+    console.log('Connected to Firestore emulator');
+  } catch (error) {
+    console.warn('Firestore emulator not available, using production Firestore');
+  }
+}
 
 // Auth providers
 export const googleProvider = new GoogleAuthProvider();
@@ -48,14 +50,14 @@ appleProvider.setCustomParameters({
   locale: 'en'
 });
 
-// Firestore helper functions (disabled)
+// Firestore helper functions
 export const isFirestoreAvailable = (): boolean => {
-  return false; // Firestore is completely disabled
+  return true; // Firestore is now enabled
 };
 
-// Function to safely get Firestore instance (returns null)
+// Function to safely get Firestore instance
 export const getFirestoreInstance = (): Firestore => {
-  return null;
+  return db;
 };
 
 export default app;

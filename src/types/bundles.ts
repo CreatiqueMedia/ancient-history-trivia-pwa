@@ -1,5 +1,5 @@
 // Bundle types for the Ancient History PWA Store
-export type BundleCategory = 'region' | 'historical_age' | 'format' | 'difficulty';
+export type BundleCategory = 'region' | 'historical_age' | 'format' | 'difficulty' | 'mega';
 
 export type RegionCategory = 
   | 'Egyptian' 
@@ -47,7 +47,7 @@ export interface QuestionBundle {
   version: string; // Current version (e.g., "v1", "v2", etc.)
   versionHistory?: BundleVersion[]; // Previous versions
   isCurrentVersion: boolean; // True if this is the latest version
-  bpType: 'RegionPackType' | 'AgePackType' | 'FormatPackType' | 'DifficultyPackType';
+  bpType: 'RegionPackType' | 'AgePackType' | 'FormatPackType' | 'DifficultyPackType' | 'MegaPackType';
   imageUrl?: string;
   iconName: string; // For Heroicons
   themeColors: {
@@ -56,6 +56,8 @@ export interface QuestionBundle {
     text: string;
   };
   storage_path?: string; // Path to the bundle's questions in Supabase Storage
+  isMegaBundle?: boolean; // Special flag for mega bundle
+  includedBundles?: string[]; // Array of bundle IDs included in mega bundle
 }
 
 export interface BundleVersion {

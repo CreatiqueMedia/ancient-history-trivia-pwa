@@ -9,6 +9,9 @@ import { getBundleById, getRandomQuestions, getQuestionsForBundle } from '../dat
 import { QUESTION_BUNDLES } from '../data/bundles';
 import { Question } from '../types';
 import { EnhancedQuizService } from '../services/EnhancedQuizService';
+import { FullQuestionService } from '../services/FullQuestionService';
+import { FirestoreQuestionService } from '../services/FirestoreQuestionService';
+import { TrialService } from '../services/TrialService';
 
 const QuizScreen: React.FC = () => {
   const { bundleId } = useParams<{ bundleId?: string }>();
@@ -30,101 +33,128 @@ const QuizScreen: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
-    
-    // Check if this is a sample quiz
-    const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode');
-    const isSampleQuiz = mode === 'sample';
-    
-    // Check for sample quiz data in localStorage
-    const sampleQuizData = localStorage.getItem('sampleQuiz');
-    let sampleQuiz = null;
-    
-    if (isSampleQuiz && sampleQuizData) {
-      try {
-        sampleQuiz = JSON.parse(sampleQuizData);
-      } catch (error) {
-        console.error('Failed to parse sample quiz data:', error);
-      }
-    }
-    
-    // Load questions based on sample quiz, bundle, daily challenge, or use enhanced quiz generation
-    let quizQuestions: Question[];
-    let bundle = null;
-    
-    if (sampleQuiz && isSampleQuiz) {
-      // Load sample quiz questions
-      quizQuestions = sampleQuiz.questions;
-      bundle = QUESTION_BUNDLES.find(b => b.id === sampleQuiz.bundleId);
-      setCurrentBundle(bundle);
-    } else if (bundleId === 'daily-challenge') {
-      // Handle daily challenge
-      try {
-        const { DailyChallengeService } = require('../services/DailyChallengeService');
-        const dailyChallenge = DailyChallengeService.getTodaysChallenge();
-        
-        // Get the actual question objects from the daily challenge question IDs
-        const { sampleQuestions } = require('../data/questions');
-        quizQuestions = dailyChallenge.questions.map((questionId: string) => 
-          sampleQuestions.find((q: Question) => q.id === questionId)
-        ).filter(Boolean);
-        
-        // Create a virtual bundle for daily challenge display
-        bundle = {
-          id: 'daily-challenge',
-          name: dailyChallenge.theme,
-          description: `Daily Challenge - ${dailyChallenge.category}`,
-          themeColors: {
-            primary: '#f59e0b',
-            background: '#fef3c7'
-          }
-        };
-        setCurrentBundle(bundle);
-      } catch (error) {
-        console.error('Failed to load daily challenge:', error);
-        // Fallback to regular quiz with max 10 questions for daily challenge
-        quizQuestions = EnhancedQuizService.generateQuickQuiz(10);
-        setCurrentBundle(null);
-      }
-    } else if (bundleId) {
-      // Find the bundle for UI display
-      bundle = QUESTION_BUNDLES.find(b => b.id === bundleId);
-      setCurrentBundle(bundle);
+    const initializeQuiz = async () => {
+      setIsLoading(true);
       
-      // Determine question count based on user access level
-      const userHasFullAccess = user && (isPremiumUser || hasAccessToBundle(bundleId));
+      // Check if this is a sample quiz
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode');
+      const isSampleQuiz = mode === 'sample';
       
-      if (userHasFullAccess) {
-        // Premium users get full 100 questions with same format as 33-question structure
-        quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
-      } else {
-        // Free users and unauthenticated users get 33 questions (sample)
-        quizQuestions = EnhancedQuizService.generateBundleSampleQuiz(bundleId, 10);
-        
-        if (quizQuestions.length === 0) {
-          // Fallback to enhanced quick quiz with 33 AP-level questions
-          quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
+      // Check for sample quiz data in localStorage
+      const sampleQuizData = localStorage.getItem('sampleQuiz');
+      let sampleQuiz = null;
+      
+      if (isSampleQuiz && sampleQuizData) {
+        try {
+          sampleQuiz = JSON.parse(sampleQuizData);
+        } catch (error) {
+          console.error('Failed to parse sample quiz data:', error);
         }
       }
-    } else {
-      // Determine question count based on user access level for general quiz
-      const userHasFullAccess = user && isPremiumUser;
       
-      if (userHasFullAccess) {
-        // Premium users get full 100 questions
-        quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
+      // Load questions based on sample quiz, bundle, daily challenge, or use enhanced quiz generation
+      let quizQuestions: Question[];
+      let bundle = null;
+      
+      if (sampleQuiz && isSampleQuiz) {
+        // Load sample quiz questions
+        quizQuestions = sampleQuiz.questions;
+        bundle = QUESTION_BUNDLES.find(b => b.id === sampleQuiz.bundleId);
+        setCurrentBundle(bundle);
+      } else if (bundleId === 'daily-challenge') {
+        // Handle daily challenge
+        try {
+          const { DailyChallengeService } = require('../services/DailyChallengeService');
+          const dailyChallenge = DailyChallengeService.getTodaysChallenge();
+          
+          // Get the actual question objects from the daily challenge question IDs
+          const { sampleQuestions } = require('../data/questions');
+          quizQuestions = dailyChallenge.questions.map((questionId: string) => 
+            sampleQuestions.find((q: Question) => q.id === questionId)
+          ).filter(Boolean);
+          
+          // Create a virtual bundle for daily challenge display
+          bundle = {
+            id: 'daily-challenge',
+            name: dailyChallenge.theme,
+            description: `Daily Challenge - ${dailyChallenge.category}`,
+            themeColors: {
+              primary: '#f59e0b',
+              background: '#fef3c7'
+            }
+          };
+          setCurrentBundle(bundle);
+        } catch (error) {
+          console.error('Failed to load daily challenge:', error);
+          // Fallback to regular quiz with max 10 questions for daily challenge
+          quizQuestions = EnhancedQuizService.generateQuickQuiz(10);
+          setCurrentBundle(null);
+        }
+      } else if (bundleId) {
+        // Find the bundle for UI display
+        bundle = QUESTION_BUNDLES.find(b => b.id === bundleId);
+        setCurrentBundle(bundle);
+        
+        // Determine question count based on user access level
+        const userHasFullAccess = user && (isPremiumUser || hasAccessToBundle(bundleId) || TrialService.isInTrial());
+        
+        if (userHasFullAccess) {
+          // Premium users and trial users get FULL question sets from Firestore
+          console.log(`🎯 Premium/Trial access detected for bundle: ${bundleId}`);
+          console.log(`🔥 Fetching full question set from Firestore...`);
+          
+          try {
+            // Try to get questions from Firestore first
+            quizQuestions = await FirestoreQuestionService.getQuestionsFromFirestore(bundleId);
+            console.log(`✅ Retrieved ${quizQuestions.length} questions for ${bundleId} from Firestore`);
+            
+            if (quizQuestions.length === 0) {
+              console.warn(`⚠️ No questions found in Firestore, falling back to enhanced quiz`);
+              quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
+            }
+          } catch (error) {
+            console.error(`❌ Error fetching questions from Firestore:`, error);
+            console.log(`🔄 Falling back to local question generation`);
+            quizQuestions = FullQuestionService.generateFullQuestions(bundleId);
+            
+            if (quizQuestions.length === 0) {
+              quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
+            }
+          }
+        } else {
+          // Free users and unauthenticated users get sample questions only
+          console.log(`🔒 Free access for bundle: ${bundleId}, generating sample questions`);
+          quizQuestions = EnhancedQuizService.generateBundleSampleQuiz(bundleId, 10);
+          
+          if (quizQuestions.length === 0) {
+            // Fallback to enhanced quick quiz with 33 AP-level questions
+            quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
+          }
+        }
       } else {
-        // Free users and unauthenticated users get 33 questions
-        quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
+        // Determine question count based on user access level for general quiz
+        const userHasFullAccess = user && (isPremiumUser || TrialService.isInTrial());
+        
+        if (userHasFullAccess) {
+          // Premium users and trial users get full 100 questions
+          console.log(`🎯 Premium/Trial access detected for general quiz`);
+          quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
+        } else {
+          // Free users and unauthenticated users get 33 questions
+          console.log(`🔒 Free access for general quiz`);
+          quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
+        }
+        setCurrentBundle(null);
       }
-      setCurrentBundle(null);
-    }
-    
-    setQuestions(quizQuestions);
-    startQuiz(quizQuestions);
-    setInitialized(true);
-    setIsLoading(false);
+      
+      setQuestions(quizQuestions);
+      startQuiz(quizQuestions);
+      setInitialized(true);
+      setIsLoading(false);
+    };
+
+    initializeQuiz();
 
     // Cleanup function to clear sample quiz data when leaving the quiz
     return () => {
@@ -221,7 +251,7 @@ const QuizScreen: React.FC = () => {
                   const urlParams = new URLSearchParams(window.location.search);
                   const mode = urlParams.get('mode');
                   return mode === 'sample' && (
-                    <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-medium border border-purple-200 dark:border-purple-700">
+                    <div className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 px-3 py-1 rounded-full text-sm font-bold border border-emerald-300 dark:border-emerald-700">
                       🧪 Sample Quiz
                     </div>
                   );

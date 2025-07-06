@@ -45,20 +45,55 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
 
   const trialUrl = `/store?action=start_trial&tab=subscription`;
 
+  // Add debugging for URL generation
+  console.log('🔗 TrialBanner: Generated trial URL:', trialUrl);
+
+  const handleTrialClick = (e: React.MouseEvent) => {
+    console.log('🎯 TrialBanner: Trial button clicked!');
+    console.log('🔗 TrialBanner: Target URL:', trialUrl);
+    console.log('🔗 TrialBanner: Current location:', window.location.href);
+    
+    // Check if we're already on the store page
+    if (window.location.pathname === '/store') {
+      console.log('🔄 Already on store page - preventing default navigation');
+      e.preventDefault();
+      
+      // Store pending trial action
+      localStorage.setItem('pendingPurchase', JSON.stringify({
+        type: 'trial',
+        action: 'start_trial'
+      }));
+      
+      // Trigger custom event to show auth modal immediately
+      const event = new CustomEvent('showAuthModal', { 
+        detail: { context: 'trial' } 
+      });
+      window.dispatchEvent(event);
+      
+      // Also set the tab to subscription
+      const tabEvent = new CustomEvent('setStoreTab', { 
+        detail: 'subscription' 
+      });
+      window.dispatchEvent(tabEvent);
+    }
+    // If not on store page, let React Router handle navigation normally
+  };
+
   if (variant === 'compact') {
     return (
-      <div className={`bg-gradient-to-r from-purple-500 to-blue-600 rounded-lg p-4 text-white ${className}`}>
+      <div className={`bg-gradient-to-r from-emerald-600 to-teal-700 rounded-lg p-4 text-white shadow-md ${className}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <SparklesIcon className="w-6 h-6" />
+            <SparklesIcon className="w-6 h-6 text-yellow-300" />
             <div>
-              <h3 className="font-semibold text-sm">Try 3-Day Free Trial</h3>
-              <p className="text-xs opacity-90">Unlock all premium features</p>
+              <h3 className="font-bold text-sm text-white">Try 3-Day Free Trial</h3>
+              <p className="text-xs text-emerald-100">Unlock all premium features</p>
             </div>
           </div>
           <Link
             to={trialUrl}
-            className="bg-white text-purple-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors flex items-center space-x-1"
+            onClick={handleTrialClick}
+            className="bg-white text-emerald-700 px-4 py-2 rounded-md text-sm font-bold hover:bg-emerald-50 transition-colors flex items-center space-x-1 shadow-sm"
           >
             <span>Start Trial</span>
             <ArrowRightIcon className="w-4 h-4" />
@@ -69,26 +104,27 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
   }
 
   return (
-    <div className={`bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl p-6 text-white shadow-lg ${className}`}>
+    <div className={`bg-gradient-to-r from-emerald-600 to-teal-700 rounded-xl p-6 text-white shadow-lg border border-emerald-500/20 ${className}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="bg-white/20 rounded-full p-3">
-            <SparklesIcon className="w-8 h-8" />
+          <div className="bg-emerald-500/30 rounded-full p-3 border border-emerald-400/30">
+            <SparklesIcon className="w-8 h-8 text-yellow-300" />
           </div>
           <div>
-            <h3 className="text-xl font-bold mb-2">Start Your 3-Day Free Trial</h3>
-            <p className="text-white mb-3">
+            <h3 className="text-xl font-bold mb-2 text-white">Start Your 3-Day Free Trial</h3>
+            <p className="text-emerald-100 mb-3 font-medium">
               Get unlimited access to all premium features and question bundles
             </p>
             <div className="flex items-center space-x-2">
-              <CheckCircleIcon className="w-5 h-5 text-green-400" />
-              <span className="font-medium text-white">3 days free</span>
+              <CheckCircleIcon className="w-5 h-5 text-yellow-300" />
+              <span className="font-bold text-white">3 days free</span>
             </div>
           </div>
         </div>
         <Link
           to={trialUrl}
-          className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-md flex items-center space-x-2"
+          onClick={handleTrialClick}
+          className="bg-white text-emerald-700 px-6 py-3 rounded-lg font-bold hover:bg-emerald-50 transition-colors shadow-md flex items-center space-x-2 border border-emerald-200"
         >
           <SparklesIcon className="w-5 h-5" />
           <span>Start Free Trial</span>
