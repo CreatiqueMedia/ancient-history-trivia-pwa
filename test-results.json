@@ -1,0 +1,918 @@
+{
+  "config": {
+    "configFile": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/playwright.config.ts",
+    "rootDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 6
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.53.2",
+    "workers": 6,
+    "webServer": {
+      "command": "yarn dev",
+      "url": "http://localhost:5173",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "comprehensive-use-cases.spec.ts",
+      "file": "comprehensive-use-cases.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Ancient History PWA - Comprehensive Use Cases",
+          "file": "comprehensive-use-cases.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "App loads successfully and displays main content",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 8137,
+                      "error": {
+                        "message": "Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:\n    1) <nav class=\"mt-6\">…</nav> aka getByText('HomeStoreAboutSettings', { exact: true })\n    2) <nav class=\"fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 lg:hidden z-50\">…</nav> aka locator('nav').filter({ hasText: 'HomeStoreAboutSettingsSign In' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('nav')\u001b[22m\n",
+                        "stack": "Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:\n    1) <nav class=\"mt-6\">…</nav> aka getByText('HomeStoreAboutSettings', { exact: true })\n    2) <nav class=\"fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 lg:hidden z-50\">…</nav> aka locator('nav').filter({ hasText: 'HomeStoreAboutSettingsSign In' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('nav')\u001b[22m\n\n    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:14:39",
+                        "location": {
+                          "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                          "column": 39,
+                          "line": 14
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// Check for main navigation elements\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'nav'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \n \u001b[90m 16 |\u001b[39m     \u001b[90m// Check for home screen content\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[36mconst\u001b[39m headingCount \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1, h2'\u001b[39m)\u001b[33m.\u001b[39mcount()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                            "column": 39,
+                            "line": 14
+                          },
+                          "message": "Error: expect.toBeVisible: Error: strict mode violation: locator('nav') resolved to 2 elements:\n    1) <nav class=\"mt-6\">…</nav> aka getByText('HomeStoreAboutSettings', { exact: true })\n    2) <nav class=\"fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 lg:hidden z-50\">…</nav> aka locator('nav').filter({ hasText: 'HomeStoreAboutSettingsSign In' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('nav')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// Check for main navigation elements\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'nav'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \n \u001b[90m 16 |\u001b[39m     \u001b[90m// Check for home screen content\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[36mconst\u001b[39m headingCount \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1, h2'\u001b[39m)\u001b[33m.\u001b[39mcount()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:14:39\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:12.704Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-99dca-y-and-displays-main-content-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-99dca-y-and-displays-main-content-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-99dca-y-and-displays-main-content-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                        "column": 39,
+                        "line": 14
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-5e01efbe10202ce04030",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "Navigation works correctly across all screens",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 17296,
+                      "error": {
+                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1, h2')\n\u001b[32m- Expected  - 2\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"Quiz\",\u001b[39m\n\u001b[32m-   \"Question\",\u001b[39m\n\u001b[31m+   \"Ancient History\",\u001b[39m\n\u001b[31m+   \"Ancient History Trivia\",\u001b[39m\n\u001b[31m+   \"The Maya city of _____ was one of the largest urban centers in the ancient Americas and featured sophisticated astronomical observatories.\",\u001b[39m\n\u001b[2m  ]\u001b[22m\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1, h2')\u001b[22m\n\u001b[2m    8 × locator resolved to 3 elements\u001b[22m\n",
+                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1, h2')\n\u001b[32m- Expected  - 2\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"Quiz\",\u001b[39m\n\u001b[32m-   \"Question\",\u001b[39m\n\u001b[31m+   \"Ancient History\",\u001b[39m\n\u001b[31m+   \"Ancient History Trivia\",\u001b[39m\n\u001b[31m+   \"The Maya city of _____ was one of the largest urban centers in the ancient Americas and featured sophisticated astronomical observatories.\",\u001b[39m\n\u001b[2m  ]\u001b[22m\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1, h2')\u001b[22m\n\u001b[2m    8 × locator resolved to 3 elements\u001b[22m\n\n    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:29:42",
+                        "location": {
+                          "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                          "column": 42,
+                          "line": 29
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 27 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'text=Quiz'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/quiz/\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1, h2'\u001b[39m))\u001b[33m.\u001b[39mtoContainText([\u001b[32m'Quiz'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Question'\u001b[39m])\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m     \n \u001b[90m 31 |\u001b[39m     \u001b[90m// Test navigation to Store screen\u001b[39m\n \u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'text=Store'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                            "column": 42,
+                            "line": 29
+                          },
+                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1, h2')\n\u001b[32m- Expected  - 2\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"Quiz\",\u001b[39m\n\u001b[32m-   \"Question\",\u001b[39m\n\u001b[31m+   \"Ancient History\",\u001b[39m\n\u001b[31m+   \"Ancient History Trivia\",\u001b[39m\n\u001b[31m+   \"The Maya city of _____ was one of the largest urban centers in the ancient Americas and featured sophisticated astronomical observatories.\",\u001b[39m\n\u001b[2m  ]\u001b[22m\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1, h2')\u001b[22m\n\u001b[2m    8 × locator resolved to 3 elements\u001b[22m\n\n\n\u001b[0m \u001b[90m 27 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'text=Quiz'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/quiz/\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1, h2'\u001b[39m))\u001b[33m.\u001b[39mtoContainText([\u001b[32m'Quiz'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Question'\u001b[39m])\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m     \n \u001b[90m 31 |\u001b[39m     \u001b[90m// Test navigation to Store screen\u001b[39m\n \u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'text=Store'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:29:42\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:12.598Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-65e19-orrectly-across-all-screens-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-65e19-orrectly-across-all-screens-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-65e19-orrectly-across-all-screens-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                        "column": 42,
+                        "line": 29
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-c1228cf9db3f78b8d6ce",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 25,
+              "column": 3
+            },
+            {
+              "title": "Store screen displays subscription plans and billing options",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 14519,
+                      "error": {
+                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('text=Choose Your Plan')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=Choose Your Plan')\u001b[22m\n",
+                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('text=Choose Your Plan')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=Choose Your Plan')\u001b[22m\n\n    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:60:57",
+                        "location": {
+                          "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                          "column": 57,
+                          "line": 60
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 58 |\u001b[39m     \n \u001b[90m 59 |\u001b[39m     \u001b[90m// Check if subscription plans are displayed\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 60 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Choose Your Plan'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 61 |\u001b[39m     \n \u001b[90m 62 |\u001b[39m     \u001b[90m// Check for subscription tabs\u001b[39m\n \u001b[90m 63 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'text=Subscription'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                            "column": 57,
+                            "line": 60
+                          },
+                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('text=Choose Your Plan')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=Choose Your Plan')\u001b[22m\n\n\n\u001b[0m \u001b[90m 58 |\u001b[39m     \n \u001b[90m 59 |\u001b[39m     \u001b[90m// Check if subscription plans are displayed\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 60 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Choose Your Plan'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 61 |\u001b[39m     \n \u001b[90m 62 |\u001b[39m     \u001b[90m// Check for subscription tabs\u001b[39m\n \u001b[90m 63 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'text=Subscription'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:60:57\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:12.730Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-15c1b-n-plans-and-billing-options-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-15c1b-n-plans-and-billing-options-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-15c1b-n-plans-and-billing-options-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                        "column": 57,
+                        "line": 60
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-77ea84303e74cf41f0c7",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 56,
+              "column": 3
+            },
+            {
+              "title": "Quiz functionality works correctly",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 24366,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('h1, h2, [data-testid=\"quiz-question\"]') to be visible\u001b[22m\n\u001b[2m    25 × locator resolved to 3 elements. Proceeding with the first one: <h1 class=\"text-lg font-bold text-gray-900 dark:text-white\">Ancient History</h1>\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('h1, h2, [data-testid=\"quiz-question\"]') to be visible\u001b[22m\n\u001b[2m    25 × locator resolved to 3 elements. Proceeding with the first one: <h1 class=\"text-lg font-bold text-gray-900 dark:text-white\">Ancient History</h1>\u001b[22m\n\n    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:94:16",
+                        "location": {
+                          "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                          "column": 16,
+                          "line": 94
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 92 |\u001b[39m     \n \u001b[90m 93 |\u001b[39m     \u001b[90m// Wait for quiz content to load\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 94 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'h1, h2, [data-testid=\"quiz-question\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 95 |\u001b[39m     \n \u001b[90m 96 |\u001b[39m     \u001b[90m// Check if we're on a quiz selection or actual quiz\u001b[39m\n \u001b[90m 97 |\u001b[39m     \u001b[36mconst\u001b[39m quizQuestion \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"quiz-question\"]'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                            "column": 16,
+                            "line": 94
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('h1, h2, [data-testid=\"quiz-question\"]') to be visible\u001b[22m\n\u001b[2m    25 × locator resolved to 3 elements. Proceeding with the first one: <h1 class=\"text-lg font-bold text-gray-900 dark:text-white\">Ancient History</h1>\u001b[22m\n\n\n\u001b[0m \u001b[90m 92 |\u001b[39m     \n \u001b[90m 93 |\u001b[39m     \u001b[90m// Wait for quiz content to load\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 94 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'h1, h2, [data-testid=\"quiz-question\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 95 |\u001b[39m     \n \u001b[90m 96 |\u001b[39m     \u001b[90m// Check if we're on a quiz selection or actual quiz\u001b[39m\n \u001b[90m 97 |\u001b[39m     \u001b[36mconst\u001b[39m quizQuestion \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"quiz-question\"]'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:94:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:12.751Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-0c076-nctionality-works-correctly-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-0c076-nctionality-works-correctly-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-0c076-nctionality-works-correctly-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                        "column": 16,
+                        "line": 94
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-d3c91f8953f84586dcdc",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 90,
+              "column": 3
+            },
+            {
+              "title": "Achievements screen displays properly",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 18609,
+                      "error": {
+                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('h1:has-text(\"Achievements\")')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1:has-text(\"Achievements\")')\u001b[22m\n",
+                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('h1:has-text(\"Achievements\")')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1:has-text(\"Achievements\")')\u001b[22m\n\n    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:145:63",
+                        "location": {
+                          "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                          "column": 63,
+                          "line": 145
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m     \n \u001b[90m 144 |\u001b[39m     \u001b[90m// Check main elements\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1:has-text(\"Achievements\")'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Overall Progress'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m     \n \u001b[90m 148 |\u001b[39m     \u001b[90m// Check for achievement filters\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                            "column": 63,
+                            "line": 145
+                          },
+                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('h1:has-text(\"Achievements\")')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1:has-text(\"Achievements\")')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m     \n \u001b[90m 144 |\u001b[39m     \u001b[90m// Check main elements\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1:has-text(\"Achievements\")'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Overall Progress'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m     \n \u001b[90m 148 |\u001b[39m     \u001b[90m// Check for achievement filters\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:145:63\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:12.604Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-2cc9c-ts-screen-displays-properly-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-2cc9c-ts-screen-displays-properly-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-2cc9c-ts-screen-displays-properly-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                        "column": 63,
+                        "line": 145
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-d58c25f7366fb201e2df",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 141,
+              "column": 3
+            },
+            {
+              "title": "Settings screen functionality",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "failed",
+                      "duration": 13163,
+                      "error": {
+                        "message": "Error: locator.isVisible: Error: strict mode violation: locator('[data-testid=\"theme-toggle\"], button:has-text(\"Dark\"), button:has-text(\"Light\")') resolved to 2 elements:\n    1) <button class=\"flex flex-col items-center p-4 rounded-lg border-2 transition-colors border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500\">…</button> aka getByRole('button', { name: 'Light' })\n    2) <button class=\"flex flex-col items-center p-4 rounded-lg border-2 transition-colors border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500\">…</button> aka getByRole('button', { name: 'Dark' })\n\nCall log:\n\u001b[2m    - checking visibility of locator('[data-testid=\"theme-toggle\"], button:has-text(\"Dark\"), button:has-text(\"Light\")')\u001b[22m\n",
+                        "stack": "Error: locator.isVisible: Error: strict mode violation: locator('[data-testid=\"theme-toggle\"], button:has-text(\"Dark\"), button:has-text(\"Light\")') resolved to 2 elements:\n    1) <button class=\"flex flex-col items-center p-4 rounded-lg border-2 transition-colors border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500\">…</button> aka getByRole('button', { name: 'Light' })\n    2) <button class=\"flex flex-col items-center p-4 rounded-lg border-2 transition-colors border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500\">…</button> aka getByRole('button', { name: 'Dark' })\n\nCall log:\n\u001b[2m    - checking visibility of locator('[data-testid=\"theme-toggle\"], button:has-text(\"Dark\"), button:has-text(\"Light\")')\u001b[22m\n\n    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:183:27",
+                        "location": {
+                          "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                          "column": 27,
+                          "line": 183
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 181 |\u001b[39m     \u001b[90m// Test theme toggle if available\u001b[39m\n \u001b[90m 182 |\u001b[39m     \u001b[36mconst\u001b[39m themeToggle \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"theme-toggle\"], button:has-text(\"Dark\"), button:has-text(\"Light\")'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 183 |\u001b[39m     \u001b[36mif\u001b[39m (\u001b[36mawait\u001b[39m themeToggle\u001b[33m.\u001b[39misVisible()) {\n \u001b[90m     |\u001b[39m                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 184 |\u001b[39m       \u001b[36mawait\u001b[39m themeToggle\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 185 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 186 |\u001b[39m       console\u001b[33m.\u001b[39mlog(\u001b[32m'Theme toggle tested'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                            "column": 27,
+                            "line": 183
+                          },
+                          "message": "Error: locator.isVisible: Error: strict mode violation: locator('[data-testid=\"theme-toggle\"], button:has-text(\"Dark\"), button:has-text(\"Light\")') resolved to 2 elements:\n    1) <button class=\"flex flex-col items-center p-4 rounded-lg border-2 transition-colors border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500\">…</button> aka getByRole('button', { name: 'Light' })\n    2) <button class=\"flex flex-col items-center p-4 rounded-lg border-2 transition-colors border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500\">…</button> aka getByRole('button', { name: 'Dark' })\n\nCall log:\n\u001b[2m    - checking visibility of locator('[data-testid=\"theme-toggle\"], button:has-text(\"Dark\"), button:has-text(\"Light\")')\u001b[22m\n\n\n\u001b[0m \u001b[90m 181 |\u001b[39m     \u001b[90m// Test theme toggle if available\u001b[39m\n \u001b[90m 182 |\u001b[39m     \u001b[36mconst\u001b[39m themeToggle \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"theme-toggle\"], button:has-text(\"Dark\"), button:has-text(\"Light\")'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 183 |\u001b[39m     \u001b[36mif\u001b[39m (\u001b[36mawait\u001b[39m themeToggle\u001b[33m.\u001b[39misVisible()) {\n \u001b[90m     |\u001b[39m                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 184 |\u001b[39m       \u001b[36mawait\u001b[39m themeToggle\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 185 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 186 |\u001b[39m       console\u001b[33m.\u001b[39mlog(\u001b[32m'Theme toggle tested'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:183:27\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:12.735Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-f8f5a-ttings-screen-functionality-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-f8f5a-ttings-screen-functionality-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-f8f5a-ttings-screen-functionality-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                        "column": 27,
+                        "line": 183
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-920ec2aaadf3bff5022b",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 175,
+              "column": 3
+            },
+            {
+              "title": "Stats screen displays analytics",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 9906,
+                      "error": {
+                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('h1:has-text(\"Stats\"), h1:has-text(\"Statistics\")')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1:has-text(\"Stats\"), h1:has-text(\"Statistics\")')\u001b[22m\n",
+                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('h1:has-text(\"Stats\"), h1:has-text(\"Statistics\")')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1:has-text(\"Stats\"), h1:has-text(\"Statistics\")')\u001b[22m\n\n    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:201:83",
+                        "location": {
+                          "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                          "column": 83,
+                          "line": 201
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 199 |\u001b[39m     \n \u001b[90m 200 |\u001b[39m     \u001b[90m// Check main stats elements\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 201 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1:has-text(\"Stats\"), h1:has-text(\"Statistics\")'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 202 |\u001b[39m     \n \u001b[90m 203 |\u001b[39m     \u001b[90m// Look for stat cards or charts\u001b[39m\n \u001b[90m 204 |\u001b[39m     \u001b[36mconst\u001b[39m statCards \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"stat-card\"], .stat-card, .stats-grid > div'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                            "column": 83,
+                            "line": 201
+                          },
+                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('h1:has-text(\"Stats\"), h1:has-text(\"Statistics\")')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1:has-text(\"Stats\"), h1:has-text(\"Statistics\")')\u001b[22m\n\n\n\u001b[0m \u001b[90m 199 |\u001b[39m     \n \u001b[90m 200 |\u001b[39m     \u001b[90m// Check main stats elements\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 201 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1:has-text(\"Stats\"), h1:has-text(\"Statistics\")'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 202 |\u001b[39m     \n \u001b[90m 203 |\u001b[39m     \u001b[90m// Look for stat cards or charts\u001b[39m\n \u001b[90m 204 |\u001b[39m     \u001b[36mconst\u001b[39m statCards \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"stat-card\"], .stat-card, .stats-grid > div'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:201:83\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:23.627Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-d4db6-s-screen-displays-analytics-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-d4db6-s-screen-displays-analytics-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-d4db6-s-screen-displays-analytics-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                        "column": 83,
+                        "line": 201
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-c7877e781fb2d2903b33",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 197,
+              "column": 3
+            },
+            {
+              "title": "Billing functionality for premium users",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 3464,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Free user detected, skipping billing tests\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:28.579Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-fe51ed10ccdc74abaf43",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 218,
+              "column": 3
+            },
+            {
+              "title": "Responsive design works on mobile viewports",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 13112,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Mobile layout verified for /quiz\n"
+                        },
+                        {
+                          "text": "Mobile layout verified for /store\n"
+                        },
+                        {
+                          "text": "Mobile layout verified for /achievements\n"
+                        },
+                        {
+                          "text": "Mobile layout verified for /stats\n"
+                        },
+                        {
+                          "text": "Mobile layout verified for /settings\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:29.804Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-16562c218a305df449a8",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 268,
+              "column": 3
+            },
+            {
+              "title": "PWA features and offline capability",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 4824,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Service Worker support detected\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:33.717Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-0cf47b336710ae75e8ca",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 297,
+              "column": 3
+            },
+            {
+              "title": "Error handling and 404 pages",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 5,
+                      "status": "failed",
+                      "duration": 3283,
+                      "error": {
+                        "message": "Error: locator.count: Unexpected token \"=\" while parsing css selector \"[data-testid=\"error-boundary\"], [data-testid=\"not-found\"], text=404, text=Page not found\". Did you mean to CSS.escape it?",
+                        "stack": "Error: locator.count: Unexpected token \"=\" while parsing css selector \"[data-testid=\"error-boundary\"], [data-testid=\"not-found\"], text=404, text=Page not found\". Did you mean to CSS.escape it?\n    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:337:46",
+                        "location": {
+                          "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                          "column": 46,
+                          "line": 337
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 335 |\u001b[39m     \u001b[90m// Check for error boundary or 404 page\u001b[39m\n \u001b[90m 336 |\u001b[39m     \u001b[36mconst\u001b[39m errorElements \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"error-boundary\"], [data-testid=\"not-found\"], text=404, text=Page not found'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 337 |\u001b[39m     \u001b[36mconst\u001b[39m hasErrorPage \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m errorElements\u001b[33m.\u001b[39mcount() \u001b[33m>\u001b[39m \u001b[35m0\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 338 |\u001b[39m     \n \u001b[90m 339 |\u001b[39m     \u001b[36mif\u001b[39m (hasErrorPage) {\n \u001b[90m 340 |\u001b[39m       console\u001b[33m.\u001b[39mlog(\u001b[32m'404 error page detected'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                            "column": 46,
+                            "line": 337
+                          },
+                          "message": "Error: locator.count: Unexpected token \"=\" while parsing css selector \"[data-testid=\"error-boundary\"], [data-testid=\"not-found\"], text=404, text=Page not found\". Did you mean to CSS.escape it?\n\n\u001b[0m \u001b[90m 335 |\u001b[39m     \u001b[90m// Check for error boundary or 404 page\u001b[39m\n \u001b[90m 336 |\u001b[39m     \u001b[36mconst\u001b[39m errorElements \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"error-boundary\"], [data-testid=\"not-found\"], text=404, text=Page not found'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 337 |\u001b[39m     \u001b[36mconst\u001b[39m hasErrorPage \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m errorElements\u001b[33m.\u001b[39mcount() \u001b[33m>\u001b[39m \u001b[35m0\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 338 |\u001b[39m     \n \u001b[90m 339 |\u001b[39m     \u001b[36mif\u001b[39m (hasErrorPage) {\n \u001b[90m 340 |\u001b[39m       console\u001b[33m.\u001b[39mlog(\u001b[32m'404 error page detected'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts:337:46\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:32.306Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-be590-rror-handling-and-404-pages-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-be590-rror-handling-and-404-pages-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/test-results/comprehensive-use-cases-An-be590-rror-handling-and-404-pages-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ronratzlaff/_Dev_Projects/Git Projects/PWA/ancient-history-pwa/tests/comprehensive-use-cases.spec.ts",
+                        "column": 46,
+                        "line": 337
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-a6598bc8634c18b80fb4",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 331,
+              "column": 3
+            },
+            {
+              "title": "Performance and loading times",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 3547,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Page load time: 995ms\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T01:14:35.409Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bafcdae6dc4c76627119-659639f31cda4b47e10e",
+              "file": "comprehensive-use-cases.spec.ts",
+              "line": 350,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-07-07T01:14:11.117Z",
+    "duration": 32221.591,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 8,
+    "flaky": 0
+  }
+}

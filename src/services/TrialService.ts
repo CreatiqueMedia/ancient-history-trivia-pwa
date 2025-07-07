@@ -213,6 +213,32 @@ export class TrialService {
   }
 
   /**
+   * Cancel trial manually by user
+   */
+  static async cancelTrial(userId: string): Promise<void> {
+    const trialStatus = this.getTrialStatus();
+    if (trialStatus && trialStatus.isActive) {
+      // End the trial
+      this.endTrial('cancelled');
+      
+      // Remove from localStorage
+      localStorage.removeItem(this.STORAGE_KEY);
+      
+      // Remove from Firestore
+      try {
+        await this.removeTrialStatusFromFirestore(userId);
+      } catch (error) {
+        console.error('Error removing trial from Firestore:', error);
+      }
+      
+      // Track cancellation
+      analyticsService.trackFeatureUsage('trial_cancelled_by_user', userId);
+      
+      console.log('Trial cancelled successfully');
+    }
+  }
+
+  /**
    * Get trial statistics for analytics
    */
   static getTrialStats(): {
@@ -424,6 +450,24 @@ export class TrialService {
       console.error('Error getting trial status from Firestore:', error);
       // Fallback to localStorage
       return this.getTrialStatus();
+    }
+  }
+
+  /**
+   * Remove trial status from Firestore
+   */
+  private static async removeTrialStatusFromFirestore(userId: string): Promise<void> {
+    try {
+      // Only attempt Firestore if we're not in localhost development
+      if (window.location.hostname !== 'localhost') {
+        const trialDoc = doc(db, 'trials', userId);
+        await deleteDoc(trialDoc);
+        console.log('Trial status removed from Firestore successfully');
+      } else {
+        console.log('Development mode: Trial status removed from localStorage only');
+      }
+    } catch (error) {
+      console.warn('Error removing trial from Firestore:', error);
     }
   }
 

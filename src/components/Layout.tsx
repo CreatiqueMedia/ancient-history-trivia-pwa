@@ -268,6 +268,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <Link
                     key={path}
                     to={path}
+                    data-testid={`nav-${label.toLowerCase().replace(/\s+/g, '-')}`}
                     onClick={() => setSidebarOpen(false)} // Close sidebar on mobile after click
                     className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${
                       active
@@ -337,6 +338,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Link
                 key={path}
                 to={path}
+                data-testid={`mobile-nav-${label.toLowerCase().replace(/\s+/g, '-')}`}
                 className={`flex flex-col items-center py-2 px-3 min-w-0 flex-1 ${
                   active 
                     ? 'text-primary-600 dark:text-primary-400' 

@@ -1311,6 +1311,73 @@ const StoreScreen: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* Billing Management for Premium Users */}
+              {isPremiumUser && (
+                <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                  <div className="text-center">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                      Need to make changes to your {TrialService.isInTrial() ? 'trial' : 'subscription'}?
+                    </h4>
+                    <div className="space-y-3">
+                      {TrialService.isInTrial() ? (
+                        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                          <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-3">
+                            Your trial will automatically convert to Pro Monthly ($4.99/month) when it expires. 
+                            You can cancel anytime to avoid being charged.
+                          </p>
+                          <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                            <button 
+                              onClick={() => {
+                                // Navigate to billing screen
+                                navigate('/billing');
+                              }}
+                              className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+                            >
+                              Cancel Trial
+                            </button>
+                            <button 
+                              onClick={() => {
+                                // Navigate to billing screen
+                                navigate('/billing');
+                              }}
+                              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                              Manage Trial Settings
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                          <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
+                            Manage your subscription, update payment methods, or cancel anytime.
+                          </p>
+                          <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                            <button 
+                              onClick={() => {
+                                // Navigate to billing screen
+                                navigate('/billing');
+                              }}
+                              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                              Manage Billing
+                            </button>
+                            <button 
+                              onClick={() => {
+                                // Navigate to billing history
+                                navigate('/billing-history');
+                              }}
+                              className="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors"
+                            >
+                              Download Invoices
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

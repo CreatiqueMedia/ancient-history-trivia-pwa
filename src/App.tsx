@@ -18,7 +18,7 @@ import StoreScreen from './screens/StoreScreen.tsx';
 import StatsScreen from './screens/StatsScreen.tsx';
 import SettingsScreen from './screens/SettingsScreen.tsx';
 import AchievementsScreen from './screens/AchievementsScreen.tsx';
-// SubscriptionScreen import removed
+import BillingScreen from './screens/BillingScreen.tsx';
 import UserProfileScreen from './screens/UserProfileScreen.tsx';
 import BillingHistoryScreen from './screens/BillingHistoryScreen.tsx';
 import AboutScreen from './screens/AboutScreen.tsx';
@@ -137,6 +137,11 @@ const AppContent = () => {
         {/* /subscription route removed */}
         <Route path="/profile" element={<UserProfileScreen />} />
         <Route path="/billing" element={
+          <ProtectedRoute>
+            <BillingScreen />
+          </ProtectedRoute>
+        } />
+        <Route path="/billing-history" element={
           <ProtectedRoute>
             <BillingHistoryScreen />
           </ProtectedRoute>

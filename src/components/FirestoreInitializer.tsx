@@ -30,8 +30,14 @@ const FirestoreInitializer: React.FC = () => {
       setInitializationStatus('Checking Firestore...');
 
       try {
-        // Check if questions already exist in Firestore
+        // Test Firestore connection first
+        setInitializationStatus('Testing Firestore connection...');
+        console.log('🔍 Testing Firestore connection...');
+        
+        // Simple connection test
         const stats = await FirestoreQuestionService.getBundleStatistics();
+        console.log('✅ Firestore connection successful');
+        
         const bundleCount = Object.keys(stats).length;
         
         if (bundleCount > 0) {
@@ -47,6 +53,7 @@ const FirestoreInitializer: React.FC = () => {
 
         // Initialize Firestore with questions
         setInitializationStatus('Generating and storing questions...');
+        console.log('🔥 Initializing Firestore with questions...');
         await FirestoreQuestionService.initializeFirestoreQuestions();
         
         // Mark as initialized
@@ -61,13 +68,16 @@ const FirestoreInitializer: React.FC = () => {
         }, 5000);
         
       } catch (error) {
-        console.error('❌ Failed to initialize Firestore:', error);
-        setInitializationStatus('❌ Failed to initialize Firestore');
+        console.log('⚠️ Firestore not available in development mode:', error);
+        setInitializationStatus('⚠️ Firestore unavailable - using local storage');
         
-        // Hide status after 5 seconds
+        // Mark as "initialized" to prevent retries
+        localStorage.setItem('firestore_questions_initialized', 'true');
+        
+        // Hide status after 3 seconds
         setTimeout(() => {
           setShowStatus(false);
-        }, 5000);
+        }, 3000);
       } finally {
         setIsInitializing(false);
       }

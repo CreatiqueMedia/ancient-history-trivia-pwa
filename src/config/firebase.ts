@@ -6,12 +6,12 @@ import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/fire
 
 // Firebase Configuration for Ancient History Trivia PWA
 const firebaseConfig = {
-  apiKey: "***REMOVED***",
-  authDomain: "ancient-history-trivia.firebaseapp.com", // Use .firebaseapp.com for auth
-  projectId: "ancient-history-trivia",
-  storageBucket: "ancient-history-trivia.firebasestorage.app",
-  messagingSenderId: "778256162112",
-  appId: "1:778256162112:web:ee31ff85689d2fe722aea5"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "***REMOVED***",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "ancient-history-trivia.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "ancient-history-trivia",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "ancient-history-trivia.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "778256162112",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:778256162112:web:ee31ff85689d2fe722aea5"
   // measurementId removed - Google Analytics completely disabled
 };
 
@@ -24,15 +24,18 @@ export const auth = getAuth(app);
 // Initialize Firestore
 export const db: Firestore = getFirestore(app);
 
-// For development, use Firestore emulator to avoid connection issues
-if (process.env.NODE_ENV === 'development' && window.location.hostname === 'localhost') {
-  try {
-    connectFirestoreEmulator(db, 'localhost', 8080);
-    console.log('Connected to Firestore emulator');
-  } catch (error) {
-    console.warn('Firestore emulator not available, using production Firestore');
-  }
-}
+// DISABLED: Firestore emulator connection
+// Using production Firestore for development to avoid emulator dependency
+// if (process.env.NODE_ENV === 'development' && window.location.hostname === 'localhost') {
+//   try {
+//     connectFirestoreEmulator(db, 'localhost', 8080);
+//     console.log('Connected to Firestore emulator');
+//   } catch (error) {
+//     console.log('Firestore emulator not available, using production Firestore');
+//   }
+// }
+
+console.log('Using production Firestore for all environments');
 
 // Auth providers
 export const googleProvider = new GoogleAuthProvider();

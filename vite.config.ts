@@ -69,7 +69,7 @@ export default defineConfig(({ command, mode }) => {
     plugins,
     server: {
       host: true,
-      port: 3000,
+      port: parseInt(env.VITE_DEV_SERVER_PORT) || 3001,
       historyApiFallback: true
     }
   };
