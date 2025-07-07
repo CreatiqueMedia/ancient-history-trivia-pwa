@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow authenticated users to read and write their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read and write their own stats
+    match /stats/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read and write their own achievements
+    match /achievements/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read and write their own quiz results
+    match /quizResults/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read questions (questions should be read-only for users)
+    match /questions/{questionId} {
+      allow read: if request.auth != null;
+    }
+    
+    // Allow authenticated users to read question bundles
+    match /questionBundles/{bundleId} {
+      allow read: if request.auth != null;
+    }
+    
+    // Allow authenticated users to read and write their own trial data
+    match /trials/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Stripe payment-related collections (managed by Stripe extension)
+    match /customers/{uid} {
+      allow read, write: if request.auth.uid == uid;
+    }
+    
+    match /customers/{uid}/checkout_sessions/{id} {
+      allow read, write: if request.auth.uid == uid;
+    }
+    
+    match /customers/{uid}/subscriptions/{id} {
+      allow read: if request.auth.uid == uid;
+    }
+    
+    match /products/{id} {
+      allow read: if true;
+    }
+    
+    match /prices/{id} {
+      allow read: if true;
+    }
+    
+    // Default deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
