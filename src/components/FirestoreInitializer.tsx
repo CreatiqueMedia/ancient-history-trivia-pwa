@@ -26,7 +26,8 @@ const FirestoreInitializer: React.FC = () => {
 
       console.log('🚀 Starting Firestore question initialization...');
       setIsInitializing(true);
-      setShowStatus(true);
+      // Don't show status UI to avoid distracting users
+      setShowStatus(false);
       setInitializationStatus('Checking Firestore...');
 
       try {
@@ -101,14 +102,12 @@ const FirestoreInitializer: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      <div className="bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg max-w-sm">
-        <div className="flex items-center space-x-3">
+      <div className="bg-gray-800 text-gray-300 px-3 py-2 rounded-md shadow-md text-xs max-w-xs opacity-80">
+        <div className="flex items-center space-x-2">
           {isInitializing && (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            <div className="animate-spin rounded-full h-3 w-3 border-b border-gray-300"></div>
           )}
-          <div>
-            <div className="text-sm">{initializationStatus}</div>
-          </div>
+          <div className="text-xs">{initializationStatus}</div>
         </div>
       </div>
     </div>

@@ -1,8 +1,9 @@
-// Firebase Configuration - FIRESTORE RE-ENABLED
+// Firebase Configuration - FIRESTORE RE-ENABLED + ANALYTICS ENABLED
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, OAuthProvider, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
-// Google Analytics completely removed
+import { getAnalytics, Analytics } from 'firebase/analytics';
+import { getPerformance } from 'firebase/performance';
 
 // Firebase Configuration for Ancient History Trivia PWA
 const firebaseConfig = {
@@ -11,8 +12,8 @@ const firebaseConfig = {
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "ancient-history-trivia",
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "ancient-history-trivia.firebasestorage.app",
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "778256162112",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:778256162112:web:ee31ff85689d2fe722aea5"
-  // measurementId removed - Google Analytics completely disabled
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:778256162112:web:ee31ff85689d2fe722aea5",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-XXXXXXXXXX"
 };
 
 // Initialize Firebase
@@ -23,6 +24,28 @@ export const auth = getAuth(app);
 
 // Initialize Firestore
 export const db: Firestore = getFirestore(app);
+
+// Initialize Analytics (only in production and if measurement ID is available)
+export let analytics: Analytics | null = null;
+if (import.meta.env.PROD && firebaseConfig.measurementId) {
+  try {
+    analytics = getAnalytics(app);
+    console.log('Firebase Analytics initialized');
+  } catch (error) {
+    console.warn('Failed to initialize Firebase Analytics:', error);
+  }
+}
+
+// Initialize Performance Monitoring (only in production)
+export let performance: any = null;
+if (import.meta.env.PROD) {
+  try {
+    performance = getPerformance(app);
+    console.log('Firebase Performance Monitoring initialized');
+  } catch (error) {
+    console.warn('Failed to initialize Firebase Performance Monitoring:', error);
+  }
+}
 
 // DISABLED: Firestore emulator connection
 // Using production Firestore for development to avoid emulator dependency

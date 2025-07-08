@@ -644,45 +644,6 @@ const AboutScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Links Section */}
-        <div className="card p-8 mb-8">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 text-center">Connect with The Awakened Hybrid</h3>
-          <div className="flex flex-wrap justify-center gap-4">
-            <a 
-              href="https://theawakenedhybrid.com/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors"
-            >
-              Main Website
-            </a>
-            <a 
-              href="https://on.soundcloud.com/zE85i" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition-colors"
-            >
-              SoundCloud
-            </a>
-            <a 
-              href="https://www.instagram.com/theawakenedhybrid/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg transition-colors"
-            >
-              Instagram
-            </a>
-            <a 
-              href="https://creatiquemedia.com/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors"
-            >
-              Web Development Business
-            </a>
-          </div>
-        </div>
-
         {/* Footer */}
         <div className="text-center py-8">
           <p className="text-gray-600 dark:text-gray-400">

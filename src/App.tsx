@@ -170,7 +170,6 @@ function App() {
       
       try {
         // Initialize analytics
-        analyticsService.initSession();
         analyticsService.trackPageView('app_start');
         
         // Initialize notifications

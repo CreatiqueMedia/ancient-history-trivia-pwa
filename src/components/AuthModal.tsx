@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 import EmailLinkSignIn from './EmailLinkSignIn';
+import { InputValidator } from '../utils/inputValidator';
+import { rateLimiter, RATE_LIMITS } from '../utils/rateLimiter';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -57,15 +59,48 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Rate limiting check
+    const clientId = `auth_${mode}_${window.location.hostname}`;
+    if (!rateLimiter.isAllowed(clientId, RATE_LIMITS.AUTH_ATTEMPTS)) {
+      const remainingTime = Math.ceil(rateLimiter.getBlockTimeRemaining(clientId) / 1000 / 60);
+      alert(`Too many authentication attempts. Please try again in ${remainingTime} minutes.`);
+      return;
+    }
+
+    // Input validation
+    const emailValidation = InputValidator.validateEmail(email);
+    if (!emailValidation.isValid) {
+      alert(emailValidation.error);
+      return;
+    }
+
+    if (mode === 'signup') {
+      const nameValidation = InputValidator.validateDisplayName(displayName);
+      if (!nameValidation.isValid) {
+        alert(nameValidation.error);
+        return;
+      }
+    }
+
+    if (mode !== 'forgot') {
+      const passwordValidation = InputValidator.validatePassword(password);
+      if (!passwordValidation.isValid) {
+        alert(passwordValidation.error);
+        return;
+      }
+    }
+
     setLoadingStates(prev => ({ ...prev, email: true }));
 
     try {
       if (mode === 'login') {
-        await signInWithEmail(email, password);
+        await signInWithEmail(emailValidation.sanitizedValue!, password);
       } else if (mode === 'signup') {
-        await signUpWithEmail(email, password, displayName);
+        const nameValidation = InputValidator.validateDisplayName(displayName);
+        await signUpWithEmail(emailValidation.sanitizedValue!, password, nameValidation.sanitizedValue!);
       } else if (mode === 'forgot') {
-        await resetPassword(email);
+        await resetPassword(emailValidation.sanitizedValue!);
         alert('Password reset email sent! Check your inbox.');
         setMode('login');
       }
