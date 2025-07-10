@@ -481,7 +481,7 @@
 ### Firebase Configuration
 ```bash
 # Install Firebase CLI
-npm install -g firebase-tools
+yarn global add firebase-tools
 
 # Login and initialize project
 firebase login
@@ -503,10 +503,10 @@ firebase deploy
 ### Supabase Setup
 ```bash
 # Install Supabase CLI
-npm install supabase --save-dev
+yarn add --dev supabase
 
 # Initialize Supabase project
-npx supabase init
+yarn supabase init
 
 # Configure environment variables
 VITE_SUPABASE_URL=your_supabase_url
@@ -517,7 +517,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ### Stripe Integration
 ```bash
 # Install Stripe packages
-npm install @stripe/stripe-js @stripe/react-stripe-js
+yarn add @stripe/stripe-js @stripe/react-stripe-js
 
 # Configure environment variables
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_test_key
@@ -527,12 +527,12 @@ STRIPE_SECRET_KEY=sk_test_your_test_secret
 ### RevenueCat Setup
 ```bash
 # Install RevenueCat SDK
-npm install react-native-purchases
+yarn add react-native-purchases
 
 # Configure for Capacitor
-npx cap add ios
-npx cap add android
-npx cap sync
+yarn cap add ios
+yarn cap add android
+yarn cap sync
 ```
 
 ### Development Environment
