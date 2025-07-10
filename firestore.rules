@@ -31,6 +31,37 @@ service cloud.firestore {
       allow read: if request.auth != null;
     }
     
+    // ===== PURCHASED CONTENT SYSTEM =====
+    
+    // User purchases - users can only access their own purchases
+    match /users/{userId}/purchases/{bundleId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Bundle metadata - readable by authenticated users for preview/purchase
+    match /bundles/{bundleId} {
+      allow read: if request.auth != null;
+    }
+    
+    // Bundle questions - only accessible if user has purchased the bundle
+    match /bundles/{bundleId}/questions/{questionId} {
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)/purchases/$(bundleId));
+    }
+    
+    // Admin can write to bundles (for content management)
+    match /bundles/{bundleId} {
+      allow write: if request.auth != null && 
+        request.auth.token.admin == true;
+    }
+    
+    match /bundles/{bundleId}/questions/{questionId} {
+      allow write: if request.auth != null && 
+        request.auth.token.admin == true;
+    }
+    
+    // ===== END PURCHASED CONTENT SYSTEM =====
+    
     // Allow authenticated users to read and write their own trial data
     match /trials/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
