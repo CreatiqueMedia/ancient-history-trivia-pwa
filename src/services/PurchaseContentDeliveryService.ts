@@ -36,29 +36,32 @@ interface CachedBundle {
 // Map Stripe Product IDs to Bundle IDs
 const STRIPE_PRODUCT_TO_BUNDLE_MAP: Record<string, string> = {
   // Regional Bundles
-  'prod_Sc1cAYaPVIFRnm': 'egypt_pack',
-  'prod_Sc1cJRaC4oR6kR': 'rome_pack',
-  'prod_Sc1cheDu2aPo24': 'greece_pack',
-  'prod_Sc1c49nwMU5uCa': 'mesopotamia_pack',
-  'prod_Sc1cjZLEoeLV59': 'china_pack',
-  'prod_ScLQ5j27CiOLtK': 'india_pack',
-  'prod_ScLS6NZofkzkv3': 'americas_pack',
-  'prod_ScLSh6yyVtIN11': 'europe_pack',
+  'prod_Sc1cAYaPVIFRnm': 'region_pack_egypt',
+  'prod_Sc1cJRaC4oR6kR': 'region_pack_rome',
+  'prod_Sc1cheDu2aPo24': 'region_pack_greece',
+  'prod_Sc1c49nwMU5uCa': 'region_pack_mesopotamia',
+  'prod_Sc1cjZLEoeLV59': 'region_pack_china',
+  'prod_ScLQ5j27CiOLtK': 'region_pack_india',
+  'prod_ScLS6NZofkzkv3': 'region_pack_americas',
+  'prod_ScLSh6yyVtIN11': 'region_pack_europe',
   
   // Time Period Packs
-  'prod_ScLSVWDcZ7gh5T': 'bronze_age_pack',
-  'prod_ScLSgqSFOxxnKH': 'iron_age_pack',
-  'prod_ScLSzGWRwaCj0F': 'prehistoric_pack',
+  'prod_ScLSVWDcZ7gh5T': 'age_pack_bronze_age',
+  'prod_ScLSgqSFOxxnKH': 'age_pack_iron_age',
+  'prod_ScLSzGWRwaCj0F': 'age_pack_prehistoric',
   
   // Format Packs
-  'prod_ScLSPhinbppXHL': 'multiple_choice_pack',
-  'prod_ScLSsw9hXo49M7': 'true_false_pack',
-  'prod_ScLSXDdQ9mNlVL': 'fill_blank_pack',
+  'prod_ScLSPhinbppXHL': 'format_pack_multiple_choice',
+  'prod_ScLSsw9hXo49M7': 'format_pack_true_false',
+  'prod_ScLSXDdQ9mNlVL': 'format_pack_fill_blank',
   
   // Difficulty Packs
-  'prod_ScLSJ73GbHZT1r': 'easy_pack',
-  'prod_ScLSgpeFtf9Pit': 'medium_pack',
-  'prod_ScLSskLoTVMOaW': 'hard_pack'
+  'prod_ScLSJ73GbHZT1r': 'difficulty_pack_easy',
+  'prod_ScLSgpeFtf9Pit': 'difficulty_pack_medium',
+  'prod_ScLSskLoTVMOaW': 'difficulty_pack_hard',
+  
+  // Mega Bundle - All Bundle Packs (1,700 questions)
+  'prod_ScM9aB1cD2eF3g': 'all_bundle_packs' // TODO: Replace with actual Stripe product ID when created
 };
 
 export class PurchaseContentDeliveryService {
@@ -140,16 +143,17 @@ export class PurchaseContentDeliveryService {
   }
 
   /**
-   * Generate 100 questions and cache locally
+   * Generate 100 questions and cache locally (or 1,700 for mega bundle)
    */
   private async generateAndDeliverQuestions(bundleId: string): Promise<void> {
-    console.log(`📦 Generating 100 questions for ${bundleId}...`);
+    const expectedCount = bundleId === 'all_bundle_packs' ? 1700 : 100;
+    console.log(`📦 Generating ${expectedCount} questions for ${bundleId}...`);
 
-    // Generate 100 questions based on bundle type
+    // Generate questions based on bundle type
     const questions = await this.generateFullQuestionSet(bundleId);
 
-    if (questions.length !== 100) {
-      console.warn(`⚠️ Expected 100 questions, generated ${questions.length} for ${bundleId}`);
+    if (questions.length !== expectedCount) {
+      console.warn(`⚠️ Expected ${expectedCount} questions, generated ${questions.length} for ${bundleId}`);
     }
 
     // Store in Firestore for secure access
@@ -165,7 +169,12 @@ export class PurchaseContentDeliveryService {
    * Generate 100 questions based on bundle type with proper difficulty distribution
    */
   private async generateFullQuestionSet(bundleId: string): Promise<Question[]> {
-    console.log(`🎯 Generating 100 questions for ${bundleId} with difficulty distribution...`);
+    console.log(`🎯 Generating questions for ${bundleId}...`);
+
+    // Check if this is the mega bundle (all bundles)
+    if (bundleId === 'all_bundle_packs') {
+      return this.generateMegaBundleQuestions(bundleId);
+    }
 
     // Check if this is a difficulty pack (different rules)
     const isDifficultyPack = this.isDifficultyPack(bundleId);
@@ -183,15 +192,15 @@ export class PurchaseContentDeliveryService {
    */
   private isDifficultyPack(bundleId: string): boolean {
     const difficultyPacks = [
-      'easy_pack',           // Easy/Elementary Pack - 100% easy questions
-      'medium_pack',         // Medium/Middle School Pack - 100% medium questions  
-      'hard_pack',           // Hard/High School Pack - 100% hard questions
-      'elementary_pack',     // Alternative naming
-      'middle_school_pack',  // Alternative naming
-      'high_school_pack',    // Alternative naming
-      'beginner_pack',       // Alternative naming
-      'intermediate_pack',   // Alternative naming
-      'advanced_pack'        // Alternative naming
+      'difficulty_pack_easy',      // Easy/Elementary Pack - 100% easy questions
+      'difficulty_pack_medium',    // Medium/Middle School Pack - 100% medium questions  
+      'difficulty_pack_hard',      // Hard/High School Pack - 100% hard questions
+      'elementary_pack',           // Alternative naming
+      'middle_school_pack',        // Alternative naming
+      'high_school_pack',          // Alternative naming
+      'beginner_pack',             // Alternative naming
+      'intermediate_pack',         // Alternative naming
+      'advanced_pack'              // Alternative naming
     ];
     return difficultyPacks.includes(bundleId);
   }
@@ -257,6 +266,79 @@ export class PurchaseContentDeliveryService {
       allQuestions.push(this.generateQuestionByDifficulty(bundleId, bundleName, difficulty, i + 1));
     }
 
+    return this.shuffleArray(allQuestions);
+  }
+
+  /**
+   * Generate questions for mega bundle (All Bundle Packs) - 1,700 total questions
+   */
+  private generateMegaBundleQuestions(bundleId: string): Question[] {
+    console.log(`🏆 Generating 1,700 questions for mega bundle: ${bundleId}`);
+    
+    const allQuestions: Question[] = [];
+    
+    // List of all individual bundle IDs that should be included
+    const includedBundles = [
+      // Regional Bundles (8 bundles × 100 = 800 questions)
+      'region_pack_rome',
+      'region_pack_egypt', 
+      'region_pack_greece',
+      'region_pack_mesopotamia',
+      'region_pack_china',
+      'region_pack_india',
+      'region_pack_americas',
+      'region_pack_europe',
+      
+      // Age/Time Period Bundles (3 bundles × 100 = 300 questions)
+      'age_pack_bronze_age',
+      'age_pack_iron_age', 
+      'age_pack_prehistoric',
+      
+      // Format Bundles (3 bundles × 100 = 300 questions)
+      'format_pack_multiple_choice',
+      'format_pack_true_false',
+      'format_pack_fill_blank',
+      
+      // Difficulty Bundles (3 bundles × 100 = 300 questions)
+      'difficulty_pack_easy',
+      'difficulty_pack_medium',
+      'difficulty_pack_hard'
+    ];
+    
+    console.log(`📊 Mega bundle includes ${includedBundles.length} individual bundles:`);
+    
+    // Generate 100 questions for each included bundle
+    includedBundles.forEach((subBundleId, index) => {
+      console.log(`   ${index + 1}. Generating 100 questions for ${subBundleId}...`);
+      
+      // Check if it's a difficulty pack
+      const isDifficultyPack = this.isDifficultyPack(subBundleId);
+      
+      let bundleQuestions: Question[];
+      if (isDifficultyPack) {
+        bundleQuestions = this.generateDifficultyPackQuestions(subBundleId);
+      } else {
+        bundleQuestions = this.generateStandardBundleQuestions(subBundleId);
+      }
+      
+      // Add bundle prefix to question IDs to avoid conflicts
+      bundleQuestions.forEach((question, qIndex) => {
+        question.id = `mega_${subBundleId}_${qIndex + 1}`;
+        question.tags = [...(question.tags || []), 'mega_bundle', 'all_bundle_packs'];
+      });
+      
+      allQuestions.push(...bundleQuestions);
+    });
+    
+    console.log(`✅ Generated ${allQuestions.length} total questions for mega bundle`);
+    console.log(`📈 Question distribution:`);
+    console.log(`   - Regional bundles: 800 questions (8 × 100)`);
+    console.log(`   - Age/Time bundles: 300 questions (3 × 100)`);
+    console.log(`   - Format bundles: 300 questions (3 × 100)`);
+    console.log(`   - Difficulty bundles: 300 questions (3 × 100)`);
+    console.log(`   - Total: ${allQuestions.length} questions`);
+    
+    // Shuffle all questions together
     return this.shuffleArray(allQuestions);
   }
 
