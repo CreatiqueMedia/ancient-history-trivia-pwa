@@ -208,36 +208,22 @@ Built with ⚡ Vite and ❤️ for history enthusiasts
 
 # Quarterly Trivia Bundle Delivery & Cloud Integration
 
-## Automated Quarterly Release Workflow
+## Content Management
 
-This project is designed for seamless, versioned delivery of new trivia question bundles every quarter. The workflow is fully automated and cloud-based for future-proofing and app store compliance.
+Question bundles are managed through the Stripe + Firebase content delivery system:
 
-### 1. Exporting Bundles
+### 1. Content Generation
 
-- Use the script at `scripts/export-bundles.ts` to export all non-format question bundles.
-- Each bundle contains exactly 100 questions, evenly mixed between true/false, fill-in-the-blank, and multiple choice.
-- Format Packs are excluded from this export.
-- The script outputs a versioned JSON file (e.g., `public/trivia-bundles-2025-Q3.json`).
+- Questions are generated dynamically after purchase through the PurchaseContentDeliveryService
+- Each bundle contains exactly 100 questions with proper difficulty distribution
+- Standard bundles follow 33/33/34 (Easy/Medium/Hard) formula
+- Difficulty packs contain 100% of their specified level
 
-**Run:**
-```bash
-yarn ts-node scripts/export-bundles.ts
-```
+### 2. Content Delivery
 
-### 2. Uploading to Supabase Storage
-
-- Use the script at `scripts/upload-bundles-to-supabase.ts` to upload the exported JSON file to your Supabase Storage bucket.
-- Requires environment variables `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (see your Supabase project settings).
-- The file is versioned for easy rollback and automation.
-
-**Run:**
-```bash
-SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... yarn ts-node scripts/upload-bundles-to-supabase.ts
-```
-
-### 3. App Integration
-
-- The app fetches the latest bundle from Supabase Storage at runtime.
+- Stripe webhooks trigger content generation after successful purchase
+- Content is cached locally for offline access
+- Users get immediate access to purchased bundles
 - Sample quiz buttons always use the correct questions for each bundle.
 - All navigation and data loading is robust and future-proof.
 
@@ -283,9 +269,9 @@ SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... yarn ts-node scripts/upload-bundl
 
 # Best Practices & Maintenance
 
-- All automation scripts are in `scripts/` and documented
-- Use versioned filenames for bundles to enable rollback and auditing
-- Keep Supabase credentials secure (never commit to source control)
+- Content is managed through Stripe + Firebase integration
+- Use the comprehensive documentation in `docs/COMPREHENSIVE_PROJECT_DOCUMENTATION.md`
+- Keep Firebase and Stripe credentials secure (never commit to source control)
 - Run Lighthouse audits before each release
 - Regularly update dependencies and test on all target platforms
 
