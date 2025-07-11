@@ -59,15 +59,17 @@ export async function mockWebhookEndpoint(bundleId: string, userId?: string): Pr
     'region_pack_india': 'prod_ScLQ5j27CiOLtK',
     'region_pack_americas': 'prod_ScLS6NZofkzkv3',
     'region_pack_europe': 'prod_ScLSh6yyVtIN11',
-    'time_pack_bronze': 'prod_ScLSVWDcZ7gh5T',
-    'time_pack_iron': 'prod_ScLSgqSFOxxnKH',
-    'time_pack_prehistoric': 'prod_ScLSzGWRwaCj0F',
+    'age_pack_bronze_age': 'prod_ScLSVWDcZ7gh5T',
+    'age_pack_iron_age': 'prod_ScLSgqSFOxxnKH',
+    'age_pack_prehistoric': 'prod_ScLSzGWRwaCj0F',
     'format_pack_multiple_choice': 'prod_ScLSPhinbppXHL',
     'format_pack_true_false': 'prod_ScLSsw9hXo49M7',
     'format_pack_fill_blank': 'prod_ScLSXDdQ9mNlVL',
     'difficulty_pack_easy': 'prod_ScLSJ73GbHZT1r',
     'difficulty_pack_medium': 'prod_ScLSgpeFtf9Pit',
-    'difficulty_pack_hard': 'prod_ScLSskLoTVMOaW'
+    'difficulty_pack_hard': 'prod_ScLSskLoTVMOaW',
+    // Mega Bundle - All Bundle Packs
+    'all_bundle_packs': 'prod_SfAi1wHgJuKhYd'
   };
 
   const stripeProductId = bundleToProductMap[bundleId];

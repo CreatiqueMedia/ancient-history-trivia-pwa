@@ -250,7 +250,9 @@ export async function testPurchaseFlow(bundleId: string): Promise<void> {
     'region_pack_rome': 'prod_Sc1cJRaC4oR6kR',
     'region_pack_greece': 'prod_Sc1cheDu2aPo24',
     'region_pack_mesopotamia': 'prod_Sc1c49nwMU5uCa',
-    'region_pack_china': 'prod_Sc1cjZLEoeLV59'
+    'region_pack_china': 'prod_Sc1cjZLEoeLV59',
+    // Mega Bundle
+    'all_bundle_packs': 'prod_SfAi1wHgJuKhYd'
   };
 
   const stripeProductId = bundleToProductMap[bundleId];

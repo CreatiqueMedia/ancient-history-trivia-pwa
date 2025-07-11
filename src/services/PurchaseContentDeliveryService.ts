@@ -61,7 +61,7 @@ const STRIPE_PRODUCT_TO_BUNDLE_MAP: Record<string, string> = {
   'prod_ScLSskLoTVMOaW': 'difficulty_pack_hard',
   
   // Mega Bundle - All Bundle Packs (1,700 questions)
-  'prod_ScM9aB1cD2eF3g': 'all_bundle_packs' // TODO: Replace with actual Stripe product ID when created
+  'prod_SfAi1wHgJuKhYd': 'all_bundle_packs' // Complete collection of all 17 bundles
 };
 
 export class PurchaseContentDeliveryService {
