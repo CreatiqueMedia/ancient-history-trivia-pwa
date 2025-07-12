@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentation
+    url: https://github.com/ronratzlaff/ancient-history-pwa/blob/main/docs/COMPREHENSIVE_PROJECT_DOCUMENTATION.md
+    about: Read the comprehensive project documentation
+  - name: 🌐 Live Demo
+    url: https://ancient-history-trivia.web.app
+    about: Try the live Ancient History Trivia PWA
+  - name: 💬 Discussions
+    url: https://github.com/ronratzlaff/ancient-history-pwa/discussions
+    about: Ask questions and discuss features with the community
+  - name: 🛡️ Security Issues
+    url: https://github.com/ronratzlaff/ancient-history-pwa/security/advisories
+    about: Report security vulnerabilities privately

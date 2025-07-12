@@ -1,0 +1,115 @@
+name: 📚 Question Content
+description: Submit new quiz questions or report issues with existing questions
+title: "[CONTENT] "
+labels: ["content", "questions"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help improve our question database! Submit new questions or report issues with existing ones.
+
+  - type: dropdown
+    id: content_type
+    attributes:
+      label: Content Type
+      description: What type of content submission is this?
+      options:
+        - New Question Submission
+        - Question Error Report
+        - Historical Accuracy Issue
+        - Question Bundle Suggestion
+        - Difficulty Rating Issue
+    validations:
+      required: true
+
+  - type: dropdown
+    id: civilization
+    attributes:
+      label: Ancient Civilization
+      description: Which ancient civilization does this relate to?
+      options:
+        - Ancient Greece
+        - Ancient Rome
+        - Ancient Egypt
+        - Ancient China
+        - Mesopotamia
+        - Ancient India
+        - Ancient Persia
+        - Maya Civilization
+        - Multiple Civilizations
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question_text
+    attributes:
+      label: Question Text (if applicable)
+      description: Provide the exact question text
+      placeholder: Enter the question text here...
+
+  - type: dropdown
+    id: question_format
+    attributes:
+      label: Question Format
+      description: What type of question format?
+      options:
+        - Multiple Choice
+        - True/False
+        - Fill-in-the-Blank
+        - Other
+
+  - type: textarea
+    id: answer_options
+    attributes:
+      label: Answer Options (if applicable)
+      description: List all answer options for multiple choice questions
+      placeholder: |
+        A) Option 1
+        B) Option 2
+        C) Option 3
+        D) Option 4
+
+  - type: textarea
+    id: correct_answer
+    attributes:
+      label: Correct Answer
+      description: What is the correct answer?
+      placeholder: Specify the correct answer...
+
+  - type: textarea
+    id: explanation
+    attributes:
+      label: Explanation/Historical Context
+      description: Provide historical context or explanation for the answer
+      placeholder: Explain the historical context and why this answer is correct...
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty Level
+      description: How difficult is this question?
+      options:
+        - Easy (High School)
+        - Medium (College)
+        - Hard (AP/Advanced)
+        - Expert (Graduate)
+
+  - type: textarea
+    id: sources
+    attributes:
+      label: Historical Sources
+      description: List any historical sources or references for verification
+      placeholder: |
+        - Source 1: Book/Article title, Author, Year
+        - Source 2: Academic paper, Journal, Year
+        - etc.
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Notes
+      description: Any additional context or notes
+      placeholder: Additional information...

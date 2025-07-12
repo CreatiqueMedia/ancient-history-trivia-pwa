@@ -1,0 +1,143 @@
+name: Template Health Check
+
+on:
+  schedule:
+    # Run monthly on the 1st at 2 AM UTC
+    - cron: '0 2 1 * *'
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'package.json'
+      - 'yarn.lock'
+      - '.github/workflows/**'
+
+jobs:
+  template-health:
+    runs-on: ubuntu-latest
+    name: Check Template Health
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'yarn'
+    
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+    
+    - name: Check for vulnerabilities
+      run: yarn audit --level moderate
+      continue-on-error: true
+    
+    - name: Check outdated packages
+      run: yarn outdated
+      continue-on-error: true
+    
+    - name: Type check
+      run: yarn tsc --noEmit
+    
+    - name: Lint check
+      run: yarn lint
+      continue-on-error: true
+    
+    - name: Build check
+      run: yarn build
+    
+    - name: Test template setup
+      run: |
+        # Test if essential template files exist
+        test -f .env.template || echo "❌ Missing .env.template"
+        test -f TEMPLATE_README.md || echo "❌ Missing TEMPLATE_README.md"
+        test -f CONTRIBUTING.md || echo "❌ Missing CONTRIBUTING.md"
+        test -f SECURITY.md || echo "❌ Missing SECURITY.md"
+        test -d .github/ISSUE_TEMPLATE || echo "❌ Missing issue templates"
+        test -f .github/PULL_REQUEST_TEMPLATE/pull_request_template.md || echo "❌ Missing PR template"
+        echo "✅ Template files check completed"
+    
+    - name: Check for secrets in code
+      run: |
+        # Basic check for potential secrets (customize as needed)
+        if grep -r "AAAA" src/ --exclude-dir=node_modules || \
+           grep -r "sk_" src/ --exclude-dir=node_modules || \
+           grep -r "pk_live" src/ --exclude-dir=node_modules; then
+          echo "❌ Potential secrets found in code"
+          exit 1
+        else
+          echo "✅ No obvious secrets found"
+        fi
+    
+    - name: Validate Firebase config
+      run: |
+        if [ -f "firebase.json" ]; then
+          echo "✅ Firebase config exists"
+          # Check if hosting config is present
+          if grep -q "hosting" firebase.json; then
+            echo "✅ Firebase hosting configured"
+          else
+            echo "❌ Firebase hosting not configured"
+          fi
+        else
+          echo "❌ Firebase config missing"
+        fi
+    
+    - name: Check PWA manifest
+      run: |
+        if [ -f "public/manifest.webmanifest" ]; then
+          echo "✅ PWA manifest exists"
+        else
+          echo "❌ PWA manifest missing"
+        fi
+    
+    - name: Template size check
+      run: |
+        # Check if dist size is reasonable (under 5MB)
+        DIST_SIZE=$(du -sm dist | cut -f1)
+        if [ $DIST_SIZE -gt 5 ]; then
+          echo "⚠️ Large build size: ${DIST_SIZE}MB"
+        else
+          echo "✅ Build size OK: ${DIST_SIZE}MB"
+        fi
+    
+    - name: Create issue if health check fails
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const title = 'Template Health Check Failed';
+          const body = `
+          ## 🚨 Template Health Check Failed
+          
+          The automated health check for the Ancient History PWA template has failed.
+          
+          **Workflow Run**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          
+          Please review the following:
+          - Check for security vulnerabilities
+          - Update outdated dependencies
+          - Fix any build or type errors
+          - Ensure all template files are present
+          
+          This issue was automatically created by the Template Health Check workflow.
+          `;
+          
+          // Check if issue already exists
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'automated,template-health'
+          });
+          
+          if (issues.data.length === 0) {
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['automated', 'template-health', 'bug']
+            });
+          }

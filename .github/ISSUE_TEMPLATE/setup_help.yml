@@ -1,0 +1,106 @@
+name: 🚀 Setup Help
+description: Get help with setting up or deploying the Ancient History PWA
+title: "[SETUP] "
+labels: ["help", "setup"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Need help getting the Ancient History PWA up and running? We're here to help!
+
+  - type: dropdown
+    id: setup_stage
+    attributes:
+      label: Setup Stage
+      description: Where are you in the setup process?
+      options:
+        - Initial Installation
+        - Development Environment
+        - Firebase Configuration
+        - Stripe Integration
+        - Build Process
+        - Deployment
+        - PWA Installation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue_description
+    attributes:
+      label: Issue Description
+      description: Describe the problem you're encountering
+      placeholder: What issue are you facing?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps_taken
+    attributes:
+      label: Steps Already Taken
+      description: What steps have you already tried?
+      placeholder: |
+        1. Step 1
+        2. Step 2
+        3. etc.
+
+  - type: textarea
+    id: error_output
+    attributes:
+      label: Error Output
+      description: Include any error messages or console output
+      placeholder: Paste error messages here...
+      render: shell
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: Your development environment details
+      placeholder: |
+        OS: 
+        Node.js version: 
+        Yarn version: 
+        Browser: 
+        Firebase CLI version: 
+      render: yaml
+    validations:
+      required: true
+
+  - type: textarea
+    id: config_files
+    attributes:
+      label: Configuration Files
+      description: Share relevant configuration (remove any secrets!)
+      placeholder: |
+        Share your .env.template, package.json, or other config files
+        (Make sure to remove any API keys or secrets!)
+      render: yaml
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-Setup Checklist
+      description: Have you completed these steps?
+      options:
+        - label: Read the README.md completely
+          required: false
+        - label: Installed Node.js 18+
+          required: false
+        - label: Installed Yarn 1.22+
+          required: false
+        - label: Created Firebase project
+          required: false
+        - label: Set up environment variables
+          required: false
+        - label: Ran `yarn install`
+          required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that might help
+      placeholder: Additional context...
