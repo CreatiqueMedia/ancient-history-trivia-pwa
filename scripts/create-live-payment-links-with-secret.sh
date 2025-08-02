@@ -2,7 +2,7 @@
 
 # Script to create live Stripe payment links using secret key
 # Usage: 
-#   export STRIPE_SECRET_KEY="sk_live_XXXXXXXXXXXXXXXXXXXXXXXX"
+#   export STRIPE_SECRET_KEY="YOUR_LIVE_SECRET_KEY_HERE"
 #   ./scripts/create-live-payment-links-with-secret.sh
 
 echo "🚀 Creating Live Stripe Payment Links with Secret Key..."
@@ -13,23 +13,15 @@ if [ -z "$STRIPE_SECRET_KEY" ]; then
     echo "❌ Error: STRIPE_SECRET_KEY environment variable not set"
     echo ""
     echo "Usage:"
-    echo "  export STRIPE_SECRET_KEY=\"sk_live_XXXXXXXXXXXXXXXXXXXXXXXX\""
+    echo "  export STRIPE_SECRET_KEY=\"YOUR_LIVE_SECRET_KEY_HERE\""
     echo "  ./scripts/create-live-payment-links-with-secret.sh"
     echo ""
     echo "Get your secret key from: https://dashboard.stripe.com/apikeys"
     exit 1
 fi
 
-# Verify secret key format (commented out for security)
-# if [[ ! $STRIPE_SECRET_KEY =~ ^sk_live_ ]]; then
-#     echo "⚠️  Warning: Key doesn't start with expected prefix - are you sure this is a live secret key?"
-#     echo "Current key starts with: ${STRIPE_SECRET_KEY:0:8}..."
-#     read -p "Continue anyway? (y/N): " -n 1 -r
-#     echo
-#     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-#         exit 1
-#     fi
-# fi
+# Verification logic commented out for security
+# Uncomment and modify as needed for your validation requirements
 
 echo "✅ Using secret key: ${STRIPE_SECRET_KEY:0:12}..."
 echo ""
