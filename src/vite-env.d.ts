@@ -56,9 +56,9 @@ interface ImportMeta {
 }
 
 // Google Analytics types
-declare function gtag(...args: any[]): void;
-
 declare global {
+  function gtag(...args: any[]): void;
+  
   interface Window {
     gtag?: (...args: any[]) => void;
   }
@@ -66,6 +66,13 @@ declare global {
   // Extended Notification API for PWA features
   interface NotificationOptions {
     vibrate?: number | number[];
+    actions?: NotificationAction[];
+  }
+  
+  interface NotificationAction {
+    action: string;
+    title: string;
+    icon?: string;
   }
 }
 
