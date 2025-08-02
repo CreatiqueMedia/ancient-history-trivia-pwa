@@ -4,7 +4,14 @@
 echo "🚀 Creating ALL Live Stripe Payment Links..."
 echo "============================================="
 
-export STRIPE_SECRET_KEY="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"
+# Set your Stripe secret key as an environment variable:
+# export STRIPE_SECRET_KEY="sk_live_YOUR_ACTUAL_SECRET_KEY"
+
+if [ -z "$STRIPE_SECRET_KEY" ]; then
+    echo "❌ Error: STRIPE_SECRET_KEY environment variable not set"
+    echo "Please set it with: export STRIPE_SECRET_KEY=\"sk_live_YOUR_SECRET_KEY\""
+    exit 1
+fi
 
 # Function to create payment link and extract URL properly
 create_link() {

@@ -156,3 +156,8 @@ setup-dev.sh
 
 # Redirect project (troubleshooting)
 redirect-project/
+
+# Scripts with secrets (create local copies from templates)
+scripts/*-with-secret.sh
+scripts/quick-test-*.sh
+scripts/create-all-*.sh
