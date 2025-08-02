@@ -8,6 +8,7 @@ import { usePurchase } from '../context/PurchaseContext';
 import { getBundleById, getRandomQuestions, getQuestionsForBundle } from '../data/questions';
 import { QUESTION_BUNDLES } from '../data/bundles';
 import { Question } from '../types';
+import { QuestionBundle } from '../types/bundles';
 import { EnhancedQuizService } from '../services/EnhancedQuizService';
 import { FullQuestionService } from '../services/FullQuestionService';
 import { FirestoreQuestionService } from '../services/FirestoreQuestionService';
@@ -25,7 +26,7 @@ const QuizScreen: React.FC = () => {
   const { isPremiumUser, hasAccessToBundle } = usePurchase();
   const [timer, setTimer] = useState<number>(settings.questionTimeLimit || 0);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentBundle, setCurrentBundle] = useState<any>(null);
+  const [currentBundle, setCurrentBundle] = useState<QuestionBundle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
 
@@ -62,17 +63,17 @@ const QuizScreen: React.FC = () => {
       
       // Load questions based on sample quiz, bundle, daily challenge, or use enhanced quiz generation
       let quizQuestions: Question[];
-      let bundle = null;
+      let bundle: QuestionBundle | null = null;
       
       if (sampleQuiz && isSampleQuiz) {
         // Load sample quiz questions from localStorage
-        quizQuestions = sampleQuiz.questions;
-        bundle = QUESTION_BUNDLES.find(b => b.id === sampleQuiz.bundleId);
+        quizQuestions = (sampleQuiz as any).questions;
+        bundle = QUESTION_BUNDLES.find(b => b.id === (sampleQuiz as any).bundleId) || null;
         setCurrentBundle(bundle);
       } else if (isSampleQuiz && effectiveBundleId) {
         // Fallback: if it's a sample quiz but no localStorage data, get sample questions directly
         quizQuestions = sampleQuestionsByBundle[effectiveBundleId] || [];
-        bundle = QUESTION_BUNDLES.find(b => b.id === effectiveBundleId);
+        bundle = QUESTION_BUNDLES.find(b => b.id === effectiveBundleId) || null;
         setCurrentBundle(bundle);
         
         if (quizQuestions.length === 0) {
@@ -113,9 +114,10 @@ const QuizScreen: React.FC = () => {
             description: `Daily Challenge - ${dailyChallenge.category}`,
             themeColors: {
               primary: '#f59e0b',
-              background: '#fef3c7'
+              background: '#fef3c7',
+              text: '#1f2937'
             }
-          };
+          } as QuestionBundle;
           setCurrentBundle(bundle);
         } catch (error) {
           console.error('Failed to load daily challenge:', error);
@@ -125,7 +127,7 @@ const QuizScreen: React.FC = () => {
         }
       } else if (effectiveBundleId) {
         // Find the bundle for UI display
-        bundle = QUESTION_BUNDLES.find(b => b.id === effectiveBundleId);
+        bundle = QUESTION_BUNDLES.find(b => b.id === effectiveBundleId) || null;
         setCurrentBundle(bundle);
         
         // Determine question count based on user access level
