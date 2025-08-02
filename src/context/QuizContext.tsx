@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext } from 'react';
 import { Question, QuizState, QuestionResult, QuizResult } from '../types';
+import { DailyChallengeService } from '../services/DailyChallengeService';
 
 interface QuizContextType {
   currentQuiz: QuizState | null;
@@ -12,74 +13,101 @@ interface QuizContextType {
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
 
-export function QuizProvider({ children }: { children: React.ReactNode }) {
-  const [currentQuiz, setCurrentQuiz] = useState<QuizState | null>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
+interface QuizProviderState {
+  currentQuiz: QuizState | null;
+  questions: Question[];
+}
 
-  const startQuiz = useCallback((quizQuestions: Question[]) => {
-    setQuestions(quizQuestions);
-    setCurrentQuiz({
-      currentQuestionIndex: 0,
-      selectedAnswer: null,
-      showAnswer: false,
-      timeRemaining: 90, // Increased to 90 seconds per question
-      isCompleted: false,
-      results: [],
-      startTime: new Date()
+export class QuizProvider extends React.Component<
+  { children: React.ReactNode },
+  QuizProviderState
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = {
+      currentQuiz: null,
+      questions: []
+    };
+  }
+
+  startQuiz = (quizQuestions: Question[]) => {
+    this.setState({
+      questions: quizQuestions,
+      currentQuiz: {
+        currentQuestionIndex: 0,
+        selectedAnswer: null,
+        showAnswer: false,
+        timeRemaining: 90, // Increased to 90 seconds per question
+        isCompleted: false,
+        results: [],
+        startTime: new Date()
+      }
     });
-  }, []);
+  };
 
-  const selectAnswer = useCallback((answerIndex: number) => {
-    setCurrentQuiz(prev => {
-      if (!prev || prev.showAnswer) return prev;
+  selectAnswer = (answerIndex: number) => {
+    this.setState(prevState => {
+      const { currentQuiz } = prevState;
+      if (!currentQuiz || currentQuiz.showAnswer) return prevState;
       
       return {
-        ...prev,
-        selectedAnswer: answerIndex,
-        showAnswer: true
+        ...prevState,
+        currentQuiz: {
+          ...currentQuiz,
+          selectedAnswer: answerIndex,
+          showAnswer: true
+        }
       };
     });
-  }, []);
+  };
 
-  const nextQuestion = useCallback(() => {
-    setCurrentQuiz(prev => {
-      if (!prev || !questions.length) return prev;
+  nextQuestion = () => {
+    this.setState(prevState => {
+      const { currentQuiz, questions } = prevState;
+      if (!currentQuiz || !questions.length) return prevState;
 
-      const currentQuestion = questions[prev.currentQuestionIndex];
-      const isCorrect = prev.selectedAnswer === currentQuestion.correctAnswer;
+      const currentQuestion = questions[currentQuiz.currentQuestionIndex];
+      const isCorrect = currentQuiz.selectedAnswer === currentQuestion.correctAnswer;
       
       const questionResult: QuestionResult = {
         questionId: currentQuestion.id,
         isCorrect,
-        selectedAnswer: prev.selectedAnswer || -1,
-        timeSpent: 90 - prev.timeRemaining
+        selectedAnswer: currentQuiz.selectedAnswer || -1,
+        timeSpent: 90 - currentQuiz.timeRemaining
       };
 
-      const newResults = [...prev.results, questionResult];
-      const nextIndex = prev.currentQuestionIndex + 1;
+      const newResults = [...currentQuiz.results, questionResult];
+      const nextIndex = currentQuiz.currentQuestionIndex + 1;
 
       if (nextIndex >= questions.length) {
         // Quiz completed
         return {
-          ...prev,
-          isCompleted: true,
-          results: newResults
+          ...prevState,
+          currentQuiz: {
+            ...currentQuiz,
+            isCompleted: true,
+            results: newResults
+          }
         };
       } else {
         // Next question
         return {
-          ...prev,
-          currentQuestionIndex: nextIndex,
-          selectedAnswer: null,
-          showAnswer: false,
-          timeRemaining: 90, // Reset to 90 seconds for next question
-          results: newResults
+          ...prevState,
+          currentQuiz: {
+            ...currentQuiz,
+            currentQuestionIndex: nextIndex,
+            selectedAnswer: null,
+            showAnswer: false,
+            timeRemaining: 90, // Reset to 90 seconds for next question
+            results: newResults
+          }
         };
       }
     });
-  }, [questions]);
+  };
 
-  const finishQuiz = useCallback((): QuizResult | null => {
+  finishQuiz = (): QuizResult | null => {
+    const { currentQuiz, questions } = this.state;
     if (!currentQuiz || !questions.length) return null;
 
     const correctAnswers = currentQuiz.results.filter(r => r.isCorrect).length;
@@ -95,7 +123,6 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
         bundleId = 'daily-challenge';
         
         // Complete the daily challenge if this is a daily challenge quiz
-        const { DailyChallengeService } = require('../services/DailyChallengeService');
         DailyChallengeService.completeDailyChallenge(score);
       } else if (currentPath.includes('/quiz/')) {
         const pathParts = currentPath.split('/');
@@ -117,29 +144,35 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
     };
 
     return result;
-  }, [currentQuiz, questions]);
+  };
 
-  const resetQuiz = useCallback(() => {
-    setCurrentQuiz(null);
-    setQuestions([]);
-  }, []);
+  resetQuiz = () => {
+    this.setState({
+      currentQuiz: null,
+      questions: []
+    });
+  };
 
-  return (
-    <QuizContext.Provider value={{
-      currentQuiz,
-      startQuiz,
-      selectAnswer,
-      nextQuestion,
-      finishQuiz,
-      resetQuiz
-    }}>
-      {children}
-    </QuizContext.Provider>
-  );
+  render() {
+    const contextValue: QuizContextType = {
+      currentQuiz: this.state.currentQuiz,
+      startQuiz: this.startQuiz,
+      selectAnswer: this.selectAnswer,
+      nextQuestion: this.nextQuestion,
+      finishQuiz: this.finishQuiz,
+      resetQuiz: this.resetQuiz
+    };
+
+    return (
+      <QuizContext.Provider value={contextValue}>
+        {this.props.children}
+      </QuizContext.Provider>
+    );
+  }
 }
 
 export function useQuiz() {
-  const context = useContext(QuizContext);
+  const context = React.useContext(QuizContext);
   if (context === undefined) {
     throw new Error('useQuiz must be used within a QuizProvider');
   }

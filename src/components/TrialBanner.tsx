@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   SparklesIcon, 
@@ -6,7 +6,7 @@ import {
   ArrowRightIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/solid';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
 import { TrialService } from '../services/TrialService';
 
@@ -22,13 +22,27 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
   const { user } = useAuth();
   const { isPremiumUser, subscriptionTier } = usePurchase();
 
+  // Memoize expensive trial checks to prevent recalculation on every render
+  const trialStatus = useMemo(() => {
+    if (!user) return { showForPublic: true, isInTrial: false, isEligible: true };
+    
+    return {
+      showForPublic: false,
+      isInTrial: TrialService.isInTrial(),
+      isEligible: TrialService.isEligibleForTrial(user.uid)
+    };
+  }, [user?.uid]);
+
+  // Memoize the trial URL since it never changes
+  const trialUrl = useMemo(() => '/store?action=start_trial&tab=subscription', []);
+
   // Show for unauthenticated users (public view)
   if (!user) {
     // Show trial banner for public users
   } else {
     // For authenticated users, only show if they are on FREE plan
     // Don't show if user is already in trial
-    if (TrialService.isInTrial()) {
+    if (trialStatus.isInTrial) {
       return null;
     }
 
@@ -38,24 +52,14 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
     }
 
     // Don't show if user is not eligible for trial
-    if (!TrialService.isEligibleForTrial(user.uid)) {
+    if (!trialStatus.isEligible) {
       return null;
     }
   }
 
-  const trialUrl = `/store?action=start_trial&tab=subscription`;
-
-  // Add debugging for URL generation
-  console.log('🔗 TrialBanner: Generated trial URL:', trialUrl);
-
   const handleTrialClick = (e: React.MouseEvent) => {
-    console.log('🎯 TrialBanner: Trial button clicked!');
-    console.log('🔗 TrialBanner: Target URL:', trialUrl);
-    console.log('🔗 TrialBanner: Current location:', window.location.href);
-    
     // Check if we're already on the store page
     if (window.location.pathname === '/store') {
-      console.log('🔄 Already on store page - preventing default navigation');
       e.preventDefault();
       
       // Store pending trial action

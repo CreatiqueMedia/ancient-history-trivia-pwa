@@ -6,6 +6,7 @@ import { purchaseContentDeliveryService } from '../services/PurchaseContentDeliv
 import { mockWebhookEndpoint } from '../api/webhookEndpoint';
 import { Question } from '../types';
 import { auth } from '../config/firebase';
+import AuthModal from './AuthModal';
 
 interface EnhancedQuizProps {
   bundleId: string;
@@ -46,6 +47,7 @@ export const EnhancedQuiz: React.FC<EnhancedQuizProps> = ({ bundleId, onClose })
   });
 
   const [showPurchasePrompt, setShowPurchasePrompt] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Load quiz data and check purchase status
   useEffect(() => {
@@ -155,7 +157,7 @@ export const EnhancedQuiz: React.FC<EnhancedQuizProps> = ({ bundleId, onClose })
   const handleTestPurchase = async () => {
     const user = auth.currentUser;
     if (!user) {
-      alert('Please log in to test purchase');
+      setShowAuthModal(true);
       return;
     }
 
@@ -391,7 +393,18 @@ export const EnhancedQuiz: React.FC<EnhancedQuizProps> = ({ bundleId, onClose })
 
             <div className="space-x-4">
               <button
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  // Reset quiz state instead of reloading page
+                  setQuizState({
+                    questions: quizState.questions,
+                    currentIndex: 0,
+                    selectedAnswer: null,
+                    showAnswer: false,
+                    score: 0,
+                    isComplete: false,
+                    timeRemaining: 30
+                  });
+                }}
                 className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
               >
                 Try Again
@@ -406,6 +419,14 @@ export const EnhancedQuiz: React.FC<EnhancedQuizProps> = ({ bundleId, onClose })
           </div>
         )}
       </div>
+      
+      {/* Authentication Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+        initialMode="login"
+        context="purchase"
+      />
     </div>
   );
 };

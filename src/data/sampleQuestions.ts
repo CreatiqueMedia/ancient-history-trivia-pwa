@@ -2200,9 +2200,9 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
     // Rome (2 questions)
     {
       id: 'mega-rome-1',
-      question: 'What was the capital city of the Roman Empire?',
-      options: ['Athens', 'Rome', 'Alexandria', 'Constantinople'],
-      correctAnswer: 1,
+      question: 'The capital city of the Roman Empire was _____.',
+      options: ['Rome', 'Athens', 'Alexandria', 'Constantinople'],
+      correctAnswer: 0,
       difficulty: 'easy',
       category: 'Geography',
       region: 'Rome',
@@ -2212,22 +2212,22 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
     },
     {
       id: 'mega-rome-2',
-      question: 'Which Roman leader was assassinated on the Ides of March?',
-      options: ['Augustus', 'Julius Caesar', 'Mark Antony', 'Pompey'],
-      correctAnswer: 1,
+      question: 'Julius Caesar was assassinated on the Ides of March.',
+      options: ['True', 'False'],
+      correctAnswer: 0,
       difficulty: 'medium',
       category: 'Politics',
       region: 'Rome',
       period: 'Late Republic',
-      explanation: 'Julius Caesar was assassinated on March 15, 44 BCE by a group of senators.',
+      explanation: 'True. Julius Caesar was assassinated on March 15, 44 BCE by a group of senators.',
       tags: ['caesar', 'assassination', 'ides']
     },
     // Egypt (2 questions)
     {
       id: 'mega-egypt-1',
-      question: 'What river was most important to ancient Egypt?',
-      options: ['Tigris', 'Euphrates', 'Nile', 'Jordan'],
-      correctAnswer: 2,
+      question: 'The _____ River was most important to ancient Egypt.',
+      options: ['Nile', 'Tigris', 'Euphrates', 'Jordan'],
+      correctAnswer: 0,
       difficulty: 'easy',
       category: 'Geography',
       region: 'Egypt',
@@ -2237,22 +2237,22 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
     },
     {
       id: 'mega-egypt-2',
-      question: 'Which pharaoh built the Great Pyramid?',
-      options: ['Tutankhamun', 'Khufu', 'Ramesses II', 'Cleopatra'],
-      correctAnswer: 1,
+      question: 'Khufu built the Great Pyramid at Giza.',
+      options: ['True', 'False'],
+      correctAnswer: 0,
       difficulty: 'medium',
       category: 'Architecture',
       region: 'Egypt',
       period: 'Old Kingdom',
-      explanation: 'Khufu (also known as Cheops) commissioned the Great Pyramid around 2580 BCE.',
+      explanation: 'True. Khufu (also known as Cheops) commissioned the Great Pyramid around 2580 BCE.',
       tags: ['khufu', 'pyramid', 'builder']
     },
     // Greece (2 questions)
     {
       id: 'mega-greece-1',
-      question: 'What city-state was known for its warriors?',
-      options: ['Athens', 'Sparta', 'Corinth', 'Thebes'],
-      correctAnswer: 1,
+      question: '_____ was the city-state known for its warriors.',
+      options: ['Sparta', 'Athens', 'Corinth', 'Thebes'],
+      correctAnswer: 0,
       difficulty: 'easy',
       category: 'Military',
       region: 'Greece',
@@ -2262,22 +2262,22 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
     },
     {
       id: 'mega-greece-2',
-      question: 'Who was the teacher of Alexander the Great?',
-      options: ['Socrates', 'Plato', 'Aristotle', 'Homer'],
-      correctAnswer: 2,
+      question: 'Aristotle was the teacher of Alexander the Great.',
+      options: ['True', 'False'],
+      correctAnswer: 0,
       difficulty: 'easy',
       category: 'Philosophy',
       region: 'Greece',
       period: 'Classical',
-      explanation: 'Aristotle tutored young Alexander in Macedonia.',
+      explanation: 'True. Aristotle tutored young Alexander in Macedonia.',
       tags: ['aristotle', 'alexander', 'tutor']
     },
     // Mesopotamia (2 questions)
     {
       id: 'mega-mesopotamia-1',
-      question: 'Mesopotamia was located between which two rivers?',
-      options: ['Nile and Jordan', 'Tigris and Euphrates', 'Indus and Ganges', 'Yellow and Yangtze'],
-      correctAnswer: 1,
+      question: 'Mesopotamia was located between the _____ and Euphrates rivers.',
+      options: ['Tigris', 'Nile', 'Indus', 'Yellow'],
+      correctAnswer: 0,
       difficulty: 'easy',
       category: 'Geography',
       region: 'Mesopotamia',
@@ -2287,9 +2287,9 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
     },
     {
       id: 'mega-mesopotamia-2',
-      question: 'Which king created the first known law code?',
-      options: ['Sargon', 'Hammurabi', 'Nebuchadnezzar', 'Gilgamesh'],
-      correctAnswer: 1,
+      question: 'King _____ created the first known law code.',
+      options: ['Hammurabi', 'Sargon', 'Nebuchadnezzar', 'Gilgamesh'],
+      correctAnswer: 0,
       difficulty: 'medium',
       category: 'Law',
       region: 'Mesopotamia',
@@ -2297,24 +2297,24 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
       explanation: 'The Code of Hammurabi is one of the earliest and most complete legal documents.',
       tags: ['hammurabi', 'law code', 'justice']
     },
-    // China (2 questions)
+    // China (2 questions) - 1 True/False, 1 Fill-in-blank
     {
       id: 'mega-china-1',
-      question: 'What famous structure was built to protect China from invaders?',
-      options: ['Forbidden City', 'Great Wall', 'Terracotta Army', 'Summer Palace'],
+      question: 'The Great Wall of China was built entirely during one dynasty.',
+      options: ['True', 'False'],
       correctAnswer: 1,
       difficulty: 'easy',
       category: 'Architecture',
       region: 'China',
       period: 'Imperial',
-      explanation: 'The Great Wall of China was built to protect against northern invasions.',
-      tags: ['great wall', 'defense', 'protection']
+      explanation: 'False. The Great Wall was built and rebuilt over many dynasties, with major construction during the Qin, Ming, and other dynasties.',
+      tags: ['great wall', 'dynasties', 'construction']
     },
     {
       id: 'mega-china-2',
-      question: 'Which dynasty unified China for the first time?',
-      options: ['Han Dynasty', 'Qin Dynasty', 'Tang Dynasty', 'Ming Dynasty'],
-      correctAnswer: 1,
+      question: 'The _____ Dynasty was the first to unify China under one emperor.',
+      options: ['Qin', 'Han', 'Tang', 'Ming'],
+      correctAnswer: 0,
       difficulty: 'medium',
       category: 'Politics',
       region: 'China',
@@ -2322,18 +2322,18 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
       explanation: 'The Qin Dynasty under Emperor Qin Shi Huang first unified China in 221 BCE.',
       tags: ['qin', 'unification', 'dynasty']
     },
-    // India (2 questions)
+    // India (2 questions) - 1 True/False, 1 Multiple Choice
     {
       id: 'mega-india-1',
-      question: 'Which river was most important to ancient Indian civilization?',
-      options: ['Ganges', 'Indus', 'Brahmaputra', 'Yamuna'],
-      correctAnswer: 1,
+      question: 'The Indus Valley Civilization developed a sophisticated drainage system.',
+      options: ['True', 'False'],
+      correctAnswer: 0,
       difficulty: 'easy',
-      category: 'Geography',
+      category: 'Urban Planning',
       region: 'India',
       period: 'Ancient',
-      explanation: 'The Indus River gave its name to the Indus Valley Civilization.',
-      tags: ['indus', 'river', 'civilization']
+      explanation: 'True. The Indus Valley cities like Harappa and Mohenjo-daro had advanced sewage and drainage systems.',
+      tags: ['indus valley', 'drainage', 'urban planning']
     },
     {
       id: 'mega-india-2',
@@ -2347,12 +2347,12 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
       explanation: 'Siddhartha Gautama became the Buddha and founded Buddhism.',
       tags: ['buddha', 'buddhism', 'siddhartha']
     },
-    // Europe (2 questions)
+    // Europe (2 questions) - 1 Fill-in-blank, 1 True/False
     {
       id: 'mega-europe-1',
-      question: 'Which ancient Celtic priests were known for their knowledge of astronomy and law?',
-      options: ['Bards', 'Druids', 'Warriors', 'Chieftains'],
-      correctAnswer: 1,
+      question: 'The ancient Celtic priests called _____ were known for their knowledge of astronomy and law.',
+      options: ['Druids', 'Bards', 'Warriors', 'Chieftains'],
+      correctAnswer: 0,
       difficulty: 'easy',
       category: 'Religion',
       region: 'Europe',
@@ -2362,22 +2362,22 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
     },
     {
       id: 'mega-europe-2',
-      question: 'What type of ships did the Vikings use for their voyages?',
-      options: ['Galleys', 'Longships', 'Caravels', 'Triremes'],
-      correctAnswer: 1,
+      question: 'Vikings were the first Europeans to reach North America.',
+      options: ['True', 'False'],
+      correctAnswer: 0,
       difficulty: 'easy',
-      category: 'Technology',
+      category: 'Exploration',
       region: 'Scandinavia',
       period: 'Viking Age',
-      explanation: 'Vikings used longships, which were fast, shallow-draft vessels perfect for both sea and river travel.',
-      tags: ['vikings', 'longships', 'technology']
+      explanation: 'True. Vikings led by Leif Erikson reached North America around 1000 CE, about 500 years before Columbus.',
+      tags: ['vikings', 'america', 'exploration']
     },
-    // Americas (2 questions)
+    // Americas (2 questions) - 1 Fill-in-blank, 1 True/False  
     {
       id: 'mega-americas-1',
-      question: 'Which ancient civilization built Machu Picchu?',
-      options: ['Maya', 'Aztec', 'Inca', 'Olmec'],
-      correctAnswer: 2,
+      question: 'The ancient _____ civilization built the mountain citadel of Machu Picchu in Peru.',
+      options: ['Inca', 'Maya', 'Aztec', 'Olmec'],
+      correctAnswer: 0,
       difficulty: 'easy',
       category: 'Architecture',
       region: 'South America',
@@ -2387,22 +2387,22 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
     },
     {
       id: 'mega-americas-2',
-      question: 'What type of writing system did the Maya develop?',
-      options: ['Alphabetic', 'Hieroglyphic', 'Cuneiform', 'Pictographic'],
+      question: 'The Maya writing system used only pictographs and had no phonetic elements.',
+      options: ['True', 'False'],
       correctAnswer: 1,
       difficulty: 'easy',
       category: 'Writing Systems',
       region: 'Mesoamerica',
       period: 'Pre-Columbian',
-      explanation: 'The Maya developed a sophisticated hieroglyphic writing system with over 800 symbols.',
+      explanation: 'False. The Maya developed a sophisticated hieroglyphic writing system that combined both pictographic and phonetic elements.',
       tags: ['maya', 'hieroglyphs', 'writing']
     },
     // Bronze Age (2 questions)
     {
       id: 'mega-bronze-1',
-      question: 'Which ancient Mesopotamian civilization built the first cities during the Bronze Age?',
-      options: ['Babylonians', 'Sumerians', 'Assyrians', 'Persians'],
-      correctAnswer: 1,
+      question: 'The _____ built the first cities during the Bronze Age.',
+      options: ['Sumerians', 'Babylonians', 'Assyrians', 'Persians'],
+      correctAnswer: 0,
       difficulty: 'easy',
       category: 'Civilization',
       region: 'Mesopotamia',
@@ -2425,9 +2425,9 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
     // Iron Age (2 questions)
     {
       id: 'mega-iron-1',
-      question: 'Which ancient Greek city-state was known for its powerful military during the Iron Age?',
-      options: ['Athens', 'Sparta', 'Corinth', 'Thebes'],
-      correctAnswer: 1,
+      question: '_____ was the ancient Greek city-state known for its powerful military.',
+      options: ['Sparta', 'Athens', 'Corinth', 'Thebes'],
+      correctAnswer: 0,
       difficulty: 'easy',
       category: 'Military',
       region: 'Greece',
@@ -2437,22 +2437,22 @@ export const sampleQuestionsByBundle: { [bundleId: string]: Question[] } = {
     },
     {
       id: 'mega-iron-2',
-      question: 'The Phoenicians contributed which major innovation to world civilization?',
-      options: ['Democracy', 'The alphabet', 'Mathematics', 'Philosophy'],
-      correctAnswer: 1,
+      question: 'The Phoenicians developed the alphabet that became the basis for modern writing systems.',
+      options: ['True', 'False'],
+      correctAnswer: 0,
       difficulty: 'medium',
       category: 'Writing Systems',
       region: 'Levant',
       period: 'Iron Age',
-      explanation: 'The Phoenician alphabet became the basis for Greek, Latin, and many modern alphabets.',
+      explanation: 'True. The Phoenician alphabet became the basis for Greek, Latin, and many modern alphabets.',
       tags: ['phoenicians', 'alphabet', 'writing']
     },
     // Prehistoric (2 questions)
     {
       id: 'mega-prehistoric-1',
-      question: 'Where did modern humans (Homo sapiens) first evolve?',
-      options: ['Asia', 'Europe', 'Africa', 'Australia'],
-      correctAnswer: 2,
+      question: 'Modern humans (Homo sapiens) first evolved in _____.',
+      options: ['Africa', 'Asia', 'Europe', 'Australia'],
+      correctAnswer: 0,
       difficulty: 'easy',
       category: 'Human Evolution',
       region: 'Africa',

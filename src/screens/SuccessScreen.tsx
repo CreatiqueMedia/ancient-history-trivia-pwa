@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { trackSubscriptionEvent } from '../config/stripe';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
 import AuthModal from '../components/AuthModal';
 

@@ -6,7 +6,7 @@ import {
   FireIcon,
   QuestionMarkCircleIcon 
 } from '@heroicons/react/24/solid';
-import { useStats } from '../context/StatsContext';
+import { useStats } from '../hooks/useStats';
 import TrialBanner from '../components/TrialBanner';
 import ManageSubscription from '../components/ManageSubscription';
 

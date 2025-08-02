@@ -5,11 +5,31 @@ import App from './App.tsx'
 import FallbackApp from './components/FallbackApp.tsx'
 import './index.css'
 
+// Performance optimization: defer non-critical imports
+const deferredImports = () => {
+  // Defer performance monitoring in production
+  if (import.meta.env.PROD) {
+    import('./services/PerformanceMonitor').then((module) => {
+      // PerformanceMonitor has static initialize method
+      if (module.PerformanceMonitor && module.PerformanceMonitor.initialize) {
+        module.PerformanceMonitor.initialize();
+      }
+    });
+  }
+};
+
+// Start deferred imports after initial render
+setTimeout(deferredImports, 100);
+
 // Determine the base path for routing
 const isGitHubPages = window.location.hostname.includes('github.io');
 const basePath = isGitHubPages ? '/ancient-history-trivia-pwa' : '';
 
-// Environment setup for routing
+// Router future flags to suppress warnings
+const routerFuture = {
+  v7_startTransition: true,
+  v7_relativeSplatPath: true,
+};
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -44,7 +64,7 @@ if (!rootElement) {
   try {
     ReactDOM.createRoot(rootElement).render(
       <ErrorBoundary>
-        <BrowserRouter basename={basePath}>
+        <BrowserRouter basename={basePath} future={routerFuture}>
           <App />
         </BrowserRouter>
       </ErrorBoundary>

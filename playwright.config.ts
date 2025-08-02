@@ -32,33 +32,95 @@ export default defineConfig({
     
     /* Record video only when test fails */
     video: 'retain-on-failure',
+    
+    /* Global timeouts - conservative for cross-browser compatibility */
+    actionTimeout: 10000,
+    navigationTimeout: 30000,
+    
+    /* Ignore HTTPS errors in development */
+    ignoreHTTPSErrors: true,
+    
+    /* Enable experimental features for better cross-browser support */
+    extraHTTPHeaders: {
+      'Accept-Language': 'en-US,en;q=0.9'
+    }
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        // Chromium-specific optimizations
+        contextOptions: {
+          permissions: ['clipboard-read', 'clipboard-write']
+        }
+      },
     },
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { 
+        ...devices['Desktop Firefox'],
+        // Firefox-specific configurations
+        launchOptions: {
+          firefoxUserPrefs: {
+            'dom.webnotifications.enabled': false,
+            'media.navigator.permission.disabled': true,
+          }
+        },
+        // Increased timeouts for Firefox
+        actionTimeout: 15000,
+        navigationTimeout: 30000,
+      },
     },
 
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: { 
+        ...devices['Desktop Safari'],
+        // WebKit/Safari-specific configurations
+        launchOptions: {
+          // Disable web security for testing
+          args: ['--disable-web-security', '--disable-features=VizDisplayCompositor']
+        },
+        // Increased timeouts for WebKit
+        actionTimeout: 20000,
+        navigationTimeout: 45000,
+      },
     },
 
-    /* Test against mobile viewports. */
+    /* Test against mobile viewports with enhanced configurations */
     {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
+      name: 'mobile-chrome',
+      use: { 
+        ...devices['Pixel 5'],
+        // Mobile Chrome specific settings
+        hasTouch: true,
+        isMobile: true,
+        actionTimeout: 10000,
+      },
     },
     {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
+      name: 'mobile-safari',
+      use: { 
+        ...devices['iPhone 12'],
+        // Mobile Safari specific settings
+        hasTouch: true,
+        isMobile: true,
+        actionTimeout: 15000,
+        navigationTimeout: 30000,
+      },
+    },
+
+    /* Edge browser testing */
+    {
+      name: 'edge',
+      use: { 
+        ...devices['Desktop Edge'],
+        channel: 'msedge'
+      },
     },
   ],
 

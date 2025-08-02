@@ -1,10 +1,12 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { analyticsService } from '../services/AnalyticsService';
+import { security } from '../config/environment';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
 interface State {
@@ -35,15 +37,48 @@ class ErrorBoundary extends Component<Props, State> {
     // Track error in analytics
     analyticsService.trackError(error.message, 'error_boundary');
     
+    // Call custom error handler if provided
+    this.props.onError?.(error, errorInfo);
+    
+    // Enhanced error logging for production
+    this.logProductionError(error, errorInfo);
+    
     this.setState({
       error,
       errorInfo
     });
+  }
 
-    // In production, you might want to send this to an error reporting service
-    if (import.meta.env.PROD) {
-      // Example: Send to error reporting service
-      // errorReportingService.captureException(error, { extra: errorInfo });
+  private logProductionError(error: Error, errorInfo: ErrorInfo) {
+    if (import.meta.env.MODE === 'production') {
+      const sanitizedError = {
+        message: security.sanitizeInput(error.message),
+        stack: error.stack?.split('\n').slice(0, 10).join('\n'), // Limit stack trace
+        componentStack: errorInfo.componentStack?.split('\n').slice(0, 5).join('\n'),
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent.substring(0, 200), // Limit user agent length
+        userId: this.getCurrentUserId(),
+        errorId: security.generateSecureId(),
+      };
+      
+      // Future: Send to error monitoring service
+      console.error('[ErrorBoundary] Production error logged:', sanitizedError);
+      
+      // TODO: Implement Sentry or similar service
+      // Sentry.captureException(error, { 
+      //   extra: sanitizedError,
+      //   tags: { component: 'ErrorBoundary' }
+      // });
+    }
+  }
+
+  private getCurrentUserId(): string | null {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      return user?.uid || null;
+    } catch {
+      return null;
     }
   }
 

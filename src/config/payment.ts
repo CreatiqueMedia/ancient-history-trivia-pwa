@@ -8,7 +8,7 @@ import {
 // Stripe publishable key - switches between test and live based on environment
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.PROD 
   ? import.meta.env.VITE_STRIPE_LIVE_PUBLISHABLE_KEY || 'pk_live_YOUR_LIVE_KEY_HERE'
-  : 'pk_test_51NxSampleKeyForTestingPurposesOnly';
+  : import.meta.env.VITE_STRIPE_TEST_PUBLISHABLE_KEY || 'pk_test_51NxSampleKeyForTestingPurposesOnly';
 
 // RevenueCat API keys (to be used when packaged for app stores)
 const REVENUECAT_API_KEYS = {
@@ -22,32 +22,40 @@ export const initializeStripePayment = async () => {
   return stripePromise;
 };
 
-// Product IDs for bundles
+// Product IDs for bundles - LIVE MODE
 export const BUNDLE_PRODUCT_IDS = {
-  egypt: 'ancient_history_bundle_egypt',
-  rome: 'ancient_history_bundle_rome',
-  greece: 'ancient_history_bundle_greece',
-  mesopotamia: 'ancient_history_bundle_mesopotamia',
-  china: 'ancient_history_bundle_china',
+  egypt: 'prod_SfhNK2NCuvLNIF', // Ancient Egypt Bundle
+  rome: 'prod_SfhNszstBNGKoD', // Roman Empire Bundle
+  greece: 'prod_SfhNvg6LYviC1j', // Ancient Greece Bundle
+  mesopotamia: 'prod_SfhN4JxycmUaXm', // All Bundle Packs (mega pack)
+  china: 'prod_SfhNiL5asn81Kh', // Hard Pack
+  easy: 'prod_SfhNCwUKsguTas', // Easy Pack
+  medium: 'prod_SfhN0OpdM5Ij6p', // Medium Pack
+  hard: 'prod_SfhNiL5asn81Kh', // Hard Pack
+  all_bundles: 'prod_SfhN4JxycmUaXm', // All Bundle Packs
 };
 
-// Product IDs for subscriptions
+// Product IDs for subscriptions - LIVE MODE
 export const SUBSCRIPTION_PRODUCT_IDS = {
-  monthly: 'ancient_history_premium_monthly',
-  annual: 'ancient_history_premium_annual',
-  biennial: 'ancient_history_premium_biennial',
+  monthly: 'prod_SfhNsGhEc6DS2N', // Pro Monthly Subscription
+  annual: 'prod_Sfmtvd0xa9jEK6', // Pro Annual
+  biennial: 'prod_Sfogdh2ZQtxidS', // Pro Biennial
 };
 
-// Bundle prices (in USD)
+// Bundle prices (in USD) - LIVE MODE PRICING
 export const BUNDLE_PRICES = {
-  egypt: 4.99,
-  rome: 4.99,
-  greece: 4.99,
-  mesopotamia: 4.99,
-  china: 4.99,
+  egypt: 2.99,
+  rome: 2.99,
+  greece: 2.99,
+  mesopotamia: 2.99,
+  china: 2.99,
+  easy: 2.99,
+  medium: 2.99,
+  hard: 2.99,
+  all_bundles: 30.49,
 };
 
-// Subscription prices (in USD)
+// Subscription prices (in USD) - LIVE MODE PRICING
 export const SUBSCRIPTION_PRICES = {
   monthly: 4.99,
   annual: 39.99,

@@ -134,3 +134,25 @@ sw.js
 workbox-*.js
 auth-config.json
 .vite/
+
+# Milestone backups (local only - do not commit)
+.milestone-backup/
+MILESTONE_WORKING_STATE.md
+
+# Test artifacts and troubleshooting files
+lighthouse-*.html
+lighthouse-*.json
+lighthouse-test.mjs
+test-results/
+test-results.json
+playwright-report/
+payment-test.html
+test-*.js
+test-*.mjs
+verify-*.mjs
+dev-helper.sh
+setup-dev.sh
+..bfg-report/
+
+# Redirect project (troubleshooting)
+redirect-project/

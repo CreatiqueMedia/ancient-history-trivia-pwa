@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   PlayIcon, 
@@ -37,7 +37,7 @@ import {
 import { QUESTION_BUNDLES, getBundleGroups, SUBSCRIPTION_TIERS } from '../data/bundles';
 import { getSampleQuestionsForBundle } from '../data/sampleQuestions';
 import { usePurchase } from '../context/PurchaseContext';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles';
 import AuthModal from '../components/AuthModal';
 import TrialSuccessModal from '../components/TrialSuccessModal';
@@ -126,9 +126,7 @@ const StoreScreen: React.FC = () => {
     };
 
     const handleShowAuthModal = (event: CustomEvent) => {
-      console.log('🎭 Custom showAuthModal event received:', event.detail);
       if (event.detail?.context === 'trial') {
-        console.log('🎭 Showing auth modal for trial context');
         setShowAuthModal(true);
       }
     };
@@ -159,53 +157,47 @@ const StoreScreen: React.FC = () => {
   // Get authentication state
   const { user } = useAuth();
 
-  // Handle start trial action from URL parameters - IMMEDIATE response
+  // Handle start trial action from URL parameters - ONE TIME ONLY
   useEffect(() => {
-    console.log('🔍 StoreScreen useEffect triggered - checking URL params');
     const urlParams = new URLSearchParams(window.location.search);
     const action = urlParams.get('action');
-    console.log('🔍 URL action parameter:', action);
-    console.log('🔍 Current user state:', user ? 'authenticated' : 'not authenticated');
-    console.log('🔍 Current showAuthModal state:', showAuthModal);
     
     if (action === 'start_trial') {
-      console.log('🎯 START_TRIAL action detected!');
-      
-      // Clear the action parameter from URL immediately
+      // Clear the action parameter from URL ONCE
       const newUrl = window.location.pathname + window.location.search.replace(/[?&]action=start_trial/, '');
       window.history.replaceState({}, '', newUrl);
-      console.log('🔗 URL cleared, new URL:', newUrl);
       
       if (!user) {
-        // User not authenticated - show auth modal IMMEDIATELY
-        console.log('🔐 User not authenticated for trial, showing auth modal immediately');
-        console.log('📦 Storing pending purchase...');
+        // User not authenticated - show auth modal
         localStorage.setItem('pendingPurchase', JSON.stringify({
           type: 'trial',
           action: 'start_trial'
         }));
         
-        console.log('🎭 Setting showAuthModal to TRUE...');
         setShowAuthModal(true);
-        console.log('🎭 setShowAuthModal(true) called successfully');
-        
-        // Force immediate re-render to ensure modal shows
-        setTimeout(() => {
-          console.log('🎭 Timeout callback - forcing modal state check');
-          setShowAuthModal(prev => {
-            console.log('🎭 Modal state in timeout:', prev);
-            return true;
-          });
-        }, 0);
       } else {
         // User is authenticated - proceed with trial
-        console.log('✅ User authenticated, proceeding with trial start');
         handleAuthenticatedTrialStart();
       }
-    } else {
-      console.log('🔍 No start_trial action found in URL');
     }
-  }, [user]);
+  }, []); // Remove user dependency to prevent loops
+
+  // Handle payment status parameters from Stripe redirects - ONE TIME ONLY
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment_status');
+    const sessionId = urlParams.get('session_id');
+    
+    if (paymentStatus && sessionId) {
+      // Clear payment parameters from URL to prevent refresh loops
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+      
+      // Redirect to success page with the parameters
+      navigate(`/success?payment_status=${paymentStatus}&session_id=${sessionId}`);
+      return;
+    }
+  }, []); // Empty dependency array to run only once
 
   // Separate function for handling authenticated trial start
   const handleAuthenticatedTrialStart = async () => {
@@ -241,17 +233,19 @@ const StoreScreen: React.FC = () => {
       }
     }
   };
+  // Track if pending trial has been processed to prevent loops
+  const pendingTrialProcessed = useRef(false);
+
   // Handle authentication success and process pending trial
   useEffect(() => {
     const processPendingTrial = async () => {
-      if (user) {
+      if (user && !pendingTrialProcessed.current) {
         const pendingPurchase = localStorage.getItem('pendingPurchase');
         if (pendingPurchase) {
+          pendingTrialProcessed.current = true; // Mark as processed
           try {
             const parsed = JSON.parse(pendingPurchase);
             if (parsed.type === 'trial' && parsed.action === 'start_trial') {
-              console.log('🎯 Processing pending trial after authentication');
-              
               // Check if user is eligible for trial
               if (TrialService.isEligibleForTrial(user.uid)) {
                 try {
@@ -299,7 +293,7 @@ const StoreScreen: React.FC = () => {
     };
 
     processPendingTrial();
-  }, [user]);
+  }, [user?.uid]); // Only depend on user ID to prevent excessive re-renders
 
   // Get version information
   const currentBundles = QUESTION_BUNDLES.filter(bundle => bundle.isCurrentVersion !== false && !bundle.isMegaBundle);
@@ -336,29 +330,23 @@ const StoreScreen: React.FC = () => {
 
   // Organize bundles into the sections you requested
   const organizeBundles = (bundleList: QuestionBundle[] = currentBundles) => {
-    console.log('organizeBundles called with:', bundleList.length, 'bundles');
-    console.log('Bundle list:', bundleList.map(b => ({ id: b.id, category: b.category, subcategory: b.subcategory })));
-    
     // Age Bundle Packs
     const ageBundles = bundleList.filter(bundle => 
       bundle.category === 'historical_age' && 
       ['Prehistoric', 'Bronze Age', 'Iron Age'].includes(bundle.subcategory)
     );
-    console.log('Age bundles found:', ageBundles.length, ageBundles.map(b => b.name));
 
     // Format Bundle Packs  
     const formatBundles = bundleList.filter(bundle => 
       bundle.category === 'format' && 
       ['Multiple Choice', 'True/False', 'Fill-in-the-Blank'].includes(bundle.subcategory)
     );
-    console.log('Format bundles found:', formatBundles.length, formatBundles.map(b => b.name));
 
     // Region Bundle Packs
     const regionBundles = bundleList.filter(bundle => 
       bundle.category === 'region' && 
       ['Roman', 'Egyptian', 'Greek', 'Mesopotamian', 'Chinese', 'Indian', 'American', 'European'].includes(bundle.subcategory)
     );
-    console.log('Region bundles found:', regionBundles.length, regionBundles.map(b => b.name));
 
     // Difficulty Packs (specifically difficulty category bundles in Easy, Medium, Hard order)
     const difficultyBundles = bundleList
@@ -369,7 +357,6 @@ const StoreScreen: React.FC = () => {
         const bIndex = order.indexOf(b.subcategory);
         return aIndex - bIndex;
       });
-    console.log('Difficulty bundles found:', difficultyBundles.length, difficultyBundles.map(b => b.name));
 
     const result = {
       'Age Bundle Packs': ageBundles,
@@ -378,7 +365,6 @@ const StoreScreen: React.FC = () => {
       'Region Bundle Packs': regionBundles
     };
     
-    console.log('Final organized bundles:', result);
     return result;
   };
 
@@ -433,23 +419,13 @@ const StoreScreen: React.FC = () => {
   };
 
   const handlePurchaseBundle = async (bundle: QuestionBundle) => {
-    console.log('🛒 Purchase button clicked for bundle:', bundle.name);
-    console.log('👤 Current user state:', user ? 'authenticated' : 'not authenticated');
-    console.log('🔐 User object:', user);
-    console.log('🎯 showAuthModal current state:', showAuthModal);
-    console.log('🔍 hasAccessToBundle result:', hasAccessToBundle(bundle.id));
-    
     // Early return if user already has access
     if (hasAccessToBundle(bundle.id)) {
-      console.log('⚠️ User already has access to bundle, returning early');
       return;
     }
     
     // Check if user is authenticated
     if (!user) {
-      console.log('🚫 User not authenticated, showing auth modal');
-      console.log('📦 Storing pending purchase:', { type: 'bundle', id: bundle.id, name: bundle.name });
-      
       // Store the intended purchase and show auth modal
       localStorage.setItem('pendingPurchase', JSON.stringify({
         type: 'bundle',
@@ -457,25 +433,18 @@ const StoreScreen: React.FC = () => {
         name: bundle.name
       }));
       
-      console.log('🎭 Setting showAuthModal to true...');
-      console.log('🎭 showAuthModal BEFORE setState:', showAuthModal);
       setShowAuthModal(true);
-      console.log('🎭 setShowAuthModal(true) called');
       
       // Add a small delay to ensure state update
       setTimeout(() => {
-        console.log('🎭 showAuthModal state after timeout - should be true');
         // Force re-render to ensure modal shows
         setShowAuthModal(prev => {
-          console.log('🎭 showAuthModal in timeout callback:', prev);
           return true;
         });
       }, 100);
       
       return;
     }
-    
-    console.log('✅ User is authenticated, proceeding with purchase');
     
     // Add this bundle to processing state
     setProcessingBundles(prev => new Set([...prev, bundle.id]));
@@ -484,14 +453,12 @@ const StoreScreen: React.FC = () => {
       const success = await purchaseBundle(bundle.id);
       if (success) {
         // Success handled by redirect to Stripe or in-app purchase
-        console.log(`Purchase initiated for ${bundle.name}`);
       }
     } catch (error: any) {
       console.error('Purchase error:', error);
       
       // Handle authentication errors gracefully
       if (error.message?.includes('Authentication required')) {
-        console.log('🔐 Authentication error caught, showing auth modal');
         // Store the intended purchase and show auth modal
         localStorage.setItem('pendingPurchase', JSON.stringify({
           type: 'bundle',
@@ -571,7 +538,6 @@ const StoreScreen: React.FC = () => {
       const success = await subscribe('pro', tier.period);
       if (success) {
         // Success handled by redirect to Stripe or in-app purchase
-        console.log(`Subscription initiated for ${tier.name}`);
       }
     } catch (error: any) {
       console.error('Subscription error:', error);
@@ -1174,7 +1140,6 @@ const StoreScreen: React.FC = () => {
                   return a.localeCompare(b);
                 })
                 .map(([sectionName, bundles]) => {
-                  console.log(`Rendering section: ${sectionName} with ${bundles.length} bundles`);
                   return bundles.length > 0 ? (
                     <div key={sectionName} className="space-y-6">
                       <div className="text-center">
@@ -1186,9 +1151,7 @@ const StoreScreen: React.FC = () => {
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {bundles.map(bundle => {
-                          console.log(`Rendering bundle card for: ${bundle.name}`);
                           const card = renderBundleCard(bundle);
-                          console.log(`Card rendered:`, card ? 'SUCCESS' : 'FAILED');
                           return card;
                         })}
                       </div>

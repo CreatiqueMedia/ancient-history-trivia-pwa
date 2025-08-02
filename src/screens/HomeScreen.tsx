@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { PlayIcon, ChartBarIcon, TrophyIcon } from '@heroicons/react/24/solid';
 import { questionBundles } from '../data/questions';
-import { useStats } from '../context/StatsContext';
-import { useAuth } from '../context/AuthContext';
+import { useStats } from '../hooks/useStats';
+import { useAuth } from '../hooks/useAuth';
 import { Logo } from '../components/Logo';
 import DailyChallengeCard from '../components/DailyChallengeCard';
 import TrialBanner from '../components/TrialBanner';

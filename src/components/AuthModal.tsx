@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import EmailLinkSignIn from './EmailLinkSignIn';
 import { InputValidator } from '../utils/inputValidator';
 import { rateLimiter, RATE_LIMITS } from '../utils/rateLimiter';
@@ -140,7 +140,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div 
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto modal"
+        role="dialog"
+        data-testid="auth-modal"
+        aria-modal="true"
+        aria-labelledby="auth-modal-title"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-gray-800 dark:to-gray-750">
           <div className="flex items-center space-x-3">
@@ -149,7 +155,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 id="auth-modal-title" className="text-2xl font-bold text-gray-900 dark:text-white">
               {mode === 'login' ? 'Welcome Back' : 
                mode === 'signup' ? 'Create Account' : 
                'Reset Password'}
@@ -175,10 +181,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                    Sign in to complete your purchase
+                    Authentication Required for Purchase
                   </h3>
                   <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                    Create an account or sign in to purchase premium content and track your progress.
+                    You must be logged in to purchase premium content. Sign in or create an account to continue.
                   </p>
                 </div>
               </div>
@@ -188,6 +194,24 @@ const AuthModal: React.FC<AuthModalProps> = ({
           {error && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
               {error}
+              {error.includes('localhost') && error.includes('authorized domains') && (
+                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                  <div className="text-sm text-yellow-800">
+                    <strong>Development Mode Fix:</strong>
+                    <br />
+                    • Use <strong>"Continue as Guest"</strong> button below for testing
+                    <br />
+                    • Or try the hosted version: <a 
+                      href="https://ancient-history-trivia.web.app" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline hover:text-blue-800"
+                    >
+                      ancient-history-trivia.web.app
+                    </a>
+                  </div>
+                </div>
+              )}
               {error.includes('unauthorized-domain') && (
                 <div className="mt-2 text-sm">
                   <strong>Quick Fix:</strong> Try the Firebase Hosting version:{' '}
