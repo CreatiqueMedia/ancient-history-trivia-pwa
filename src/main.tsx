@@ -62,13 +62,19 @@ if (!rootElement) {
   }
 
   try {
+    // Clear the initial loading state first
+    const loadingElement = rootElement.querySelector('.loading-spinner');
+    if (loadingElement) {
+      loadingElement.remove();
+    }
+    
     ReactDOM.createRoot(rootElement).render(
       <ErrorBoundary>
         <BrowserRouter basename={basePath} future={routerFuture}>
           <App />
         </BrowserRouter>
       </ErrorBoundary>
-    )
+    );
   } catch (error) {
     console.error('[Main] Failed to render main app, using fallback:', error);
     ReactDOM.createRoot(rootElement).render(
