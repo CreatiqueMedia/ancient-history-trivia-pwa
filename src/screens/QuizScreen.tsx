@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeftIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { useQuiz } from '../context/QuizContext';
 import { useSettings } from '../context/SettingsContext';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
 import { getBundleById, getRandomQuestions, getQuestionsForBundle } from '../data/questions';
 import { QUESTION_BUNDLES } from '../data/bundles';
@@ -12,10 +12,13 @@ import { EnhancedQuizService } from '../services/EnhancedQuizService';
 import { FullQuestionService } from '../services/FullQuestionService';
 import { FirestoreQuestionService } from '../services/FirestoreQuestionService';
 import { TrialService } from '../services/TrialService';
+import { DailyChallengeService } from '../services/DailyChallengeService';
+import { sampleQuestionsByBundle } from '../data/sampleQuestions';
 
 const QuizScreen: React.FC = () => {
   const { bundleId } = useParams<{ bundleId?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentQuiz, startQuiz, selectAnswer, nextQuestion, finishQuiz } = useQuiz();
   const { settings } = useSettings();
   const { user } = useAuth();
@@ -25,6 +28,10 @@ const QuizScreen: React.FC = () => {
   const [currentBundle, setCurrentBundle] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
+
+  // Detect if this is a daily challenge from the pathname
+  const isDailyChallenge = location.pathname === '/quiz/daily-challenge';
+  const effectiveBundleId = isDailyChallenge ? 'daily-challenge' : bundleId;
 
   // Initialize quiz only once when component mounts or bundleId changes
   useEffect(() => {
@@ -58,21 +65,46 @@ const QuizScreen: React.FC = () => {
       let bundle = null;
       
       if (sampleQuiz && isSampleQuiz) {
-        // Load sample quiz questions
+        // Load sample quiz questions from localStorage
         quizQuestions = sampleQuiz.questions;
         bundle = QUESTION_BUNDLES.find(b => b.id === sampleQuiz.bundleId);
         setCurrentBundle(bundle);
-      } else if (bundleId === 'daily-challenge') {
+      } else if (isSampleQuiz && effectiveBundleId) {
+        // Fallback: if it's a sample quiz but no localStorage data, get sample questions directly
+        quizQuestions = sampleQuestionsByBundle[effectiveBundleId] || [];
+        bundle = QUESTION_BUNDLES.find(b => b.id === effectiveBundleId);
+        setCurrentBundle(bundle);
+        
+        if (quizQuestions.length === 0) {
+          console.warn('No sample questions found for bundle:', effectiveBundleId);
+          quizQuestions = EnhancedQuizService.generateQuickQuiz(10);
+        }
+      } else if (effectiveBundleId === 'daily-challenge') {
         // Handle daily challenge
         try {
-          const { DailyChallengeService } = require('../services/DailyChallengeService');
           const dailyChallenge = DailyChallengeService.getTodaysChallenge();
           
-          // Get the actual question objects from the daily challenge question IDs
-          const { sampleQuestions } = require('../data/questions');
-          quizQuestions = dailyChallenge.questions.map((questionId: string) => 
-            sampleQuestions.find((q: Question) => q.id === questionId)
-          ).filter(Boolean);
+          // The DailyChallengeService already generates the actual questions, not just IDs
+          // Let's get the questions directly from the service instead of trying to look them up
+          const allQuestions: Question[] = [];
+          Object.values(sampleQuestionsByBundle as { [key: string]: Question[] }).forEach((bundleQuestions: Question[]) => {
+            allQuestions.push(...bundleQuestions);
+          });
+          
+          // Map the question IDs to actual question objects
+          quizQuestions = dailyChallenge.questions.map((questionId: string) => {
+            const found = allQuestions.find((q: Question) => q.id === questionId);
+            return found;
+          }).filter((q): q is Question => q !== undefined);
+          
+          // Ensure we have exactly 10 questions - if not, regenerate
+          if (quizQuestions.length !== 10) {
+            DailyChallengeService.resetAllData();
+            const newChallenge = DailyChallengeService.getTodaysChallenge();
+            quizQuestions = newChallenge.questions.map((questionId: string) => 
+              allQuestions.find((q: Question) => q.id === questionId)
+            ).filter((q): q is Question => q !== undefined);
+          }
           
           // Create a virtual bundle for daily challenge display
           bundle = {
@@ -91,32 +123,26 @@ const QuizScreen: React.FC = () => {
           quizQuestions = EnhancedQuizService.generateQuickQuiz(10);
           setCurrentBundle(null);
         }
-      } else if (bundleId) {
+      } else if (effectiveBundleId) {
         // Find the bundle for UI display
-        bundle = QUESTION_BUNDLES.find(b => b.id === bundleId);
+        bundle = QUESTION_BUNDLES.find(b => b.id === effectiveBundleId);
         setCurrentBundle(bundle);
         
         // Determine question count based on user access level
-        const userHasFullAccess = user && (isPremiumUser || hasAccessToBundle(bundleId) || TrialService.isInTrial());
+        const userHasFullAccess = user && (isPremiumUser || hasAccessToBundle(effectiveBundleId) || TrialService.isInTrial());
         
         if (userHasFullAccess) {
           // Premium users and trial users get FULL question sets from Firestore
-          console.log(`🎯 Premium/Trial access detected for bundle: ${bundleId}`);
-          console.log(`🔥 Fetching full question set from Firestore...`);
-          
           try {
             // Try to get questions from Firestore first
-            quizQuestions = await FirestoreQuestionService.getQuestionsFromFirestore(bundleId);
-            console.log(`✅ Retrieved ${quizQuestions.length} questions for ${bundleId} from Firestore`);
+            quizQuestions = await FirestoreQuestionService.getQuestionsFromFirestore(effectiveBundleId);
             
             if (quizQuestions.length === 0) {
-              console.warn(`⚠️ No questions found in Firestore, falling back to enhanced quiz`);
               quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
             }
           } catch (error) {
             console.error(`❌ Error fetching questions from Firestore:`, error);
-            console.log(`🔄 Falling back to local question generation`);
-            quizQuestions = FullQuestionService.generateFullQuestions(bundleId);
+            quizQuestions = FullQuestionService.generateFullQuestions(effectiveBundleId);
             
             if (quizQuestions.length === 0) {
               quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
@@ -124,12 +150,16 @@ const QuizScreen: React.FC = () => {
           }
         } else {
           // Free users and unauthenticated users get sample questions only
-          console.log(`🔒 Free access for bundle: ${bundleId}, generating sample questions`);
-          quizQuestions = EnhancedQuizService.generateBundleSampleQuiz(bundleId, 10);
+          quizQuestions = EnhancedQuizService.generateBundleSampleQuiz(effectiveBundleId, 10);
           
           if (quizQuestions.length === 0) {
             // Fallback to enhanced quick quiz with 33 AP-level questions
-            quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
+            // BUT NOT for daily challenge - that should always have exactly 10
+            if (effectiveBundleId !== 'daily-challenge') {
+              quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
+            } else {
+              console.error('[QuizScreen] Daily challenge failed to load questions - this should not happen');
+            }
           }
         }
       } else {
@@ -138,11 +168,9 @@ const QuizScreen: React.FC = () => {
         
         if (userHasFullAccess) {
           // Premium users and trial users get full 100 questions
-          console.log(`🎯 Premium/Trial access detected for general quiz`);
           quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
         } else {
           // Free users and unauthenticated users get 33 questions
-          console.log(`🔒 Free access for general quiz`);
           quizQuestions = EnhancedQuizService.generateQuickQuiz(33);
         }
         setCurrentBundle(null);
@@ -164,7 +192,7 @@ const QuizScreen: React.FC = () => {
         localStorage.removeItem('sampleQuiz');
       }
     };
-  }, [bundleId]); // Only depend on bundleId, not on startQuiz or other functions
+  }, [effectiveBundleId]); // Only depend on bundleId, not on startQuiz or other functions
 
   useEffect(() => {
     // Only run timer if there's a time limit set

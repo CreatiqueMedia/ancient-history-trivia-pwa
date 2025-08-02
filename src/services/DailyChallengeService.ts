@@ -1,6 +1,6 @@
 import { DailyChallenge, DailyChallengeStreak, DailyChallengeReward, StreakEntry } from '../types/enhancements';
 import { Question } from '../types';
-import { sampleQuestions } from '../data/questions';
+import { sampleQuestionsByBundle } from '../data/sampleQuestions';
 import { analyticsService } from './AnalyticsService';
 import { notificationService } from './NotificationService';
 
@@ -99,7 +99,8 @@ export class DailyChallengeService {
   }
 
   /**
-   * Select questions for the daily challenge
+   * Select questions for the daily challenge from ALL bundles
+   * Ensures diversity across bundles, difficulties, and formats
    */
   private static selectQuestionsForChallenge(
     category: string, 
@@ -107,26 +108,62 @@ export class DailyChallengeService {
     count: number, 
     seed: number
   ): Question[] {
-    // Filter questions by category and difficulty
-    let filteredQuestions = sampleQuestions.filter(q => 
-      q.category === category || q.difficulty === difficulty
-    );
+    // Collect ALL questions from all bundles for maximum diversity
+    const allQuestions: Question[] = [];
+    
+    // Get questions from all bundle categories
+    Object.values(sampleQuestionsByBundle).forEach(bundleQuestions => {
+      allQuestions.push(...bundleQuestions);
+    });
 
-    // If not enough questions, expand criteria
-    if (filteredQuestions.length < count) {
-      filteredQuestions = sampleQuestions.filter(q => 
-        q.category === category || q.difficulty === difficulty || q.region
+    if (allQuestions.length === 0) {
+      console.warn('No questions found in sampleQuestionsByBundle');
+      return [];
+    }
+
+    // For daily challenge, we want diversity across:
+    // 1. All difficulties (easy, medium, hard) 
+    // 2. All regions/bundles
+    // 3. All question formats (multiple choice, true/false, fill-in-the-blank)
+    
+    // Group questions by difficulty for balanced selection
+    const easyQuestions = allQuestions.filter(q => q.difficulty === 'easy');
+    const mediumQuestions = allQuestions.filter(q => q.difficulty === 'medium');
+    const hardQuestions = allQuestions.filter(q => q.difficulty === 'hard');
+
+    // Shuffle each difficulty group with the same seed for consistency
+    const shuffledEasy = this.shuffleWithSeed(easyQuestions, seed);
+    const shuffledMedium = this.shuffleWithSeed(mediumQuestions, seed + 1);
+    const shuffledHard = this.shuffleWithSeed(hardQuestions, seed + 2);
+
+    // For the daily challenge, aim for a balanced mix:
+    // 3-4 easy, 3-4 medium, 3-4 hard questions (total 10)
+    const selectedQuestions: Question[] = [];
+    
+    // Take 3-4 from each difficulty (adjust based on availability)
+    const easyCount = Math.min(3 + (seed % 2), shuffledEasy.length);
+    const mediumCount = Math.min(3 + ((seed + 1) % 2), shuffledMedium.length);
+    const hardCount = Math.min(count - easyCount - mediumCount, shuffledHard.length);
+    
+    selectedQuestions.push(...shuffledEasy.slice(0, easyCount));
+    selectedQuestions.push(...shuffledMedium.slice(0, mediumCount));
+    selectedQuestions.push(...shuffledHard.slice(0, hardCount));
+
+    // If we still need more questions, fill from any difficulty
+    if (selectedQuestions.length < count) {
+      const remainingQuestions = allQuestions.filter(q => 
+        !selectedQuestions.some(selected => selected.id === q.id)
       );
+      const shuffledRemaining = this.shuffleWithSeed(remainingQuestions, seed + 3);
+      const needed = count - selectedQuestions.length;
+      selectedQuestions.push(...shuffledRemaining.slice(0, needed));
     }
 
-    // If still not enough, use all questions
-    if (filteredQuestions.length < count) {
-      filteredQuestions = [...sampleQuestions];
-    }
-
-    // Shuffle using seed for consistency
-    const shuffled = this.shuffleWithSeed(filteredQuestions, seed);
-    return shuffled.slice(0, count);
+    // Final shuffle to mix up the order of difficulties
+    const finalShuffled = this.shuffleWithSeed(selectedQuestions, seed + 4);
+    
+    // Ensure we return exactly the requested count
+    return finalShuffled.slice(0, count);
   }
 
   /**
@@ -438,6 +475,14 @@ export class DailyChallengeService {
     localStorage.removeItem(this.STORAGE_KEY);
     localStorage.removeItem(this.STREAK_KEY);
     localStorage.removeItem(this.COMPLETED_KEY);
+  }
+
+  /**
+   * Force generate a new challenge (for testing)
+   */
+  static forceNewChallenge(): DailyChallenge {
+    this.resetAllData();
+    return this.getTodaysChallenge();
   }
 
   /**

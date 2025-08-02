@@ -1,242 +1,185 @@
-import React from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useEffect } from 'react';
-import { SettingsProvider } from './context/SettingsContext';
-import { StatsProvider } from './context/StatsContext';
-import { QuizProvider } from './context/QuizContext';
+// import { useRegisterSW } from 'virtual:pwa-register/react';
 import { ThemeProvider } from './context/ThemeContext';
-import { PurchaseProvider } from './context/PurchaseContext';
-// Use Firebase authentication everywhere now that GitHub Pages domain is authorized
 import { AuthProvider } from './context/AuthContext';
-import { useFirebaseAuth, getServiceWorkerPath } from './config/environment';
-import PaymentProvider from './components/PaymentProvider';
-import PaymentModal from './components/PaymentModal';
-import HomeScreen from './screens/HomeScreen.tsx';
-import QuizScreen from './screens/QuizScreen.tsx';
-import ResultsScreen from './screens/ResultsScreen.tsx';
-import StoreScreen from './screens/StoreScreen.tsx';
-import StatsScreen from './screens/StatsScreen.tsx';
-import SettingsScreen from './screens/SettingsScreen.tsx';
-import AchievementsScreen from './screens/AchievementsScreen.tsx';
-import BillingScreen from './screens/BillingScreen.tsx';
-import UserProfileScreen from './screens/UserProfileScreen.tsx';
-import BillingHistoryScreen from './screens/BillingHistoryScreen.tsx';
-import AboutScreen from './screens/AboutScreen.tsx';
-import EmailLinkHandler from './screens/EmailLinkHandler.tsx';
-import SuccessScreen from './screens/SuccessScreen.tsx';
-import TestPurchaseFlow from './components/TestPurchaseFlow.tsx';
-import Layout from './components/Layout.tsx';
-import LoadingSpinner from './components/LoadingSpinner.tsx';
-import ProtectedRoute from './components/ProtectedRoute.tsx';
-import { analyticsService } from './services/AnalyticsService';
-import { notificationService } from './services/NotificationService';
-import { errorHandler } from './services/ErrorHandlingService';
-import { QuestionService } from './services/QuestionService';
-import ErrorBoundary from './components/ErrorBoundary';
-import FirestoreInitializer from './components/FirestoreInitializer';
+import { QuizProvider } from './context/QuizContext';
+import { PurchaseProvider } from './context/PurchaseContext';
+import { StatsProvider } from './context/StatsContext';
+import { SettingsProvider } from './context/SettingsContext';
+import { TrialProvider } from './context/TrialContext';
+import { GameProvider } from './context/GameContext';
+import { SoundProvider } from './context/SoundContext';
+import { AppStateProvider } from './context/AppStateContext';
+import { ServiceWorkerProvider } from './context/ServiceWorkerContext';
+import Layout from './components/Layout';
+import { lazyWithPreload, preloadCriticalRoutes } from './utils/lazyLoading';
+import { RouteLoadingFallback } from './components/LazyLoadingFallbacks';
+import { performanceMonitor, checkPerformanceBudget } from './utils/performance';
 
-// AppContent component to handle auth loading state
-const AppContent = () => {
-  // Add error boundary and debugging for GitHub Pages
-  const [hasError, setHasError] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState('');
+// Lazy load heavy components with preloading
+const HomePage = lazyWithPreload(() => import('./screens/HomeScreen'));
+const QuizPage = lazyWithPreload(() => import('./screens/QuizScreen'));
+const ResultsPage = lazyWithPreload(() => import('./screens/ResultsScreen'));
+const ProfilePage = lazyWithPreload(() => import('./screens/UserProfileScreen'));
+const SettingsPage = lazyWithPreload(() => import('./screens/SettingsScreen'));
+const LeaderboardPage = lazyWithPreload(() => import('./pages/LeaderboardPage'));
+const AchievementsPage = lazyWithPreload(() => import('./screens/AchievementsScreen'));
+const StorePage = lazyWithPreload(() => import('./screens/StoreScreen'));
+const StatsPage = lazyWithPreload(() => import('./screens/StatsScreen'));
+const BillingPage = lazyWithPreload(() => import('./screens/BillingScreen'));
+
+// Less critical pages - regular lazy loading
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
+const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
+const AboutPage = lazy(() => import('./screens/AboutScreen'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
+const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
+const UnauthorizedPage = lazy(() => import('./pages/UnauthorizedPage'));
+const MaintenancePage = lazy(() => import('./pages/MaintenancePage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const SuccessPage = lazy(() => import('./screens/SuccessScreen'));
+
+// Component to handle online/offline state
+const OnlineStatusHandler: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isOnline, setIsOnline] = React.useState(navigator.onLine);
 
   React.useEffect(() => {
-    // Handle Firebase auth redirect if stuck on auth handler page
-    if (window.location.pathname.includes('/__/auth/handler')) {
-      // Wait a moment for Firebase to handle the redirect automatically
-      setTimeout(() => {
-        // If still on the auth handler page after 3 seconds, manually redirect
-        if (window.location.pathname.includes('/__/auth/handler')) {
-          window.location.href = '/';
-        }
-      }, 3000);
-    }
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
 
-    // Add global error handler with Firebase auth domain error filtering
-    const handleError = (event: ErrorEvent) => {
-      const error = event.error;
-      console.error('[App] Global error:', error);
-      
-      // Filter out Firebase auth domain errors - these are handled by AuthContext
-      if (error?.code === 'auth/unauthorized-domain' || 
-          error?.message?.includes('unauthorized-domain') ||
-          error?.message?.includes('OAuth redirect domains')) {
-        console.log('🔒 Firebase auth domain error caught and suppressed');
-        // Don't show error to user - AuthContext handles this gracefully
-        return;
-      }
-      
-      setHasError(true);
-      setErrorMessage(error?.message || 'Unknown error');
-    };
-
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      const error = event.reason;
-      console.error('[App] Unhandled promise rejection:', error);
-      
-      // Filter out Firebase auth domain errors - these are handled by AuthContext
-      if (error?.code === 'auth/unauthorized-domain' || 
-          error?.message?.includes('unauthorized-domain') ||
-          error?.message?.includes('OAuth redirect domains')) {
-        console.log('🔒 Firebase auth domain promise rejection caught and suppressed');
-        // Don't show error to user - AuthContext handles this gracefully
-        event.preventDefault(); // Prevent the default unhandled rejection behavior
-        return;
-      }
-      
-      setHasError(true);
-      setErrorMessage(error?.message || 'Promise rejection');
-    };
-
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
     return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
-  // Check for errors before rendering
-
-  if (hasError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h1>
-          <p className="text-gray-600 mb-4">{errorMessage}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Reload Page
-          </button>
+  return (
+    <>
+      {!isOnline && (
+        <div className="bg-red-500 text-white p-2 text-center">
+          You are currently offline
         </div>
-      </div>
-    );
-  }
+      )}
+      {children}
+    </>
+  );
+};
+
+// Component to handle app loading state
+const AppLoadingHandler: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Remove artificial loading delay that might cause refresh loops
+  return <>{children}</>;
+};
+
+// App routes component
+const AppRoutes: React.FC = () => {
+  // Preload critical routes after component mounts
+  React.useEffect(() => {
+    preloadCriticalRoutes([
+      HomePage,
+      QuizPage,
+      ResultsPage,
+      ProfilePage,
+      SettingsPage
+    ]);
+  }, []);
 
   return (
     <Layout>
-      <Routes>
-        <Route path="/" element={<HomeScreen />} />
-        <Route path="/quiz/:bundleId?" element={<QuizScreen />} />
-        <Route path="/results" element={<ResultsScreen />} />
-        <Route path="/store" element={<StoreScreen />} />
-        <Route path="/stats" element={
-          <ProtectedRoute>
-            <StatsScreen />
-          </ProtectedRoute>
-        } />
-        <Route path="/settings" element={<SettingsScreen />} />
-        <Route path="/achievements" element={
-          <ProtectedRoute>
-            <AchievementsScreen />
-          </ProtectedRoute>
-        } />
-        {/* /subscription route removed */}
-        <Route path="/profile" element={<UserProfileScreen />} />
-        <Route path="/billing" element={
-          <ProtectedRoute>
-            <BillingScreen />
-          </ProtectedRoute>
-        } />
-        <Route path="/billing-history" element={
-          <ProtectedRoute>
-            <BillingHistoryScreen />
-          </ProtectedRoute>
-        } />
-        <Route path="/about" element={<AboutScreen />} />
-        <Route path="/success" element={<SuccessScreen />} />
-        <Route path="/test-purchase" element={<TestPurchaseFlow />} />
-        <Route path="/auth/signin" element={<EmailLinkHandler />} />
-        {/* Specific route for auth handlers only */}
-        <Route path="/__/auth/*" element={<HomeScreen />} />
-      </Routes>
-      
-      {/* Firestore Initializer - only runs in development */}
-      <FirestoreInitializer />
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/quiz" element={<QuizPage />} />
+          <Route path="/quiz/:bundleId" element={<QuizPage />} />
+          <Route path="/quiz/daily-challenge" element={<QuizPage />} />
+          <Route path="/results" element={<ResultsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/stats" element={<StatsPage />} />
+          <Route path="/billing" element={<BillingPage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/achievements" element={<AchievementsPage />} />
+          <Route path="/store" element={<StorePage />} />
+          <Route path="/success" element={<SuccessPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="/maintenance" element={<MaintenancePage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
     </Layout>
   );
 };
 
-function App() {
-  // Now using Firebase Auth everywhere since GitHub Pages domain is authorized
-  // Using Firebase AuthProvider on all platforms
+// Context providers wrapper
+const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <ThemeProvider>
+      <AppStateProvider>
+        <AuthProvider>
+          <SettingsProvider>
+            <SoundProvider>
+              <QuizProvider>
+                <GameProvider>
+                  <StatsProvider>
+                    <PurchaseProvider>
+                      <TrialProvider>
+                        <ServiceWorkerProvider>
+                          {children}
+                        </ServiceWorkerProvider>
+                      </TrialProvider>
+                    </PurchaseProvider>
+                  </StatsProvider>
+                </GameProvider>
+              </QuizProvider>
+            </SoundProvider>
+          </SettingsProvider>
+        </AuthProvider>
+      </AppStateProvider>
+    </ThemeProvider>
+  );
+};
 
-  // Initialize services on app startup
-  useEffect(() => {
-    const initializeServices = async () => {
-      // Initialize services
-      
-      try {
-        // Initialize analytics
-        analyticsService.trackPageView('app_start');
-        
-        // Initialize notifications
-        await notificationService.initialize();
-        
-        // Initialize QuestionService for on-demand question loading
-        await QuestionService.initialize();
-        
-        // Temporarily disable service worker for GitHub Pages to fix the loading issue
-        // TODO: Fix PWA service worker configuration for GitHub Pages
-        /*
-        // Register service worker for PWA features
-        if ('serviceWorker' in navigator) {
-          try {
-            const swPath = getServiceWorkerPath();
-            // Register service worker
-            const registration = await navigator.serviceWorker.register(swPath);
-            // Service worker registered successfully
-            
-            // Listen for service worker messages
-            navigator.serviceWorker.addEventListener('message', (event) => {
-              if (event.data?.type === 'ANALYTICS_EVENT') {
-                analyticsService.trackFeatureUsage('service_worker_event', event.data.eventName);
-              }
-            });
-          } catch (error) {
-            console.error('[App] Service worker registration failed:', error);
-            errorHandler.handleGenericError(error, 'service-worker-registration');
-          }
-        }
-        */
-        
-        // Track app initialization success
-        analyticsService.trackFeatureUsage('app_initialization', 'success');
-        // All services initialized successfully
-        
-      } catch (error) {
-        console.error('[App] Service initialization failed:', error);
-        errorHandler.handleGenericError(error, 'app-initialization');
-        analyticsService.trackError('App initialization failed', 'startup');
+const App: React.FC = () => {
+  // Initialize performance monitoring
+  React.useEffect(() => {
+    // Check performance budget after initial load
+    setTimeout(() => {
+      const violations = checkPerformanceBudget();
+      if (violations.length > 0 && process.env.NODE_ENV === 'development') {
+        console.warn('Performance budget violations detected:', violations);
       }
-    };
+    }, 3000); // Check after 3 seconds
 
-    initializeServices();
+    // Track app initialization
+    performanceMonitor.markFeatureUsage('app_initialization');
   }, []);
 
   return (
-    <ErrorBoundary>
-      <ThemeProvider>
-        <AuthProvider>
-          <SettingsProvider>
-            <StatsProvider>
-              <PaymentProvider>
-                <PurchaseProvider>
-                  <QuizProvider>
-                    <AppContent />
-                  </QuizProvider>
-                </PurchaseProvider>
-              </PaymentProvider>
-            </StatsProvider>
-          </SettingsProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
+    <AppProviders>
+      <AppLoadingHandler>
+        <OnlineStatusHandler>
+          <AppRoutes />
+        </OnlineStatusHandler>
+      </AppLoadingHandler>
+    </AppProviders>
   );
-}
+};
 
 export default App;

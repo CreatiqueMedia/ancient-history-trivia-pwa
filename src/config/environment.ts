@@ -3,6 +3,52 @@ export const isGitHubPages = window.location.hostname.includes('github.io');
 export const isFirebaseHosting = window.location.hostname.includes('web.app') || window.location.hostname.includes('firebaseapp.com');
 export const isLocalhost = window.location.hostname === 'localhost';
 
+// Production Environment Validation
+export const isProduction = import.meta.env.MODE === 'production';
+export const isDevelopment = import.meta.env.MODE === 'development';
+export const isStaging = import.meta.env.MODE === 'staging';
+
+// Required Environment Variables Validation
+const requiredEnvVars = [
+  'VITE_FIREBASE_API_KEY',
+  'VITE_FIREBASE_AUTH_DOMAIN', 
+  'VITE_FIREBASE_PROJECT_ID',
+  'VITE_STRIPE_PUBLISHABLE_KEY'
+];
+
+// Validate required environment variables
+function validateEnvironment() {
+  const missing = requiredEnvVars.filter(varName => !import.meta.env[varName]);
+  
+  if (missing.length > 0) {
+    const error = `Missing required environment variables: ${missing.join(', ')}`;
+    console.error('[Environment] Validation failed:', error);
+    if (isProduction) {
+      throw new Error(error);
+    }
+  }
+  
+  // Validate Stripe key format
+  const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  if (stripeKey && !stripeKey.startsWith('pk_')) {
+    const error = 'Stripe publishable key must start with "pk_"';
+    console.error('[Environment] Stripe validation failed:', error);
+    if (isProduction) {
+      throw new Error(error);
+    }
+  }
+  
+  // Check for production vs test keys
+  if (isProduction && stripeKey?.includes('test')) {
+    const error = 'Production environment detected but using test Stripe key';
+    console.error('[Environment] Stripe key validation failed:', error);
+    throw new Error(error);
+  }
+}
+
+// Run validation
+validateEnvironment();
+
 // Supabase Configuration
 export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -51,4 +97,38 @@ export const initializeSupabase = () => {
     console.error('Failed to initialize Supabase:', error);
     return null;
   });
+};
+
+// Security Configuration
+export const security = {
+  enableCSP: isProduction,
+  enableHSTS: isProduction, 
+  enableSecureHeaders: isProduction,
+  
+  // Security utility functions
+  sanitizeInput: (input: string): string => {
+    return input
+      .replace(/[<>]/g, '') // Remove angle brackets
+      .replace(/javascript:/gi, '') // Remove javascript: protocol
+      .replace(/on\w+=/gi, '') // Remove event handlers
+      .trim();
+  },
+  
+  isValidEmail: (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  },
+  
+  generateSecureId: (): string => {
+    return crypto.randomUUID();
+  },
+  
+  isSafeUrl: (url: string): boolean => {
+    try {
+      const urlObj = new URL(url, window.location.origin);
+      return urlObj.protocol === 'https:' || urlObj.protocol === 'http:';
+    } catch {
+      return false;
+    }
+  }
 };

@@ -10,8 +10,8 @@ import {
   PencilIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { useAuth } from '../context/AuthContext';
-import { useStats } from '../context/StatsContext';
+import { useAuth } from '../hooks/useAuth';
+import { useStats } from '../hooks/useStats';
 import { usePurchase } from '../context/PurchaseContext';
 import { TrialService } from '../services/TrialService';
 import { SUBSCRIPTION_TIERS } from '../data/bundles';

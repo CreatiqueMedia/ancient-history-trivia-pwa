@@ -1,0 +1,12 @@
+# Yarn Auto-Answer File
+# This file automatically answers yarn prompts for version selection
+# based on the resolutions defined in package.json
+
+# For React type packages, always choose versions compatible with React 18.x
+@types/react-dom: 18.2.15
+
+# For any React 19.x options, automatically decline
+@types/react-dom@19.*: decline
+
+# Use package.json resolutions for all version conflicts
+*: use-resolutions

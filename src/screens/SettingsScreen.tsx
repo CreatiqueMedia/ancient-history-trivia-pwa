@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useSettings } from '../context/SettingsContext';
 import { useTheme } from '../context/ThemeContext';
-import { useStats } from '../context/StatsContext';
+import { useStats } from '../hooks/useStats';
 
 const SettingsScreen: React.FC = () => {
   const { settings, updateSettings, resetSettings } = useSettings();

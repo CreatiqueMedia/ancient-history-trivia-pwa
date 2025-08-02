@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React from 'react';
 import {
   User,
   signInWithPopup,
@@ -17,9 +17,8 @@ import {
   GoogleAuthProvider,
   OAuthProvider
 } from 'firebase/auth';
-// FIRESTORE IMPORTS REMOVED - App now operates in pure offline mode
 import { auth, googleProvider, appleProvider } from '../config/firebase';
-import type { UserProfile, AuthProvider, SubscriptionTier } from '../types';
+import type { UserProfile, SubscriptionTier } from '../types';
 import { TrialService } from '../services/TrialService';
 
 interface AuthContextType {
@@ -29,7 +28,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<any>;
   signInWithApple: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
   sendSignInLink: (email: string) => Promise<void>;
   signInWithLink: (email: string, emailLink: string) => Promise<void>;
   signInAnonymously: () => Promise<void>;
@@ -40,29 +39,90 @@ interface AuthContextType {
   error: string | null;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const defaultContext: AuthContextType = {
+  user: null,
+  userProfile: null,
+  loading: false,
+  signInWithGoogle: async () => {},
+  signInWithApple: async () => {},
+  signInWithEmail: async () => {},
+  signUpWithEmail: async () => {},
+  sendSignInLink: async () => {},
+  signInWithLink: async () => {},
+  signInAnonymously: async () => {},
+  logout: async () => {},
+  resetPassword: async () => {},
+  updateUserProfile: async () => {},
+  isSubscribed: () => false,
+  error: null,
+};
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
+const AuthContext = React.createContext<AuthContextType>(defaultContext);
+
+export { AuthContext };
+
+
 
 interface AuthProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface AuthProviderState {
+  user: User | null;
+  userProfile: UserProfile | null;
+  loading: boolean;
+  error: string | null;
+}
 
-  // Create user profile (pure offline mode - no Firestore)
-  const createUserProfile = async (user: User, provider: AuthProvider): Promise<UserProfile> => {
-    // Always create profile from auth data since Firestore is disabled
+export class AuthProvider extends React.Component<AuthProviderProps, AuthProviderState> {
+  private unsubscribe: (() => void) | null = null;
+
+  constructor(props: AuthProviderProps) {
+    super(props);
+    
+    this.state = {
+      user: null,
+      userProfile: null,
+      loading: true,
+      error: null,
+    };
+  }
+
+  componentDidMount() {
+    // Set up auth state listener
+    this.unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const profile = await this.createUserProfile(user, 'google');
+        this.setState({ user, userProfile: profile, loading: false, error: null });
+      } else {
+        this.setState({ user: null, userProfile: null, loading: false, error: null });
+      }
+    });
+
+    // Check for redirect result on app start
+    this.checkRedirectResult();
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
+
+  checkRedirectResult = async () => {
+    try {
+      const result = await getRedirectResult(auth);
+      if (result?.user) {
+        const profile = await this.createUserProfile(result.user, 'google');
+        this.setState({ userProfile: profile, error: null });
+      }
+    } catch (error: any) {
+      console.error('Redirect result error:', error);
+      this.setState({ error: error.message });
+    }
+  };
+
+  createUserProfile = async (user: User, provider: 'google' | 'apple' | 'email' | 'anonymous'): Promise<UserProfile> => {
     const profile: UserProfile = {
       id: user.uid,
       email: user.email || '',
@@ -93,21 +153,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isAnonymous: user.isAnonymous
     };
 
-    // Try to load any existing profile from localStorage
+    // Try to load existing profile from localStorage
     try {
       const savedProfile = localStorage.getItem(`userProfile_${user.uid}`);
       if (savedProfile) {
         const parsed = JSON.parse(savedProfile);
-        // Merge saved preferences with current auth data
-        profile.preferences = { ...profile.preferences, ...parsed.preferences };
-        profile.subscription = parsed.subscription || 'free';
-        profile.createdAt = new Date(parsed.createdAt) || profile.createdAt;
+        return { ...profile, ...parsed, lastActive: new Date() };
       }
     } catch (error) {
-      console.warn('Could not load saved profile from localStorage:', error);
+      console.warn('Could not load saved profile:', error);
     }
 
-    // Save profile to localStorage for persistence
+    // Save new profile to localStorage
     try {
       localStorage.setItem(`userProfile_${user.uid}`, JSON.stringify(profile));
     } catch (error) {
@@ -117,393 +174,244 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return profile;
   };
 
-  // Sign in with Google
-  const signInWithGoogle = async () => {
+  signInWithGoogle = async () => {
     try {
-      setError(null);
-      setLoading(true);
+      this.setState({ error: null, loading: true });
       
       try {
-        // Try popup first with improved error handling
+        // Try popup first
         const result = await signInWithPopup(auth, googleProvider);
-        const profile = await createUserProfile(result.user, 'google');
-        setUserProfile(profile);
-        return result;
-      } catch (popupError: any) {
-        console.warn('🔄 Popup authentication failed, trying redirect...', popupError.code);
-        
-        // If popup fails due to COOP, popup blocking, or other issues, fall back to redirect
-        if (popupError.code === 'auth/popup-blocked' || 
-            popupError.code === 'auth/popup-closed-by-user' ||
-            popupError.message?.includes('Cross-Origin-Opener-Policy') ||
-            popupError.message?.includes('window.close') ||
-            popupError.message?.includes('window.closed')) {
-          
-          console.log('🔄 Using redirect method due to popup restrictions...');
-          setError('Redirecting for sign-in...');
-          await signInWithRedirect(auth, googleProvider);
-          return; // Redirect will handle the rest
+        if (result.user) {
+          const profile = await this.createUserProfile(result.user, 'google');
+          this.setState({ userProfile: profile });
         }
-        throw popupError; // Re-throw other popup errors
+      } catch (popupError: any) {
+        console.log('🔄 Popup authentication failed, trying redirect...', popupError.code);
+        
+        if (
+          popupError.code === 'auth/popup-blocked' ||
+          popupError.code === 'auth/popup-closed-by-user' ||
+          popupError.code === 'auth/cancelled-popup-request' ||
+          popupError.message?.includes('COOP')
+        ) {
+          // Fallback to redirect
+          this.setState({ error: 'Redirecting for sign-in...' });
+          await signInWithRedirect(auth, googleProvider);
+          return;
+        } else {
+          throw popupError;
+        }
       }
     } catch (error: any) {
       console.error('❌ Google sign in error:', error);
+      let userError = 'Failed to sign in with Google. Please try again.';
       
-      // Provide user-friendly error messages
-      let userError = error.message;
-      if (error.code === 'auth/popup-closed-by-user') {
-        userError = 'Sign-in was cancelled. Trying redirect method...';
-      } else if (error.code === 'auth/popup-blocked') {
-        userError = 'Pop-up blocked. Using redirect method...';
-      } else if (error.code === 'auth/operation-not-allowed') {
-        userError = 'Google sign-in is not enabled. Please contact support.';
-      } else if (error.code === 'auth/invalid-api-key') {
-        userError = 'Authentication configuration error. Please contact support.';
-      } else if (error.code === 'auth/unauthorized-domain') {
-        userError = 'This domain is not authorized for authentication. Please contact support or try the Firebase Hosting version at ancient-history-trivia.web.app';
-      } else if (error.code === 'auth/account-exists-with-different-credential') {
-        userError = 'An account already exists with this email address using a different sign-in method.';
-      } else if (error.message?.includes('Cross-Origin-Opener-Policy')) {
-        userError = 'Browser security detected. Using redirect method...';
-        // Automatically try redirect for COOP issues
-        try {
-          await signInWithRedirect(auth, googleProvider);
-          return;
-        } catch (redirectError) {
-          userError = 'Authentication failed. Please try again or use email sign-in.';
-        }
+      if (error.code === 'auth/popup-blocked') {
+        userError = 'Pop-up blocked. Please allow pop-ups and try again.';
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        userError = 'Sign-in cancelled. Please try again.';
+      } else if (error.message?.includes('requests-from-referer') && error.message?.includes('localhost')) {
+        // Development environment - localhost not authorized
+        userError = 'Development mode: Please add localhost:5173 to Firebase authorized domains or use anonymous sign-in for testing.';
+        console.warn('⚠️ Development issue: Add localhost to Firebase Console > Authentication > Settings > Authorized domains');
+      } else if (error.message?.includes('are-blocked')) {
+        userError = 'Domain not authorized. Please contact support.';
       }
       
-      setError(userError);
-      throw error; // Re-throw so the modal can handle it
+      this.setState({ error: userError });
     } finally {
-      setLoading(false);
+      this.setState({ loading: false });
     }
   };
 
-
-  // Sign in with Apple
-  const signInWithApple = async () => {
+  signInWithApple = async () => {
     try {
-      setError(null);
-      setLoading(true);
+      this.setState({ error: null, loading: true });
       const result = await signInWithPopup(auth, appleProvider);
-      const profile = await createUserProfile(result.user, 'apple');
-      setUserProfile(profile);
+      const profile = await this.createUserProfile(result.user, 'apple');
+      this.setState({ userProfile: profile });
     } catch (error: any) {
-      console.error('Apple sign in error:', error);
+      console.error('❌ Apple sign in error:', error);
+      let userError = 'Failed to sign in with Apple. Please try again.';
       
-      let userError = error.message;
-      if (error.code === 'auth/operation-not-allowed') {
-        userError = 'Apple Sign-In is not enabled for this app. Please use Google Sign-In or email authentication instead.';
-      } else if (error.code === 'auth/unauthorized-domain') {
-        userError = 'This domain is not authorized for authentication. Please contact support or try the Firebase Hosting version at ancient-history-trivia.web.app';
-      } else if (error.code === 'auth/popup-closed-by-user') {
-        userError = 'Sign-in was cancelled. Please try again.';
-      } else if (error.code === 'auth/popup-blocked') {
-        userError = 'Pop-up blocked. Please allow pop-ups for this site and try again.';
+      if (error.code === 'auth/popup-blocked') {
+        userError = 'Pop-up blocked. Please allow pop-ups and try again.';
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        userError = 'Sign-in cancelled. Please try again.';
       }
       
-      setError(userError);
+      this.setState({ error: userError });
     } finally {
-      setLoading(false);
+      this.setState({ loading: false });
     }
   };
 
-  // Sign in with Email
-  const signInWithEmail = async (email: string, password: string) => {
+  signInWithEmail = async (email: string, password: string) => {
     try {
-      setError(null);
-      setLoading(true);
+      this.setState({ error: null, loading: true });
       const result = await signInWithEmailAndPassword(auth, email, password);
-      const profile = await createUserProfile(result.user, 'email');
-      setUserProfile(profile);
+      const profile = await this.createUserProfile(result.user, 'email');
+      this.setState({ userProfile: profile });
     } catch (error: any) {
-      setError(error.message);
-      console.error('Email sign in error:', error);
+      console.error('❌ Email sign in error:', error);
+      this.setState({ error: error.message });
     } finally {
-      setLoading(false);
+      this.setState({ loading: false });
     }
   };
 
-  // Sign up with Email
-  const signUpWithEmail = async (email: string, password: string, displayName: string) => {
+  signUpWithEmail = async (email: string, password: string, displayName?: string) => {
     try {
-      setError(null);
-      setLoading(true);
+      this.setState({ error: null, loading: true });
       const result = await createUserWithEmailAndPassword(auth, email, password);
       
-      // Update the user's display name
-      await updateProfile(result.user, { displayName });
+      if (displayName && result.user) {
+        await updateProfile(result.user, { displayName });
+      }
       
-      const profile = await createUserProfile(result.user, 'email');
-      setUserProfile(profile);
+      const profile = await this.createUserProfile(result.user, 'email');
+      this.setState({ userProfile: profile });
     } catch (error: any) {
-      setError(error.message);
-      console.error('Email sign up error:', error);
+      console.error('❌ Email sign up error:', error);
+      this.setState({ error: error.message });
     } finally {
-      setLoading(false);
+      this.setState({ loading: false });
     }
   };
 
-  // Sign in anonymously
-  const signInAnonymouslyHandler = async () => {
+  signInAnonymously = async () => {
     try {
-      setError(null);
-      setLoading(true);
+      this.setState({ error: null, loading: true });
       const result = await signInAnonymously(auth);
-      const profile = await createUserProfile(result.user, 'anonymous');
-      setUserProfile(profile);
+      const profile = await this.createUserProfile(result.user, 'anonymous');
+      this.setState({ userProfile: profile });
     } catch (error: any) {
-      setError(error.message);
-      console.error('Anonymous sign in error:', error);
+      console.error('❌ Anonymous sign in error:', error);
+      this.setState({ error: error.message });
     } finally {
-      setLoading(false);
+      this.setState({ loading: false });
     }
   };
 
-  // Send sign-in link to email
-  const sendSignInLink = async (email: string) => {
+  logout = async () => {
     try {
-      setError(null);
-      const actionCodeSettings = {
-        // URL where user will be redirected after clicking the link
-        url: window.location.origin + '/auth/signin',
-        handleCodeInApp: true,
-        // For web-only deployment, we don't need iOS/Android configs yet
-        // When you're ready for mobile apps, uncomment and configure these:
-        // iOS: {
-        //   bundleId: 'com.creativequemedia.ancienthistorytrivia'
-        // },
-        // android: {
-        //   packageName: 'com.creativequemedia.ancienthistorytrivia',
-        //   installApp: true,
-        //   minimumVersion: '1'
-        // },
-        // dynamicLinkDomain: 'ancienthistorytrivia.page.link' // Set up in Firebase Console when needed
-      };
-      
-      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-      // Save email in localStorage for verification
-      localStorage.setItem('emailForSignIn', email);
-    } catch (error: any) {
-      setError(error.message);
-      console.error('Send sign-in link error:', error);
-      throw error;
-    }
-  };
-
-  // Sign in with email link
-  const signInWithLink = async (email: string, emailLink: string) => {
-    try {
-      setError(null);
-      setLoading(true);
-      
-      if (isSignInWithEmailLink(auth, emailLink)) {
-        const result = await signInWithEmailLink(auth, email, emailLink);
-        const profile = await createUserProfile(result.user, 'email');
-        setUserProfile(profile);
-        // Clear email from localStorage
-        localStorage.removeItem('emailForSignIn');
-      } else {
-        throw new Error('Invalid sign-in link');
-      }
-    } catch (error: any) {
-      setError(error.message);
-      console.error('Sign in with link error:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Logout
-  const logout = async () => {
-    try {
-      setError(null);
+      this.setState({ error: null });
       await signOut(auth);
-      
-      // Clear user profile and purchase data, but preserve trial data
-      if (user) {
-        localStorage.removeItem(`userProfile_${user.uid}`);
-        localStorage.removeItem('subscription');
-        localStorage.removeItem('purchaseHistory');
+      // Clear localStorage data
+      if (this.state.user?.uid) {
+        localStorage.removeItem(`userProfile_${this.state.user.uid}`);
       }
-      
-      setUser(null);
-      setUserProfile(null);
+      this.setState({ user: null, userProfile: null });
     } catch (error: any) {
-      setError(error.message);
-      console.error('Logout error:', error);
+      console.error('❌ Logout error:', error);
+      this.setState({ error: error.message });
     }
   };
 
-  // Reset password
-  const resetPassword = async (email: string) => {
+  resetPassword = async (email: string) => {
     try {
-      setError(null);
+      this.setState({ error: null });
       await sendPasswordResetEmail(auth, email);
     } catch (error: any) {
-      setError(error.message);
-      console.error('Password reset error:', error);
+      console.error('❌ Password reset error:', error);
+      this.setState({ error: error.message });
     }
   };
 
-  // Update user profile
-  const updateUserProfile = async (updates: Partial<UserProfile>) => {
-    if (!user || !userProfile) return;
-
+  sendSignInLink = async (email: string) => {
     try {
-      setError(null);
-      
-      // Update local state and localStorage (pure offline mode)
-      const updatedProfile = { ...userProfile, ...updates, lastActive: new Date() };
-      setUserProfile(updatedProfile);
-      
-      // Save to localStorage for persistence
-      try {
-        localStorage.setItem(`userProfile_${user.uid}`, JSON.stringify(updatedProfile));
-      } catch (storageError) {
-        console.warn('Could not save updated profile to localStorage:', storageError);
-      }
-      
+      this.setState({ error: null });
+      const actionCodeSettings = {
+        url: window.location.href,
+        handleCodeInApp: true,
+      };
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      localStorage.setItem('emailForSignIn', email);
     } catch (error: any) {
-      console.warn('Profile update error:', error);
-      setError('Failed to update profile');
+      console.error('❌ Send sign in link error:', error);
+      this.setState({ error: error.message });
     }
   };
 
-  // Check subscription status
-  const isSubscribed = (tier?: SubscriptionTier): boolean => {
-    if (!userProfile) return false;
-    
-    const tierHierarchy = ['free', 'pro_monthly', 'pro_annual'];
-    const userTierIndex = tierHierarchy.indexOf(userProfile.subscription);
-    const requiredTierIndex = tierHierarchy.indexOf(tier || 'pro_monthly');
-    
-    return userTierIndex >= requiredTierIndex;
+  signInWithLink = async (email: string, emailLink: string) => {
+    try {
+      this.setState({ error: null, loading: true });
+      if (isSignInWithEmailLink(auth, emailLink)) {
+        const result = await signInWithEmailLink(auth, email, emailLink);
+        localStorage.removeItem('emailForSignIn');
+        const profile = await this.createUserProfile(result.user, 'email');
+        this.setState({ userProfile: profile });
+      }
+    } catch (error: any) {
+      console.error('❌ Sign in with link error:', error);
+      this.setState({ error: error.message });
+    } finally {
+      this.setState({ loading: false });
+    }
   };
 
-  // Listen for auth state changes (pure offline mode)
-  useEffect(() => {
-    
-    // Check for redirect result first
-    const checkRedirectResult = async () => {
-      try {
-        const result = await getRedirectResult(auth);
+  updateUserProfile = async (updates: Partial<UserProfile>) => {
+    try {
+      this.setState({ error: null });
+      if (this.state.userProfile) {
+        const updatedProfile = { ...this.state.userProfile, ...updates };
+        this.setState({ userProfile: updatedProfile });
         
-        if (result && result.user) {
-          try {
-            const provider = result.providerId?.includes('google') ? 'google' :
-                            result.providerId?.includes('apple') ? 'apple' : 'email';
-            const profile = await createUserProfile(result.user, provider);
-            setUserProfile(profile);
-          } catch (profileError) {
-            console.error('Error creating profile from redirect:', profileError);
-          }
-        }
-      } catch (error: any) {
-        // Don't set error for these specific cases as they're expected
-        if (error.code !== 'auth/no-auth-event' && error.code !== 'auth/invalid-auth-event') {
-          setError(error.message);
+        // Save to localStorage
+        if (this.state.user?.uid) {
+          localStorage.setItem(`userProfile_${this.state.user.uid}`, JSON.stringify(updatedProfile));
         }
       }
+    } catch (error: any) {
+      console.error('❌ Update profile error:', error);
+      this.setState({ error: error.message });
+    }
+  };
+
+  isSubscribed = (tier?: SubscriptionTier): boolean => {
+    if (!this.state.userProfile) return false;
+    
+    if (!tier) {
+      return this.state.userProfile.subscription !== 'free';
+    }
+    
+    // Check if user has the required subscription tier or higher
+    const tierHierarchy = {
+      'free': 0,
+      'pro_monthly': 1,
+      'pro_annual': 2,
+      'pro_biennial': 3
     };
     
-    // Check for redirect result immediately
-    checkRedirectResult();
+    const currentLevel = tierHierarchy[this.state.userProfile.subscription] || 0;
+    const requiredLevel = tierHierarchy[tier] || 0;
     
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      
-      if (user) {
-        setLoading(true);
-        
-        // Load user profile and trial data from Firestore
-        try {
-          const provider = user.providerData[0]?.providerId.includes('google') ? 'google' :
-                          user.providerData[0]?.providerId.includes('apple') ? 'apple' :
-                          user.isAnonymous ? 'anonymous' : 'email';
-          
-          const profile = await createUserProfile(user, provider);
-          setUserProfile(profile);
-          
-          // Load trial data from Firestore when user logs in
-          try {
-            const trialStatus = await TrialService.getTrialStatusFromFirestore(user.uid);
-            if (trialStatus) {
-              console.log('Trial data loaded from Firestore:', trialStatus);
-            }
-          } catch (trialError) {
-            console.warn('Could not load trial data from Firestore:', trialError);
-          }
-        } catch (error: any) {
-          console.warn('[AuthContext] Error creating user profile:', error);
-          
-          // Create basic fallback profile
-          const fallbackProfile: UserProfile = {
-            id: user.uid,
-            email: user.email || '',
-            displayName: user.displayName || user.email?.split('@')[0] || 'User',
-            photoURL: user.photoURL || undefined,
-            provider: user.isAnonymous ? 'anonymous' : 'email',
-            subscription: 'free',
-            preferences: {
-              theme: 'system',
-              soundEnabled: true,
-              vibrationEnabled: true,
-              autoAdvance: false,
-              showExplanations: true,
-              questionTimeLimit: null,
-              language: 'en',
-              accessibilityEnabled: false,
-              fontSize: 'medium',
-              notifications: {
-                dailyReminders: true,
-                achievementUpdates: true,
-                newContentAlerts: true,
-                friendActivity: false,
-                reminderTime: '19:00'
-              }
-            },
-            createdAt: new Date(),
-            lastActive: new Date(),
-            isAnonymous: user.isAnonymous
-          };
-          
-          setUserProfile(fallbackProfile);
-        }
-      } else {
-        setUserProfile(null);
-      }
-      
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const value: AuthContextType = {
-    user,
-    userProfile,
-    loading,
-    signInWithGoogle,
-    signInWithApple,
-    signInWithEmail,
-    signUpWithEmail,
-    sendSignInLink,
-    signInWithLink,
-    signInAnonymously: signInAnonymouslyHandler,
-    logout,
-    resetPassword,
-    updateUserProfile,
-    isSubscribed,
-    error
+    return currentLevel >= requiredLevel;
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  render() {
+    const value: AuthContextType = {
+      user: this.state.user,
+      userProfile: this.state.userProfile,
+      loading: this.state.loading,
+      error: this.state.error,
+      signInWithGoogle: this.signInWithGoogle,
+      signInWithApple: this.signInWithApple,
+      signInWithEmail: this.signInWithEmail,
+      signUpWithEmail: this.signUpWithEmail,
+      sendSignInLink: this.sendSignInLink,
+      signInWithLink: this.signInWithLink,
+      signInAnonymously: this.signInAnonymously,
+      logout: this.logout,
+      resetPassword: this.resetPassword,
+      updateUserProfile: this.updateUserProfile,
+      isSubscribed: this.isSubscribed,
+    };
+
+    return (
+      <AuthContext.Provider value={value}>
+        {this.props.children}
+      </AuthContext.Provider>
+    );
+  }
 }

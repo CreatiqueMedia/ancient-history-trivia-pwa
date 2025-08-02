@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { 
   LeaderboardEntry, 
   Challenge, 
@@ -39,6 +39,8 @@ interface LeaderboardContextType {
 
 const LeaderboardContext = createContext<LeaderboardContextType | undefined>(undefined);
 
+export { LeaderboardContext };
+
 export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   
@@ -60,7 +62,7 @@ export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ c
       loadChallengeData();
       loadNotifications();
     }
-  }, [user]);
+  }, [user?.uid]); // Only depend on user ID to prevent excessive re-renders
 
   // Generate mock leaderboard data (in production, this would come from your backend)
   const generateMockLeaderboard = (): LeaderboardEntry[] => {
@@ -358,12 +360,4 @@ export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ c
       {children}
     </LeaderboardContext.Provider>
   );
-};
-
-export const useLeaderboard = (): LeaderboardContextType => {
-  const context = useContext(LeaderboardContext);
-  if (!context) {
-    throw new Error('useLeaderboard must be used within a LeaderboardProvider');
-  }
-  return context;
 };

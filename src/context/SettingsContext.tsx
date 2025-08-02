@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React from 'react';
 import { Settings } from '../types';
 
 interface SettingsContextType {
@@ -19,40 +19,79 @@ const defaultSettings: Settings = {
   fontSize: 'medium'
 };
 
-const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
+const defaultContext: SettingsContextType = {
+  settings: defaultSettings,
+  updateSettings: () => {},
+  resetSettings: () => {},
+};
 
-export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<Settings>(() => {
+const SettingsContext = React.createContext<SettingsContextType>(defaultContext);
+
+interface SettingsProviderState {
+  settings: Settings;
+}
+
+export class SettingsProvider extends React.Component<
+  { children: React.ReactNode },
+  SettingsProviderState
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    
+    // Initialize state directly - don't call setState in constructor
+    let initialSettings: Settings = defaultSettings;
     try {
       const saved = localStorage.getItem('settings');
-      return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
-    } catch {
-      return defaultSettings;
+      if (saved) {
+        initialSettings = { ...defaultSettings, ...JSON.parse(saved) };
+      }
+    } catch (error) {
+      console.warn('Could not read settings from localStorage:', error);
     }
-  });
 
-  useEffect(() => {
-    localStorage.setItem('settings', JSON.stringify(settings));
-  }, [settings]);
+    this.state = {
+      settings: initialSettings,
+    };
+  }
 
-  const updateSettings = (updates: Partial<Settings>) => {
-    setSettings(prev => ({ ...prev, ...updates }));
+  componentDidUpdate(_: any, prevState: SettingsProviderState) {
+    if (prevState.settings !== this.state.settings) {
+      try {
+        localStorage.setItem('settings', JSON.stringify(this.state.settings));
+      } catch (error) {
+        console.warn('Could not save settings to localStorage:', error);
+      }
+    }
+  }
+
+  updateSettings = (updates: Partial<Settings>) => {
+    this.setState(prevState => ({
+      settings: { ...prevState.settings, ...updates }
+    }));
   };
 
-  const resetSettings = () => {
-    setSettings(defaultSettings);
+  resetSettings = () => {
+    this.setState({ settings: defaultSettings });
   };
 
-  return (
-    <SettingsContext.Provider value={{ settings, updateSettings, resetSettings }}>
-      {children}
-    </SettingsContext.Provider>
-  );
+  render() {
+    const value: SettingsContextType = {
+      settings: this.state.settings,
+      updateSettings: this.updateSettings,
+      resetSettings: this.resetSettings,
+    };
+
+    return (
+      <SettingsContext.Provider value={value}>
+        {this.props.children}
+      </SettingsContext.Provider>
+    );
+  }
 }
 
 export function useSettings() {
-  const context = useContext(SettingsContext);
-  if (context === undefined) {
+  const context = React.useContext(SettingsContext);
+  if (!context) {
     throw new Error('useSettings must be used within a SettingsProvider');
   }
   return context;

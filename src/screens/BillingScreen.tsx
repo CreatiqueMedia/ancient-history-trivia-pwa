@@ -11,7 +11,7 @@ import {
   LifebuoyIcon,
   ChartBarIcon
 } from '@heroicons/react/24/solid';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
 import { TrialService } from '../services/TrialService';
 import BillingManagement from '../components/BillingManagement';

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { TrialService } from '../services/TrialService';
 import { 
   getBundlePrice, 
@@ -65,9 +65,8 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       localStorage.removeItem('ownedBundles');
       localStorage.removeItem('subscription');
       localStorage.removeItem('purchaseHistory');
-      console.log('PurchaseContext: Cleared all purchase data on logout');
     }
-  }, [user]);
+  }, [user?.uid]); // Only depend on user ID, not the entire user object
 
   // Load saved purchase data on initialization
   useEffect(() => {
@@ -92,27 +91,18 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               setSubscriptionTier(sub.tier);
               setSubscriptionPeriod(sub.period);
               setSubscriptionExpiry(sub.expiry);
-              console.log('Loaded valid subscription:', sub);
             } else {
               // Subscription expired, reset to free
-              console.log('Subscription expired, reset to free');
             }
           }
         }
-        
-        console.log('Subscription state loaded:', {
-          tier: subscriptionTier,
-          period: subscriptionPeriod,
-          expiry: subscriptionExpiry,
-          isPremium: isPremiumUser
-        });
       } catch (error) {
         console.error('Error loading purchase data:', error);
       }
     };
 
     loadPurchaseData();
-  }, [user]);
+  }, [user?.uid]); // Only depend on user ID, not the entire user object
 
   // Save purchase data whenever it changes
   useEffect(() => {
@@ -319,8 +309,9 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // For web/PWA, redirect to Stripe Checkout
         console.log('Redirecting to Stripe checkout for subscription:', period);
         
-        // Store user ID for tracking
+        // Store user ID and subscription info for tracking
         localStorage.setItem('userId', user.uid);
+        localStorage.setItem('pendingSubscriptionPurchase', period);
         
         // Redirect to Stripe payment link for subscription (this will throw if user not authenticated)
         redirectToStripeCheckout(period);
@@ -464,10 +455,13 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 };
 
-export const usePurchase = (): PurchaseContextType => {
+// Hook to use purchase context
+const usePurchase = (): PurchaseContextType => {
   const context = useContext(PurchaseContext);
   if (!context) {
     throw new Error('usePurchase must be used within a PurchaseProvider');
   }
   return context;
 };
+
+export { usePurchase };

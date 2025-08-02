@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -8,55 +8,147 @@ interface ThemeContextType {
   isDark: boolean;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const defaultContext: ThemeContextType = {
+  theme: 'light',
+  setTheme: () => {},
+  isDark: false,
+};
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('theme');
-    return (saved as Theme) || 'system';
-  });
+const ThemeContext = React.createContext<ThemeContextType>(defaultContext);
 
-  const [isDark, setIsDark] = useState(false);
+interface ThemeProviderState {
+  theme: Theme;
+  isDark: boolean;
+}
 
-  useEffect(() => {
-    const root = window.document.documentElement;
+export class ThemeProvider extends React.Component<
+  { children: React.ReactNode },
+  ThemeProviderState
+> {
+  private mediaQuery: MediaQueryList | null = null;
+
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
     
-    const applyTheme = (isDarkMode: boolean) => {
-      if (isDarkMode) {
+    // Initialize state directly - don't call setState in constructor
+    let initialTheme: Theme = 'light';
+    try {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light' || saved === 'dark' || saved === 'system') {
+        initialTheme = saved;
+      }
+    } catch (error) {
+      console.warn('Could not read theme from localStorage:', error);
+    }
+
+    this.state = {
+      theme: initialTheme,
+      isDark: false,
+    };
+  }
+
+  componentDidMount() {
+    this.applyTheme();
+  }
+
+  componentDidUpdate(prevProps: any, prevState: ThemeProviderState) {
+    if (prevState.theme !== this.state.theme) {
+      this.applyTheme();
+      this.saveThemeToStorage();
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.mediaQuery) {
+      this.mediaQuery.removeEventListener('change', this.handleMediaQueryChange);
+    }
+  }
+
+  private saveThemeToStorage = () => {
+    try {
+      localStorage.setItem('theme', this.state.theme);
+    } catch (error) {
+      console.warn('Could not save theme to localStorage:', error);
+    }
+  };
+
+  private handleMediaQueryChange = (e: MediaQueryListEvent) => {
+    const isDark = e.matches;
+    this.setState({ isDark });
+    
+    try {
+      const root = document.documentElement;
+      if (isDark) {
         root.classList.add('dark');
       } else {
         root.classList.remove('dark');
       }
-      setIsDark(isDarkMode);
+    } catch (error) {
+      console.warn('Could not apply theme:', error);
+    }
+  };
+
+  private applyTheme = () => {
+    try {
+      const root = document.documentElement;
+      
+      if (this.state.theme === 'system') {
+        if (typeof window !== 'undefined' && window.matchMedia) {
+          this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+          const isDarkMode = this.mediaQuery.matches;
+          this.setState({ isDark: isDarkMode });
+          
+          if (isDarkMode) {
+            root.classList.add('dark');
+          } else {
+            root.classList.remove('dark');
+          }
+          
+          this.mediaQuery.addEventListener('change', this.handleMediaQueryChange);
+        }
+      } else {
+        // Clean up media query listener if switching away from system
+        if (this.mediaQuery) {
+          this.mediaQuery.removeEventListener('change', this.handleMediaQueryChange);
+          this.mediaQuery = null;
+        }
+        
+        const isDarkMode = this.state.theme === 'dark';
+        this.setState({ isDark: isDarkMode });
+        
+        if (isDarkMode) {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+      }
+    } catch (error) {
+      console.warn('Could not apply theme:', error);
+    }
+  };
+
+  private setTheme = (theme: Theme) => {
+    this.setState({ theme });
+  };
+
+  render() {
+    const contextValue: ThemeContextType = {
+      theme: this.state.theme,
+      setTheme: this.setTheme,
+      isDark: this.state.isDark,
     };
 
-    if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      applyTheme(mediaQuery.matches);
-      
-      const handleChange = (e: MediaQueryListEvent) => applyTheme(e.matches);
-      mediaQuery.addEventListener('change', handleChange);
-      
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    } else {
-      applyTheme(theme === 'dark');
-    }
-  }, [theme]);
-
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme, isDark }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+    return (
+      <ThemeContext.Provider value={contextValue}>
+        {this.props.children}
+      </ThemeContext.Provider>
+    );
+  }
 }
 
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
+export function useTheme(): ThemeContextType {
+  const context = React.useContext(ThemeContext);
+  if (!context) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;

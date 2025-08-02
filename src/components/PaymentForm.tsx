@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { usePurchase } from '../context/PurchaseContext';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { getBundleName, getSubscriptionName } from '../config/payment';
 
 interface PaymentFormProps {

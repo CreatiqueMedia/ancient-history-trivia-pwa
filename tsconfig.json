@@ -20,7 +20,9 @@
       "@/*": ["./src/*"]
     },
     "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo"
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "skipDefaultLibCheck": true,
+    "types": ["vite/client"]
   },
   "include": ["src"],
   "exclude": [

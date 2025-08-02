@@ -1,9 +1,7 @@
-// Firebase Configuration - FIRESTORE RE-ENABLED + ANALYTICS ENABLED
+// Firebase Configuration - FIRESTORE RE-ENABLED + ANALYTICS LAZY LOADED
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, OAuthProvider, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
-import { getAnalytics, Analytics } from 'firebase/analytics';
-import { getPerformance } from 'firebase/performance';
 
 // Firebase Configuration for Ancient History Trivia PWA
 const firebaseConfig = {
@@ -30,27 +28,43 @@ export const auth = getAuth(app);
 // Initialize Firestore
 export const db: Firestore = getFirestore(app);
 
-// Initialize Analytics (only in production and if measurement ID is available)
-export let analytics: Analytics | null = null;
-if (import.meta.env.PROD && firebaseConfig.measurementId) {
+// Lazy-loaded Analytics and Performance
+export let analytics: any = null;
+export let performance: any = null;
+
+// Function to initialize analytics when needed
+export const initializeAnalytics = async () => {
+  if (analytics || !import.meta.env.PROD || !firebaseConfig.measurementId) {
+    return analytics;
+  }
+  
   try {
+    const { getAnalytics } = await import('firebase/analytics');
     analytics = getAnalytics(app);
     console.log('Firebase Analytics initialized');
+    return analytics;
   } catch (error) {
     console.warn('Failed to initialize Firebase Analytics:', error);
+    return null;
   }
-}
+};
 
-// Initialize Performance Monitoring (only in production)
-export let performance: any = null;
-if (import.meta.env.PROD) {
+// Function to initialize performance monitoring when needed
+export const initializePerformance = async () => {
+  if (performance || !import.meta.env.PROD) {
+    return performance;
+  }
+  
   try {
+    const { getPerformance } = await import('firebase/performance');
     performance = getPerformance(app);
     console.log('Firebase Performance Monitoring initialized');
+    return performance;
   } catch (error) {
-    console.warn('Failed to initialize Firebase Performance Monitoring:', error);
+    console.warn('Failed to initialize Firebase Performance:', error);
+    return null;
   }
-}
+};
 
 // DISABLED: Firestore emulator connection
 // Using production Firestore for development to avoid emulator dependency
@@ -63,7 +77,12 @@ if (import.meta.env.PROD) {
 //   }
 // }
 
-console.log('Using production Firestore for all environments');
+const isDevelopment = import.meta.env.DEV && window.location.hostname === 'localhost';
+if (isDevelopment) {
+  console.log('🔧 Development mode: Using production Firestore with local data isolation');
+} else {
+  console.log('🚀 Production mode: Using production Firestore');
+}
 
 // Auth providers
 export const googleProvider = new GoogleAuthProvider();
@@ -73,6 +92,13 @@ export const appleProvider = new OAuthProvider('apple.com');
 // Simplified Google provider configuration to avoid redirect issues
 googleProvider.addScope('profile');
 googleProvider.addScope('email');
+
+// For development: Add custom parameters to avoid localhost blocking
+if (isDevelopment) {
+  googleProvider.setCustomParameters({
+    'prompt': 'select_account'
+  });
+}
 
 // Configure Apple provider with proper scopes and parameters
 appleProvider.addScope('email');

@@ -271,6 +271,8 @@ const defaultStats: UserStats = {
 
 const StatsContext = createContext<StatsContextType | undefined>(undefined);
 
+export { StatsContext };
+
 export function StatsProvider({ children }: { children: React.ReactNode }) {
   const [stats, setStats] = useState<UserStats>(() => {
     try {
@@ -478,10 +480,4 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useStats() {
-  const context = useContext(StatsContext);
-  if (context === undefined) {
-    throw new Error('useStats must be used within a StatsProvider');
-  }
-  return context;
-}
+

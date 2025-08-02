@@ -7,7 +7,7 @@ import {
   ShareIcon,
   ChartBarIcon 
 } from '@heroicons/react/24/solid';
-import { useStats } from '../context/StatsContext';
+import { useStats } from '../hooks/useStats';
 import { QuizResult } from '../types';
 
 const ResultsScreen: React.FC = () => {

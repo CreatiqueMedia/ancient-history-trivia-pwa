@@ -23,7 +23,7 @@ import {
   InformationCircleIcon as InformationCircleIconSolid,
   CreditCardIcon as CreditCardIconSolid
 } from '@heroicons/react/24/solid';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import AuthModal from './AuthModal';
 import FeedbackModal from './FeedbackModal';
 import { Logo } from './Logo';
@@ -34,7 +34,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Start with sidebar closed by default
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const { user, userProfile, logout } = useAuth();
@@ -114,9 +114,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Mobile Header */}
-      <header className="block lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+      <header className="block lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40" data-testid="mobile-header">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mr-3"
+              title={sidebarOpen ? "Close Navigation" : "Open Navigation"}
+            >
+              {sidebarOpen ? (
+                <XMarkIcon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+              ) : (
+                <Bars3Icon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+              )}
+            </button>
             <Logo size={24} className="mr-2" />
             <h1 className="text-lg font-bold text-gray-900 dark:text-white">
               Ancient History
@@ -163,17 +174,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </header>
 
       {/* Desktop Header with Toggle */}
-      <header className="hidden lg:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+      <header className="hidden lg:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40" data-testid="desktop-header">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-600 shadow-sm bg-white dark:bg-gray-800 mr-3"
+              title={sidebarOpen ? "Close Navigation Menu" : "Open Navigation Menu"}
             >
               {sidebarOpen ? (
-                <XMarkIcon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                <XMarkIcon className="w-6 h-6 text-gray-700 dark:text-gray-300" />
               ) : (
-                <Bars3Icon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                <Bars3Icon className="w-6 h-6 text-gray-700 dark:text-gray-300" />
               )}
             </button>
             <div className="flex items-center ml-3">
@@ -285,10 +297,66 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </aside>
 
-        {/* Overlay for mobile */}
+        {/* Mobile Sidebar */}
+        <aside className={`lg:hidden fixed left-0 top-0 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-40 transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-0'
+        }`}>
+          <div className="pt-16 h-full overflow-y-auto">
+            <nav className="mt-6">
+              {navItems.map(({ path, label, icon: Icon, iconSolid: IconSolid }) => {
+                const active = isActive(path);
+                const IconComponent = active ? IconSolid : Icon;
+                
+                return (
+                  <Link
+                    key={path}
+                    to={path}
+                    data-testid={`mobile-sidebar-${label.toLowerCase().replace(/\s+/g, '-')}`}
+                    onClick={() => setSidebarOpen(false)} // Close sidebar after click
+                    className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${
+                      active
+                        ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 border-r-2 border-primary-600 dark:border-primary-400'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <IconComponent className="w-5 h-5 mr-3" />
+                    {label}
+                  </Link>
+                );
+              })}
+              
+              {/* Mobile Sidebar Auth/Logout */}
+              {user ? (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setSidebarOpen(false);
+                  }}
+                  className="flex items-center px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 w-full transition-colors"
+                >
+                  <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
+                  Sign Out
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setAuthModalOpen(true);
+                    setSidebarOpen(false);
+                  }}
+                  className="flex items-center px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 w-full transition-colors"
+                >
+                  <UserIcon className="w-5 h-5 mr-3" />
+                  Sign In
+                </button>
+              )}
+            </nav>
+          </div>
+        </aside>
+
+        {/* Overlay for mobile and desktop when sidebar is open */}
         {sidebarOpen && (
           <div 
-            className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+            className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:z-20"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -328,7 +396,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </footer>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 lg:hidden z-50">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 lg:hidden z-50" data-testid="bottom-nav">
         <div className="flex justify-around items-center py-2">
           {navItems.map(({ path, label, icon: Icon, iconSolid: IconSolid }) => {
             const active = isActive(path);

@@ -8,7 +8,7 @@ import {
   CalendarDaysIcon,
   ArrowRightIcon
 } from '@heroicons/react/24/solid';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
 import { TrialService } from '../services/TrialService';
 
@@ -68,8 +68,11 @@ const BillingManagement: React.FC<BillingManagementProps> = ({ isOpen, onClose }
       localStorage.removeItem('subscription');
       localStorage.removeItem('trial_status');
       
-      // Reload the page to update state
-      window.location.reload();
+      // Use navigation instead of reload to prevent refresh loops
+      // window.location.reload(); // REMOVED - causes refresh loops
+      
+      // Trigger a state update to reflect the cancellation
+      // The parent component should handle re-rendering based on auth/purchase context
     } catch (error) {
       console.error('Error cancelling trial:', error);
     }

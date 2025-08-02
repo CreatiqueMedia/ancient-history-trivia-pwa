@@ -14,6 +14,33 @@
     <meta name="description" content="Test your knowledge of ancient civilizations and historical events with our comprehensive trivia app." />
     <meta name="theme-color" content="#1f2937" />
     
+    <!-- Resource hints for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://firebaseapp.com" />
+    <link rel="dns-prefetch" href="https://firebaseio.com" />
+    
+    <!-- Critical CSS preload -->
+    <style>
+      /* Critical above-the-fold styles */
+      body { 
+        font-family: system-ui, -apple-system, sans-serif; 
+        margin: 0; 
+        background: #1f2937; 
+        color: white; 
+      }
+      #root { 
+        min-height: 100vh; 
+        display: flex; 
+        flex-direction: column; 
+      }
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 50vh;
+      }
+    </style>
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -46,7 +73,22 @@
     <title>Ancient History Trivia</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Initial loading state for better perceived performance -->
+      <div class="loading-spinner">
+        <div style="text-align: center;">
+          <div style="width: 40px; height: 40px; border: 3px solid #374151; border-top: 3px solid #6366f1; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+          <p style="margin-top: 16px; color: #9ca3af;">Loading Ancient History Trivia...</p>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx?v=2025070201"></script>
+    
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
   </body>
 </html>
