@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
+import ErrorBoundary from './components/ErrorBoundary.tsx'
 import FallbackApp from './components/FallbackApp.tsx'
 import './index.css'
 
@@ -35,32 +36,6 @@ const rootElement = document.getElementById('root');
 if (!rootElement) {
   console.error('❌ Root element not found!');
 } else {
-  // Initialize React app
-  
-  // Error boundary component
-  class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
-    constructor(props: {children: React.ReactNode}) {
-      super(props);
-      this.state = { hasError: false };
-    }
-
-    static getDerivedStateFromError() {
-      return { hasError: true };
-    }
-
-    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-      console.error('[ErrorBoundary] Caught error:', error, errorInfo);
-    }
-
-    render() {
-      if (this.state.hasError) {
-        return <FallbackApp />;
-      }
-
-      return this.props.children;
-    }
-  }
-
   try {
     // Clear the initial loading state first
     const loadingElement = rootElement.querySelector('.loading-spinner');
@@ -69,7 +44,7 @@ if (!rootElement) {
     }
     
     ReactDOM.createRoot(rootElement).render(
-      <ErrorBoundary>
+      <ErrorBoundary fallback={<FallbackApp />}>
         <BrowserRouter basename={basePath} future={routerFuture}>
           <App />
         </BrowserRouter>

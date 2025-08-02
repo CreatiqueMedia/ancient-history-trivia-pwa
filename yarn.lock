@@ -8067,7 +8067,7 @@ libsodium@^0.7.15:
   resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.7.15.tgz#ac284e3dcb1c29ae9526c5581cdada6a072f6d20"
   integrity sha512-sZwRknt/tUpE2AwzHq3jEyUU5uvIZHtSssktXq7owd++3CSgn8RGrv6UZJJBpP7+iBghBqe7Z06/2M31rI2NKw==
 
-lighthouse-logger@^2.0.1:
+lighthouse-logger@^2.0.1, lighthouse-logger@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/lighthouse-logger/-/lighthouse-logger-2.0.2.tgz#c0b39daee22035ce28551f3503c5935d0b5e1bf3"
   integrity sha512-vWl2+u5jgOQuZR55Z1WM0XDdrJT6mzMP8zHUct7xTlWhuQs+eV0g+QL0RQdFjT54zVmbhLCP8vIVpy1wGn/gCg==
@@ -8080,10 +8080,10 @@ lighthouse-stack-packs@1.12.2:
   resolved "https://registry.yarnpkg.com/lighthouse-stack-packs/-/lighthouse-stack-packs-1.12.2.tgz#dbe0ccdbc381784ef176f4f8c2367ac5b077d6ca"
   integrity sha512-Ug8feS/A+92TMTCK6yHYLwaFMuelK/hAKRMdldYkMNwv+d9PtWxjXEg6rwKtsUXTADajhdrhXyuNCJ5/sfmPFw==
 
-lighthouse@^12.8.0:
-  version "12.8.0"
-  resolved "https://registry.yarnpkg.com/lighthouse/-/lighthouse-12.8.0.tgz#38a680417d1235be77cecc9ee5bfef66de15335a"
-  integrity sha512-MNmHLGRsaApxrigFl6M4FSvat8opl6K4MnBRWdU3yEaTH5pzrDSWjdIL2cBdCoV7OgAD1Cy/cdBiXR+ZzdsBNw==
+lighthouse@^12.8.1:
+  version "12.8.1"
+  resolved "https://registry.yarnpkg.com/lighthouse/-/lighthouse-12.8.1.tgz#f9e18537187691e6d077099a7bb5bc57e8cfff3f"
+  integrity sha512-z0ceMjEM16C0HuADzMFgXe32BGJ7aJMSx48qTCcQYYjMUPxF1XWTP3rGXJEgB6P/VvS+yfp3TOMR3FpmLo0W3w==
   dependencies:
     "@paulirish/trace_engine" "0.0.57"
     "@sentry/node" "^9.28.1"
@@ -8097,7 +8097,7 @@ lighthouse@^12.8.0:
     intl-messageformat "^10.5.3"
     jpeg-js "^0.4.4"
     js-library-detector "^6.7.0"
-    lighthouse-logger "^2.0.1"
+    lighthouse-logger "^2.0.2"
     lighthouse-stack-packs "1.12.2"
     lodash-es "^4.17.21"
     lookup-closest-locale "6.2.0"

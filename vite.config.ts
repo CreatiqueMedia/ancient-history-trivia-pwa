@@ -14,9 +14,10 @@ export default defineConfig(({ command, mode }) => {
   // Using Firebase Hosting only - simplified configuration
   const plugins = [react()];
   
-  // Add PWA plugin for production builds
-  plugins.push(
-    VitePWA({
+  // Add PWA plugin for production builds only
+  if (mode === 'production') {
+    plugins.push(
+      VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['logos/logo_64.svg', 'logos/logo_128.svg', 'logos/logo_192.svg'],
       manifest: {
@@ -65,6 +66,7 @@ export default defineConfig(({ command, mode }) => {
       }
     })
   );
+  }
 
   // Add image optimization for production builds only
   if (mode === 'production') {
