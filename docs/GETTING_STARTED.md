@@ -1,20 +1,20 @@
-# 🚀 Quick Start Guide
+# 🚀 Quick Start Guide for Template Users
 
-Welcome! This guide will help you get the Ancient History Trivia PWA up and running quickly.
+Welcome! You've just created a new repository from the Ancient History PWA template. This guide will help you get your custom trivia app up and running quickly.
 
 ## ⚡ 5-Minute Setup
 
 ### 1. Clone & Install
 ```bash
-git clone <repository-url>
-cd ancient-history-trivia-pwa
+git clone https://github.com/yourusername/your-repo-name.git
+cd your-repo-name
 yarn install
 ```
 
 ### 2. Environment Setup
 ```bash
-cp .env.example .env.local
-# Edit .env.local with your Firebase and Stripe configuration
+cp .env.template .env.development
+# Edit .env.development with your Firebase config
 ```
 
 ### 3. Start Development
