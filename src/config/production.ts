@@ -119,7 +119,14 @@ export const ANALYTICS_CONFIG = {
 // Production Payment Configuration
 export const PAYMENT_CONFIG = {
   // Stripe settings
-  stripePublishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51NxSampleKeyForTestingPurposesOnly',
+  stripePublishableKey: (() => {
+    // Import environment helper to get correct Stripe key
+    if (import.meta.env.MODE === 'production') {
+      return import.meta.env.VITE_STRIPE_LIVE_PUBLISHABLE_KEY || 'pk_live_sample_key';
+    } else {
+      return import.meta.env.VITE_STRIPE_TEST_PUBLISHABLE_KEY || 'pk_test_sample_key';
+    }
+  })(),
   enableApplePay: true,
   enableGooglePay: true,
   
