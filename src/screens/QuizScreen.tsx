@@ -5,16 +5,18 @@ import { useQuiz } from '../context/QuizContext';
 import { useSettings } from '../context/SettingsContext';
 import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
-import { getBundleById, getRandomQuestions, getQuestionsForBundle } from '../data/questions';
-import { QUESTION_BUNDLES } from '../data/bundles';
-import { Question } from '../types';
-import { QuestionBundle } from '../types/bundles';
+
+import { TrialService } from '../services/TrialService';
+import { DailyChallengeService } from '../services/DailyChallengeService';
 import { EnhancedQuizService } from '../services/EnhancedQuizService';
 import { FullQuestionService } from '../services/FullQuestionService';
 import { FirestoreQuestionService } from '../services/FirestoreQuestionService';
-import { TrialService } from '../services/TrialService';
-import { DailyChallengeService } from '../services/DailyChallengeService';
+import AuthModal from '../components/AuthModal';
+import { getBundleById, getRandomQuestions, getQuestionsForBundle } from '../data/questions';
 import { sampleQuestionsByBundle } from '../data/sampleQuestions';
+import { QUESTION_BUNDLES } from '../data/bundles';
+import { Question } from '../types';
+import { QuestionBundle } from '../types/bundles';
 
 const QuizScreen: React.FC = () => {
   const { bundleId } = useParams<{ bundleId?: string }>();
@@ -29,10 +31,19 @@ const QuizScreen: React.FC = () => {
   const [currentBundle, setCurrentBundle] = useState<QuestionBundle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Detect if this is a daily challenge from the pathname
   const isDailyChallenge = location.pathname === '/quiz/daily-challenge';
   const effectiveBundleId = isDailyChallenge ? 'daily-challenge' : bundleId;
+
+  // Check authentication for daily challenges
+  useEffect(() => {
+    if (isDailyChallenge && !user) {
+      setShowAuthModal(true);
+      return;
+    }
+  }, [isDailyChallenge, user]);
 
   // Initialize quiz only once when component mounts or bundleId changes
   useEffect(() => {
@@ -429,6 +440,13 @@ const QuizScreen: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Auth Modal for Daily Challenge */}        {showAuthModal && (
+          <AuthModal 
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+          />
+        )}
     </div>
   );
 };
