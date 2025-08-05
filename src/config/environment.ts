@@ -12,9 +12,17 @@ export const isStaging = import.meta.env.MODE === 'staging';
 const requiredEnvVars = [
   'VITE_FIREBASE_API_KEY',
   'VITE_FIREBASE_AUTH_DOMAIN', 
-  'VITE_FIREBASE_PROJECT_ID',
-  'VITE_STRIPE_PUBLISHABLE_KEY'
+  'VITE_FIREBASE_PROJECT_ID'
 ];
+
+// Get the appropriate Stripe key based on environment
+export const getStripePublishableKey = () => {
+  if (isProduction) {
+    return import.meta.env.VITE_STRIPE_LIVE_PUBLISHABLE_KEY;
+  } else {
+    return import.meta.env.VITE_STRIPE_TEST_PUBLISHABLE_KEY;
+  }
+};
 
 // Validate required environment variables
 function validateEnvironment() {
@@ -29,7 +37,7 @@ function validateEnvironment() {
   }
   
   // Validate Stripe key format
-  const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  const stripeKey = getStripePublishableKey();
   if (stripeKey && !stripeKey.startsWith('pk_')) {
     const error = 'Stripe publishable key must start with "pk_"';
     console.error('[Environment] Stripe validation failed:', error);
@@ -43,6 +51,12 @@ function validateEnvironment() {
     const error = 'Production environment detected but using test Stripe key';
     console.error('[Environment] Stripe key validation failed:', error);
     throw new Error(error);
+  }
+  
+  // Warn if no Stripe key is configured (but don't throw)
+  if (!stripeKey) {
+    const keyType = isProduction ? 'VITE_STRIPE_LIVE_PUBLISHABLE_KEY' : 'VITE_STRIPE_TEST_PUBLISHABLE_KEY';
+    console.warn(`[Environment] Warning: ${keyType} not configured. Payment features will be disabled.`);
   }
 }
 
