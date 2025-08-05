@@ -44,6 +44,7 @@ interface ImportMetaEnv {
   // Development config
   readonly VITE_HMR_PORT: string
   readonly VITE_DEV_SERVER_PORT: string
+  readonly VITE_USE_FIREBASE_EMULATORS: string
   
   // Mock flags
   readonly VITE_USE_MOCK_AUTH: string
