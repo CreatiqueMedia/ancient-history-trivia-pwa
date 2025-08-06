@@ -1,6 +1,6 @@
 {
   "name": "ancient-history-pwa",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Ancient History Trivia Progressive Web App",
   "license": "MIT",
   "type": "module",
@@ -13,7 +13,8 @@
   "scripts": {
     "preinstall": "node -e \"if(process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('Please use yarn instead of npm')\"",
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
+    "build:check": "tsc --noEmit && vite build",
     "deploy": "yarn build && firebase deploy --only hosting",
     "preview": "vite preview",
     "test": "vitest",
@@ -29,6 +30,7 @@
     "test:e2e:cross-browser": "playwright test --project=chromium --project=firefox --project=webkit",
     "test:e2e:debug": "playwright test --debug",
     "test:run": "vitest run",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "yarn:check": "yarn check --integrity",
     "yarn:clean": "yarn cache clean && rm -rf node_modules yarn.lock && yarn install"
