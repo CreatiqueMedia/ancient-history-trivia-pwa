@@ -24,7 +24,7 @@ const QuizScreen: React.FC = () => {
   const location = useLocation();
   const { currentQuiz, startQuiz, selectAnswer, nextQuestion, finishQuiz } = useQuiz();
   const { settings } = useSettings();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { isPremiumUser, hasAccessToBundle } = usePurchase();
   const [timer, setTimer] = useState<number>(settings.questionTimeLimit || 0);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -37,16 +37,28 @@ const QuizScreen: React.FC = () => {
   const isDailyChallenge = location.pathname === '/quiz/daily-challenge';
   const effectiveBundleId = isDailyChallenge ? 'daily-challenge' : bundleId;
 
-  // Check authentication for daily challenges
+  // Check authentication for daily challenges (exclude anonymous users)
   useEffect(() => {
-    if (isDailyChallenge && !user) {
+    if (isDailyChallenge && (!user || user.isAnonymous)) {
       setShowAuthModal(true);
       return;
     }
   }, [isDailyChallenge, user]);
 
   // Initialize quiz only once when component mounts or bundleId changes
+  // BUT WAIT for auth to finish loading for daily challenges
   useEffect(() => {
+    // For daily challenges, don't initialize until auth is done loading
+    if (isDailyChallenge && authLoading) {
+      return;
+    }
+    
+    // For daily challenges, block initialization if user is not properly authenticated
+    if (isDailyChallenge && (!user || user.isAnonymous)) {
+      setIsLoading(false);
+      return;
+    }
+    
     // Prevent re-initialization if already initialized for this bundleId
     if (initialized && currentQuiz && questions.length > 0) {
       return;
@@ -125,7 +137,7 @@ const QuizScreen: React.FC = () => {
             description: `Daily Challenge - ${dailyChallenge.category}`,
             themeColors: {
               primary: '#f59e0b',
-              background: '#fef3c7',
+              background: '#ffffff', // Use white background for consistency
               text: '#1f2937'
             }
           } as QuestionBundle;
@@ -205,7 +217,7 @@ const QuizScreen: React.FC = () => {
         localStorage.removeItem('sampleQuiz');
       }
     };
-  }, [effectiveBundleId]); // Only depend on bundleId, not on startQuiz or other functions
+  }, [effectiveBundleId, authLoading, user, isDailyChallenge]); // Include auth-related dependencies
 
   useEffect(() => {
     // Only run timer if there's a time limit set
@@ -250,7 +262,71 @@ const QuizScreen: React.FC = () => {
     navigate(-1);
   };
 
-  if (isLoading || !currentQuiz || !questions.length) {
+  // If daily challenge requires auth and user is not properly authenticated, show auth modal
+  if (isDailyChallenge && (!user || user.isAnonymous)) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
+          {/* Daily Challenge Icon */}
+          <div className="w-20 h-20 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-10 h-10 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Authentication Required
+          </h2>
+          
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
+            Daily challenges require you to be signed in to track your progress, streaks, and rewards. 
+            Sign in to start today's challenge and earn XP!
+          </p>
+          
+          <div className="space-y-3">
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="w-full btn-primary flex items-center justify-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3 3v1" />
+              </svg>
+              Sign In to Continue
+            </button>
+            
+            <button
+              onClick={() => navigate('/')}
+              className="w-full btn-secondary"
+            >
+              Back to Home
+            </button>
+          </div>
+          
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-300 dark:border-blue-700">
+            <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100 mb-2">
+              Why Sign In for Daily Challenges?
+            </h3>
+            <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1 text-left font-medium">
+              <li>• Track your daily streak and earn bonus XP</li>
+              <li>• Compete on leaderboards</li>
+              <li>• Unlock achievements and badges</li>
+              <li>• Prevent multiple attempts per day</li>
+              <li>• Save your progress across devices</li>
+            </ul>
+          </div>
+        </div>
+        
+        {showAuthModal && (
+          <AuthModal 
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  if (authLoading || isLoading || !currentQuiz || !questions.length) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-center">
@@ -274,18 +350,18 @@ const QuizScreen: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 py-4">
           {/* Bundle Info */}
           {currentBundle && (
-            <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: currentBundle.themeColors.background }}>
+            <div className="mb-4 p-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg"
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-md"
                     style={{ backgroundColor: currentBundle.themeColors.primary }}
                   >
                     📚
                   </div>
                   <div>
-                    <h2 className="font-bold text-gray-900 dark:text-white">{currentBundle.name}</h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{currentBundle.description}</p>
+                    <h2 className="font-bold text-gray-900 dark:text-white text-lg">{currentBundle.name}</h2>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">{currentBundle.description}</p>
                   </div>
                 </div>
                 {(() => {
@@ -351,25 +427,25 @@ const QuizScreen: React.FC = () => {
             
             {/* Enhanced Question Meta */}
             <div className="flex flex-wrap gap-2 text-sm mb-3">
-              <span className="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-3 py-1 rounded-full font-medium">
+              <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-2 rounded-full font-semibold border border-blue-300 dark:border-blue-700">
                 📍 {questionDisplayInfo.region}
               </span>
-              <span className="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full font-medium">
+              <span className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-3 py-2 rounded-full font-semibold border border-purple-300 dark:border-purple-700">
                 ⏳ {questionDisplayInfo.historicalAge}
               </span>
-              <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">
+              <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-2 rounded-full font-semibold border border-green-300 dark:border-green-700">
                 📚 {questionDisplayInfo.category}
               </span>
             </div>
             
             {/* Difficulty Level Display */}
             <div className="mb-4">
-              <div className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm ${
+              <div className={`inline-flex items-center px-4 py-2 rounded-lg font-bold text-sm border-2 ${
                 currentQuestion.difficulty === 'easy' 
-                  ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border border-green-300 dark:border-green-700'
+                  ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border-green-400 dark:border-green-600'
                   : currentQuestion.difficulty === 'medium'
-                  ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 border border-yellow-300 dark:border-yellow-700'
-                  : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border border-red-300 dark:border-red-700'
+                  ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 border-amber-400 dark:border-amber-600'
+                  : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border-red-400 dark:border-red-600'
               }`}>
                 <span className="mr-2">
                   {currentQuestion.difficulty === 'easy' ? '🟢' : 

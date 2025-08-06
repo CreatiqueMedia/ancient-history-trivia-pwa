@@ -575,20 +575,25 @@ const StoreScreen: React.FC = () => {
         key={bundle.id}
         className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow"
       >
-        {/* Header with theme colors */}
+        {/* Header with improved accessibility */}
         <div 
-          className="p-4 text-white relative"
-          style={{ backgroundColor: bundle.themeColors.primary }}
+          className="p-4 bg-gray-50 dark:bg-gray-700 border-l-4 border-gray-300 dark:border-gray-600"
+          style={{ borderLeftColor: bundle.themeColors.primary }}
         >
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
-              {getIconComponent(bundle.iconName, "w-8 h-8")}
+              <div 
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-sm"
+                style={{ backgroundColor: bundle.themeColors.primary }}
+              >
+                {getIconComponent(bundle.iconName, "w-5 h-5")}
+              </div>
               <div>
-                <h3 className="font-bold text-lg">{bundle.name}</h3>
+                <h3 className="font-bold text-lg text-gray-900 dark:text-white">{bundle.name}</h3>
                 <div className="flex items-center space-x-2">
-                  <p className="text-sm opacity-90">{bundle.subcategory}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{bundle.subcategory}</p>
                   {showVersion && (
-                    <span className="bg-white/20 px-2 py-1 rounded text-xs font-medium">
+                    <span className="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs font-medium">
                       {bundle.version}
                     </span>
                   )}
@@ -596,7 +601,7 @@ const StoreScreen: React.FC = () => {
               </div>
             </div>
             {canAccess && (
-              <CheckCircleIcon className="w-6 h-6 text-white" />
+              <CheckCircleIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
             )}
           </div>
         </div>
