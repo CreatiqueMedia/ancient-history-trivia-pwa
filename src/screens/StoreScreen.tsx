@@ -199,6 +199,91 @@ const StoreScreen: React.FC = () => {
     }
   }, []); // Empty dependency array to run only once
 
+  // Handle secure checkout purchase success parameters - ONE TIME ONLY
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const purchase = urlParams.get('purchase');
+    const type = urlParams.get('type');
+    const id = urlParams.get('id');
+    
+    if (purchase === 'success' && type && id && user) {
+      // Clear purchase parameters from URL to prevent refresh loops
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+      
+      // Process successful purchase
+      const now = new Date();
+      
+      if (type === 'bundle') {
+        if (id === 'all_bundles') {
+          // Special handling for all bundles purchase
+          const allBundleIds = ['easy', 'medium', 'hard', 'egypt', 'rome', 'greece'];
+          const currentBundles = JSON.parse(localStorage.getItem('ownedBundles') || '[]');
+          
+          allBundleIds.forEach(bundleId => {
+            if (!currentBundles.includes(bundleId)) {
+              currentBundles.push(bundleId);
+            }
+          });
+          if (!currentBundles.includes('all_bundles')) {
+            currentBundles.push('all_bundles');
+          }
+          
+          localStorage.setItem('ownedBundles', JSON.stringify(currentBundles));
+          console.log('Successfully processed All Bundle Packs purchase');
+          alert('🎉 Success! You now have access to all question bundles!');
+        } else {
+          // Regular single bundle purchase
+          const currentBundles = JSON.parse(localStorage.getItem('ownedBundles') || '[]');
+          if (!currentBundles.includes(id)) {
+            currentBundles.push(id);
+            localStorage.setItem('ownedBundles', JSON.stringify(currentBundles));
+          }
+          
+          console.log(`Successfully processed ${id} bundle purchase`);
+          alert(`🎉 Success! You now have access to the ${id} bundle!`);
+        }
+      } else if (type === 'subscription') {
+        // Handle subscription success
+        let expiryDate: Date;
+        
+        switch (id) {
+          case 'monthly':
+            expiryDate = new Date(now.setMonth(now.getMonth() + 1));
+            break;
+          case 'annual':
+            expiryDate = new Date(now.setFullYear(now.getFullYear() + 1));
+            break;
+          case 'biennial':
+            expiryDate = new Date(now.setFullYear(now.getFullYear() + 2));
+            break;
+          default:
+            expiryDate = now;
+        }
+        
+        localStorage.setItem('subscription', JSON.stringify({
+          tier: 'pro',
+          period: id,
+          expiry: expiryDate.toISOString()
+        }));
+        
+        console.log(`Successfully processed ${id} subscription`);
+        alert(`🎉 Success! Your ${id} subscription is now active!`);
+      }
+      
+      // Force a page refresh to update the UI with new purchase state
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } else if (purchase === 'cancelled') {
+      // Clear purchase parameters from URL to prevent refresh loops
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+      
+      console.log('Purchase was cancelled by user');
+    }
+  }, [user]); // Include user dependency
+
   // Separate function for handling authenticated trial start
   const handleAuthenticatedTrialStart = async () => {
     if (!user) return;
