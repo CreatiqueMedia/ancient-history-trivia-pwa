@@ -18,7 +18,10 @@ import {
   isAppStoreEnvironment,
   isWebEnvironment
 } from '../utils/platform';
-import { redirectToStripeCheckout } from '../config/stripe';
+import { 
+  createAndRedirectToCheckout, 
+  getPriceId 
+} from '../services/StripeService';
 
 interface PurchaseContextType {
   ownedBundles: string[];
@@ -132,27 +135,72 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const now = new Date();
     
     if (currentPurchase.type === 'bundle') {
-      // Add bundle to owned bundles
-      setOwnedBundles(prev => [...prev, currentPurchase.id]);
-      
-      // Save to localStorage
-      const updatedBundles = [...ownedBundles, currentPurchase.id];
-      localStorage.setItem('ownedBundles', JSON.stringify(updatedBundles));
-      
-      // Add to purchase history
-      const purchaseRecord = {
-        id: `bundle_${currentPurchase.id}_${now.getTime()}`,
-        date: now.toISOString(),
-        type: 'bundle',
-        description: getBundleName(currentPurchase.id),
-        amount: getBundlePrice(currentPurchase.id),
-        method: 'Stripe Payment',
-        bundleId: currentPurchase.id
-      };
-      
-      savePurchaseToHistory(purchaseRecord);
-      
-      console.log(`Successfully purchased ${getBundleName(currentPurchase.id)} bundle`);
+      if (currentPurchase.id === 'all_bundles') {
+        // Special handling for all bundles purchase - add all individual bundles
+        const allBundleIds = ['easy', 'medium', 'hard', 'egypt', 'rome', 'greece'];
+        setOwnedBundles(prev => {
+          const newBundles = [...prev];
+          allBundleIds.forEach(bundleId => {
+            if (!newBundles.includes(bundleId)) {
+              newBundles.push(bundleId);
+            }
+          });
+          // Also add the all_bundles identifier
+          if (!newBundles.includes('all_bundles')) {
+            newBundles.push('all_bundles');
+          }
+          return newBundles;
+        });
+        
+        // Save to localStorage
+        const existingBundles = [...ownedBundles];
+        allBundleIds.forEach(bundleId => {
+          if (!existingBundles.includes(bundleId)) {
+            existingBundles.push(bundleId);
+          }
+        });
+        if (!existingBundles.includes('all_bundles')) {
+          existingBundles.push('all_bundles');
+        }
+        localStorage.setItem('ownedBundles', JSON.stringify(existingBundles));
+        
+        // Add to purchase history
+        const purchaseRecord = {
+          id: `bundle_all_bundles_${now.getTime()}`,
+          date: now.toISOString(),
+          type: 'bundle',
+          description: getBundleName('all_bundles'),
+          amount: getBundlePrice('all_bundles'),
+          method: 'Stripe Payment',
+          bundleId: 'all_bundles'
+        };
+        
+        savePurchaseToHistory(purchaseRecord);
+        
+        console.log('Successfully purchased All Bundle Packs');
+      } else {
+        // Regular single bundle purchase
+        setOwnedBundles(prev => [...prev, currentPurchase.id]);
+        
+        // Save to localStorage
+        const updatedBundles = [...ownedBundles, currentPurchase.id];
+        localStorage.setItem('ownedBundles', JSON.stringify(updatedBundles));
+        
+        // Add to purchase history
+        const purchaseRecord = {
+          id: `bundle_${currentPurchase.id}_${now.getTime()}`,
+          date: now.toISOString(),
+          type: 'bundle',
+          description: getBundleName(currentPurchase.id),
+          amount: getBundlePrice(currentPurchase.id),
+          method: 'Stripe Payment',
+          bundleId: currentPurchase.id
+        };
+        
+        savePurchaseToHistory(purchaseRecord);
+        
+        console.log(`Successfully purchased ${getBundleName(currentPurchase.id)} bundle`);
+      }
     } else {
       // Handle subscription success
       const period = currentPurchase.id;
@@ -227,19 +275,28 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // For app store versions, use RevenueCat
         return await purchaseBundleWithRevenueCat(bundleId);
       } else {
-        // For web/PWA, redirect to Stripe Checkout
-        console.log('Redirecting to Stripe checkout for bundle:', bundleId);
+        // For web/PWA, use secure Firebase Functions + Stripe Checkout
+        console.log('Creating secure checkout session for bundle:', bundleId);
         
-        // Store user ID and bundle ID for tracking
-        localStorage.setItem('userId', user.uid);
-        localStorage.setItem('pendingBundlePurchase', bundleId);
-        
-        // Redirect to Stripe payment link (this will throw if user not authenticated)
-        redirectToStripeCheckout(bundleId);
-        
-        // Return false since we're redirecting (purchase will complete on return)
-        setIsProcessing(false);
-        return false;
+        try {
+          const priceId = getPriceId(bundleId);
+          const currentUrl = window.location.origin;
+          
+          await createAndRedirectToCheckout({
+            priceId,
+            planType: bundleId,
+            successUrl: `${currentUrl}/store?purchase=success&type=bundle&id=${bundleId}`,
+            cancelUrl: `${currentUrl}/store?purchase=cancelled`
+          });
+          
+          // This won't execute because we redirect, but for type safety
+          setIsProcessing(false);
+          return true;
+        } catch (error) {
+          console.error('Failed to create checkout session:', error);
+          setIsProcessing(false);
+          throw new Error('Failed to initiate secure checkout');
+        }
       }
     } catch (error) {
       console.error('Purchase failed:', error);
@@ -256,40 +313,47 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     setIsProcessing(true);
     try {
-      // For group purchases, we'll process them one by one
-      let allSuccessful = true;
-      
-      for (const bundleId of bundleIds) {
-        // Check if we should use app store purchases (iOS/Android)
-        if (shouldUseAppStorePurchases()) {
-          // For app store versions, use RevenueCat
+      // Check if we should use app store purchases (iOS/Android)
+      if (shouldUseAppStorePurchases()) {
+        // For app store versions, we'll process them one by one using RevenueCat
+        let allSuccessful = true;
+        
+        for (const bundleId of bundleIds) {
           const success = await purchaseBundleWithRevenueCat(bundleId);
           if (!success) {
             allSuccessful = false;
           }
-        } else {
-          // For web/PWA, show payment modal for each bundle
-          setCurrentPurchase({ type: 'bundle', id: bundleId });
-          setShowPaymentModal(true);
+        }
+        
+        return allSuccessful;
+      } else {
+        // For web/PWA, use the "all_bundles" product for group purchases
+        console.log('Creating secure checkout session for all bundles group purchase');
+        
+        try {
+          const priceId = getPriceId('all_bundles');
+          const currentUrl = window.location.origin;
           
-          // Wait for the payment to complete (this is a simplified approach)
-          // In a real implementation, you would need to handle this more robustly
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await createAndRedirectToCheckout({
+            priceId,
+            planType: 'all_bundles',
+            successUrl: `${currentUrl}/store?purchase=success&type=bundle&id=all_bundles`,
+            cancelUrl: `${currentUrl}/store?purchase=cancelled`
+          });
           
-          // Check if the bundle was added to ownedBundles
-          if (!ownedBundles.includes(bundleId)) {
-            allSuccessful = false;
-          }
+          // This won't execute because we redirect, but for type safety
+          setIsProcessing(false);
+          return true;
+        } catch (error) {
+          console.error('Failed to create checkout session for group purchase:', error);
+          setIsProcessing(false);
+          throw new Error('Failed to initiate secure checkout');
         }
       }
-      
-      return allSuccessful;
     } catch (error) {
       console.error('Group purchase failed:', error);
-      return false;
-    } finally {
       setIsProcessing(false);
-      closePaymentModal();
+      throw error; // Re-throw to let the calling component handle the error
     }
   };
 
@@ -306,19 +370,28 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // For app store versions, use RevenueCat
         return await subscribeWithRevenueCat(tier, period);
       } else {
-        // For web/PWA, redirect to Stripe Checkout
-        console.log('Redirecting to Stripe checkout for subscription:', period);
+        // For web/PWA, use secure Firebase Functions + Stripe Checkout
+        console.log('Creating secure checkout session for subscription:', period);
         
-        // Store user ID and subscription info for tracking
-        localStorage.setItem('userId', user.uid);
-        localStorage.setItem('pendingSubscriptionPurchase', period);
-        
-        // Redirect to Stripe payment link for subscription (this will throw if user not authenticated)
-        redirectToStripeCheckout(period);
-        
-        // Return false since we're redirecting (subscription will complete on return)
-        setIsProcessing(false);
-        return false;
+        try {
+          const priceId = getPriceId(period);
+          const currentUrl = window.location.origin;
+          
+          await createAndRedirectToCheckout({
+            priceId,
+            planType: period,
+            successUrl: `${currentUrl}/store?purchase=success&type=subscription&id=${period}`,
+            cancelUrl: `${currentUrl}/store?purchase=cancelled`
+          });
+          
+          // This won't execute because we redirect, but for type safety
+          setIsProcessing(false);
+          return true;
+        } catch (error) {
+          console.error('Failed to create checkout session:', error);
+          setIsProcessing(false);
+          throw new Error('Failed to initiate secure checkout');
+        }
       }
     } catch (error) {
       console.error('Subscription failed:', error);

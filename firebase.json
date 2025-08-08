@@ -1,4 +1,11 @@
 {
+  "functions": {
+    "predeploy": [
+      "yarn --cwd functions install",
+      "yarn --cwd functions run build"
+    ],
+    "source": "functions"
+  },
   "hosting": {
     "public": "dist",
     "ignore": [
