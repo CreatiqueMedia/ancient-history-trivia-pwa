@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeftIcon,
@@ -19,26 +19,33 @@ import BillingManagement from '../components/BillingManagement';
 const BillingScreen: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isPremiumUser, subscriptionTier, subscriptionPeriod, subscriptionExpiry } = usePurchase();
+  const { isPremiumUser, subscriptionTier, subscriptionPeriod, subscriptionExpiry, refreshSubscriptionData } = usePurchase();
   const [showBillingModal, setShowBillingModal] = useState(false);
 
-  // Redirect if not authenticated or not premium
+  // Redirect if not authenticated
   if (!user) {
     navigate('/');
-    return null;
-  }
-
-  if (!isPremiumUser) {
-    navigate('/store');
     return null;
   }
 
   const isInTrial = TrialService.isInTrial();
   const trialStatus = TrialService.getTrialStatus();
 
+  // Refresh subscription data when component mounts
+  useEffect(() => {
+    if (user) {
+      console.log('BillingScreen mounted, refreshing subscription data...');
+      refreshSubscriptionData();
+    }
+  }, [user, refreshSubscriptionData]);
+
   const getSubscriptionDisplayName = () => {
     if (isInTrial) {
       return `3-Day Trial (${trialStatus?.daysRemaining || 0} days left)`;
+    }
+    
+    if (subscriptionTier === 'free') {
+      return 'Free Plan';
     }
     
     switch (subscriptionPeriod) {
@@ -58,6 +65,10 @@ const BillingScreen: React.FC = () => {
       return new Date(trialStatus.endDate).toLocaleDateString();
     }
     
+    if (subscriptionTier === 'free') {
+      return 'No billing - Free plan';
+    }
+    
     if (subscriptionExpiry) {
       return new Date(subscriptionExpiry).toLocaleDateString();
     }
@@ -65,36 +76,58 @@ const BillingScreen: React.FC = () => {
     return 'N/A';
   };
 
-  const billingActions = [
-    {
-      icon: CreditCardIcon,
-      title: 'Manage Billing',
-      description: 'Update payment methods, view invoices, and cancel subscription',
-      action: () => setShowBillingModal(true),
-      color: 'blue'
-    },
-    {
-      icon: DocumentTextIcon,
-      title: 'Download Invoices',
-      description: 'Get receipts for your subscription payments',
-      action: () => alert('Invoice download would be implemented here'),
-      color: 'green'
-    },
-    {
-      icon: ChartBarIcon,
-      title: 'Usage Statistics',
-      description: 'View your learning progress and app usage analytics',
-      action: () => navigate('/stats'),
-      color: 'purple'
-    },
-    {
-      icon: LifebuoyIcon,
-      title: 'Contact Support',
-      description: 'Get help with billing issues or account questions',
-      action: () => window.open('mailto:support@ancienthistorytrivia.com?subject=Billing Support', '_blank'),
-      color: 'orange'
+  const billingActions = (() => {
+    // Common actions for all users
+    const commonActions = [
+      {
+        icon: ChartBarIcon,
+        title: 'Usage Statistics',
+        description: 'View your learning progress and app usage analytics',
+        action: () => navigate('/stats'),
+        color: 'purple'
+      },
+      {
+        icon: LifebuoyIcon,
+        title: 'Contact Support',
+        description: 'Get help with account questions or technical issues',
+        action: () => window.open('mailto:support@ancienthistorytrivia.com?subject=Account Support', '_blank'),
+        color: 'orange'
+      }
+    ];
+
+    // Premium-specific actions
+    if (isPremiumUser) {
+      return [
+        {
+          icon: CreditCardIcon,
+          title: 'Manage Billing',
+          description: 'Update payment methods, view invoices, and cancel subscription',
+          action: () => setShowBillingModal(true),
+          color: 'blue'
+        },
+        {
+          icon: DocumentTextIcon,
+          title: 'Download Invoices',
+          description: 'Get receipts for your subscription payments',
+          action: () => alert('Invoice download would be implemented here'),
+          color: 'green'
+        },
+        ...commonActions
+      ];
     }
-  ];
+
+    // Free user actions
+    return [
+      {
+        icon: CreditCardIcon,
+        title: 'Upgrade to Pro',
+        description: 'Unlock premium features and unlimited access',
+        action: () => navigate('/store'),
+        color: 'blue'
+      },
+      ...commonActions
+    ];
+  })();
 
   const getColorClasses = (color: string) => {
     switch (color) {
@@ -116,40 +149,55 @@ const BillingScreen: React.FC = () => {
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center space-x-4 mb-6">
-            <button
-              onClick={() => navigate('/store?tab=subscription')}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
-            >
-              <ArrowLeftIcon className="w-6 h-6 text-gray-500" />
-            </button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Billing & Account Management
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Manage your subscription, payments, and account settings
-              </p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate('/store?tab=subscription')}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+              >
+                <ArrowLeftIcon className="w-6 h-6 text-gray-500" />
+              </button>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Billing & Account Management
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Manage your subscription, payments, and account settings
+                </p>
+              </div>
             </div>
+            <button
+              onClick={refreshSubscriptionData}
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
+            >
+              Refresh Status
+            </button>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Current Plan Overview */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-6 text-white mb-8">
+        <div className={`rounded-xl p-6 text-white mb-8 ${
+          subscriptionTier === 'free' 
+            ? 'bg-gradient-to-r from-gray-500 to-gray-600' 
+            : 'bg-gradient-to-r from-green-500 to-emerald-600'
+        }`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="bg-white/20 rounded-full p-3">
                 {isInTrial ? (
                   <ClockIcon className="w-8 h-8" />
+                ) : subscriptionTier === 'free' ? (
+                  <CreditCardIcon className="w-8 h-8" />
                 ) : (
                   <CheckCircleIcon className="w-8 h-8" />
                 )}
               </div>
               <div>
                 <h2 className="text-2xl font-bold mb-1">
-                  {isInTrial ? 'Active Trial' : 'Active Subscription'}
+                  {isInTrial ? 'Active Trial' : 
+                   subscriptionTier === 'free' ? 'Free Account' : 'Active Subscription'}
                 </h2>
                 <p className="opacity-90 mb-2">
                   Current plan: <strong>{getSubscriptionDisplayName()}</strong>
@@ -159,12 +207,22 @@ const BillingScreen: React.FC = () => {
                   <span>
                     {isInTrial 
                       ? `Converts to Pro Monthly on ${getNextBillingDate()}`
+                      : subscriptionTier === 'free'
+                      ? 'Upgrade anytime to unlock premium features'
                       : `Next billing date: ${getNextBillingDate()}`
                     }
                   </span>
                 </div>
               </div>
             </div>
+            {subscriptionTier === 'free' && (
+              <button
+                onClick={() => navigate('/store')}
+                className="bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-lg font-medium"
+              >
+                Upgrade Now
+              </button>
+            )}
           </div>
         </div>
 
@@ -268,11 +326,13 @@ const BillingScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Billing Management Modal */}
-      <BillingManagement 
-        isOpen={showBillingModal} 
-        onClose={() => setShowBillingModal(false)} 
-      />
+      {/* Billing Management Modal - Only for premium users */}
+      {isPremiumUser && (
+        <BillingManagement 
+          isOpen={showBillingModal} 
+          onClose={() => setShowBillingModal(false)} 
+        />
+      )}
     </div>
   );
 };
