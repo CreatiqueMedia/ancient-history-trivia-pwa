@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeftIcon,
@@ -19,7 +19,7 @@ import BillingManagement from '../components/BillingManagement';
 const BillingScreen: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isPremiumUser, subscriptionTier, subscriptionPeriod, subscriptionExpiry } = usePurchase();
+  const { isPremiumUser, subscriptionTier, subscriptionPeriod, subscriptionExpiry, refreshSubscriptionData } = usePurchase();
   const [showBillingModal, setShowBillingModal] = useState(false);
 
   // Redirect if not authenticated
@@ -30,6 +30,14 @@ const BillingScreen: React.FC = () => {
 
   const isInTrial = TrialService.isInTrial();
   const trialStatus = TrialService.getTrialStatus();
+
+  // Refresh subscription data when component mounts
+  useEffect(() => {
+    if (user) {
+      console.log('BillingScreen mounted, refreshing subscription data...');
+      refreshSubscriptionData();
+    }
+  }, [user, refreshSubscriptionData]);
 
   const getSubscriptionDisplayName = () => {
     if (isInTrial) {
@@ -141,21 +149,29 @@ const BillingScreen: React.FC = () => {
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center space-x-4 mb-6">
-            <button
-              onClick={() => navigate('/store?tab=subscription')}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
-            >
-              <ArrowLeftIcon className="w-6 h-6 text-gray-500" />
-            </button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Billing & Account Management
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Manage your subscription, payments, and account settings
-              </p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate('/store?tab=subscription')}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+              >
+                <ArrowLeftIcon className="w-6 h-6 text-gray-500" />
+              </button>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Billing & Account Management
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Manage your subscription, payments, and account settings
+                </p>
+              </div>
             </div>
+            <button
+              onClick={refreshSubscriptionData}
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
+            >
+              Refresh Status
+            </button>
           </div>
         </div>
       </div>

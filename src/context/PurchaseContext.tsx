@@ -39,6 +39,7 @@ interface PurchaseContextType {
   isPremiumUser: boolean;
   closePaymentModal: () => void;
   handlePaymentSuccess: () => void;
+  refreshSubscriptionData: () => void;
   calculateLoyaltyDiscount: () => { discount: number; message: string };
   getDiscountedSubscriptionPrice: (originalPrice: number) => { price: number; discount: number; message: string };
 }
@@ -107,6 +108,19 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     loadPurchaseData();
   }, [user?.uid]); // Only depend on user ID, not the entire user object
 
+  // Listen for localStorage changes (e.g., from SuccessScreen or other components)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'subscription' && user) {
+        console.log('Subscription data changed in localStorage, refreshing...');
+        refreshSubscriptionData();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [user]);
+
   // Save purchase data whenever it changes
   useEffect(() => {
     if (user) {
@@ -127,6 +141,41 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const closePaymentModal = () => {
     setShowPaymentModal(false);
     setCurrentPurchase(null);
+  };
+
+  const refreshSubscriptionData = () => {
+    // Force reload subscription data from localStorage
+    if (!user) return;
+    
+    try {
+      const savedBundles = localStorage.getItem('ownedBundles');
+      const savedSubscription = localStorage.getItem('subscription');
+      
+      if (savedBundles) {
+        setOwnedBundles(JSON.parse(savedBundles));
+      }
+      
+      if (savedSubscription) {
+        const sub = JSON.parse(savedSubscription);
+        if (sub.tier && sub.expiry) {
+          const expiryDate = new Date(sub.expiry);
+          if (expiryDate > new Date()) {
+            setSubscriptionTier(sub.tier);
+            setSubscriptionPeriod(sub.period);
+            setSubscriptionExpiry(sub.expiry);
+          } else {
+            // Subscription expired, reset to free
+            setSubscriptionTier('free');
+            setSubscriptionPeriod('none');
+            setSubscriptionExpiry(undefined);
+          }
+        }
+      }
+      
+      console.log('Subscription data refreshed');
+    } catch (error) {
+      console.error('Error refreshing subscription data:', error);
+    }
   };
 
   const handlePaymentSuccess = () => {
@@ -517,6 +566,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     isPremiumUser,
     closePaymentModal,
     handlePaymentSuccess,
+    refreshSubscriptionData,
     calculateLoyaltyDiscount,
     getDiscountedSubscriptionPrice
   };
