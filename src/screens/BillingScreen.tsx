@@ -31,13 +31,13 @@ const BillingScreen: React.FC = () => {
   const isInTrial = TrialService.isInTrial();
   const trialStatus = TrialService.getTrialStatus();
 
-  // Refresh subscription data when component mounts
+  // Refresh subscription data when component mounts - ONCE
   useEffect(() => {
     if (user) {
       console.log('BillingScreen mounted, refreshing subscription data...');
       refreshSubscriptionData();
     }
-  }, [user, refreshSubscriptionData]);
+  }, []); // Remove dependencies to prevent infinite loops
 
   const getSubscriptionDisplayName = () => {
     if (isInTrial) {
@@ -109,7 +109,7 @@ const BillingScreen: React.FC = () => {
           icon: DocumentTextIcon,
           title: 'Download Invoices',
           description: 'Get receipts for your subscription payments',
-          action: () => alert('Invoice download would be implemented here'),
+          action: () => window.open('mailto:billing@ancienthistorytrivia.com?subject=Invoice Request&body=Please provide my subscription invoices.', '_blank'),
           color: 'green'
         },
         ...commonActions
@@ -149,29 +149,21 @@ const BillingScreen: React.FC = () => {
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => navigate('/store?tab=subscription')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
-              >
-                <ArrowLeftIcon className="w-6 h-6 text-gray-500" />
-              </button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Billing & Account Management
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Manage your subscription, payments, and account settings
-                </p>
-              </div>
-            </div>
+          <div className="flex items-center space-x-4 mb-6">
             <button
-              onClick={refreshSubscriptionData}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
+              onClick={() => navigate('/store?tab=subscription')}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
             >
-              Refresh Status
+              <ArrowLeftIcon className="w-6 h-6 text-gray-500" />
             </button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Billing & Account Management
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Manage your subscription, payments, and account settings
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -277,17 +269,20 @@ const BillingScreen: React.FC = () => {
             <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Account Status</h4>
             <p className="text-2xl font-bold text-green-600">Active</p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {isInTrial ? 'Trial period' : 'Paid subscription'}
+              {isInTrial ? 'Trial period' : 
+               subscriptionTier === 'free' ? 'Free account' : 'Paid subscription'}
             </p>
           </div>
           
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
             <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Payment Method</h4>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {isInTrial ? 'None' : '••••1234'}
+              {isInTrial ? 'None' : 
+               subscriptionTier === 'free' ? 'None' : '••••1234'}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {isInTrial ? 'No payment required' : 'Credit card'}
+              {isInTrial ? 'No payment required' : 
+               subscriptionTier === 'free' ? 'Free plan' : 'Credit card'}
             </p>
           </div>
           
@@ -309,7 +304,10 @@ const BillingScreen: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                 Questions about charges, refunds, or payment methods? Our billing team is here to help.
               </p>
-              <button className="text-blue-600 dark:text-blue-400 text-sm hover:underline">
+              <button 
+                onClick={() => window.open('mailto:billing@ancienthistorytrivia.com?subject=Billing Support Request', '_blank')}
+                className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
+              >
                 Contact Billing Support →
               </button>
             </div>
@@ -318,7 +316,10 @@ const BillingScreen: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                 Having trouble with the app or features? Get technical assistance from our team.
               </p>
-              <button className="text-blue-600 dark:text-blue-400 text-sm hover:underline">
+              <button 
+                onClick={() => window.open('mailto:support@ancienthistorytrivia.com?subject=Technical Support Request', '_blank')}
+                className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
+              >
                 Get Technical Help →
               </button>
             </div>

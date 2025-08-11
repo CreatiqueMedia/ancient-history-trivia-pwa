@@ -113,13 +113,35 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'subscription' && user) {
         console.log('Subscription data changed in localStorage, refreshing...');
-        refreshSubscriptionData();
+        // Call refreshSubscriptionData directly to avoid dependency issues
+        if (user) {
+          try {
+            const savedSubscription = localStorage.getItem('subscription');
+            if (savedSubscription) {
+              const sub = JSON.parse(savedSubscription);
+              if (sub.tier && sub.expiry) {
+                const expiryDate = new Date(sub.expiry);
+                if (expiryDate > new Date()) {
+                  setSubscriptionTier(sub.tier);
+                  setSubscriptionPeriod(sub.period);
+                  setSubscriptionExpiry(sub.expiry);
+                } else {
+                  setSubscriptionTier('free');
+                  setSubscriptionPeriod('none');
+                  setSubscriptionExpiry(undefined);
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error refreshing subscription data:', error);
+          }
+        }
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [user]);
+  }, [user?.uid]); // Only depend on user ID
 
   // Save purchase data whenever it changes
   useEffect(() => {
