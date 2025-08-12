@@ -26,8 +26,8 @@ const BillingManagement: React.FC<BillingManagementProps> = ({ isOpen, onClose }
 
   if (!isOpen || !user || !isPremiumUser) return null;
 
-  const isInTrial = StripeStripeTrialService.isInTrial();
-  const trialStatus = StripeStripeTrialService.getTrialStatus();
+  const isInTrial = StripeTrialService.isInTrial();
+  const trialStatus = StripeTrialService.getTrialStatus();
 
   const getSubscriptionDisplayName = () => {
     if (isInTrial) {
@@ -62,7 +62,7 @@ const BillingManagement: React.FC<BillingManagementProps> = ({ isOpen, onClose }
     setIsProcessing(true);
     try {
       // Cancel trial immediately
-      StripeStripeTrialService.endTrial(user.uid);
+      StripeTrialService.endTrial(user.uid);
       
       // Clear subscription data
       localStorage.removeItem('subscription');

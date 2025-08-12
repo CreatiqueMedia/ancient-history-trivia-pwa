@@ -503,7 +503,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     
     // Check if user has an active trial (gives access to all bundles)
-    if (StripeStripeTrialService.isInTrial()) {
+    if (StripeTrialService.isInTrial()) {
       return true;
     }
     
@@ -563,7 +563,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     
     // Check if user has an active trial
-    if (StripeStripeTrialService.isInTrial()) {
+    if (StripeTrialService.isInTrial()) {
       return true;
     }
     
