@@ -1,5 +1,15 @@
 # 🏛️ Ancient History Trivia PWA
 
+## 🚨 FOR AI DEVELOPERS: READ FIRST 🚨
+**Before making ANY changes to this project:**
+- Read `/.ai-guardrails/RESPONSE_PROTOCOL.md`
+- Check `/AI_SYSTEM_PROMPT.md` 
+- Follow `/MANDATORY_CHECKLIST.md`
+- **Architecture**: Stripe-only (NO Firestore)
+- **Services**: StripeTrialService, LocalQuestionService, StripePurchaseContentService
+
+---
+
 A Progressive Web App (PWA) for testing your knowledge of ancient civilizations and historical events. Originally converted from a React Native app to work seamlessly on both mobile devices and web browsers.
 
 ## ✨ Features

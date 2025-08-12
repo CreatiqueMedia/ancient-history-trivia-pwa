@@ -1,0 +1,40 @@
+{
+  "ai_guardrails": {
+    "enabled": true,
+    "mandatory_files": [
+      "/.ai-guardrails/RESPONSE_PROTOCOL.md",
+      "/AI_SYSTEM_PROMPT.md", 
+      "/MANDATORY_CHECKLIST.md"
+    ],
+    "architecture": {
+      "type": "stripe_only_pwa",
+      "database": "none",
+      "storage": ["localStorage", "stripe_metadata", "bundled_data"],
+      "forbidden": ["firestore", "database", "server_storage"]
+    },
+    "services": {
+      "allowed": [
+        "StripeTrialService",
+        "LocalQuestionService", 
+        "StripePurchaseContentService"
+      ],
+      "forbidden": [
+        "TrialService",
+        "FirestoreQuestionService",
+        "PurchaseContentDeliveryService"
+      ]
+    },
+    "response_requirements": {
+      "verification_header": true,
+      "architecture_check": true,
+      "service_validation": true,
+      "testing_reminder": true
+    },
+    "violation_response": {
+      "stop_immediately": true,
+      "acknowledge_mistake": true,
+      "provide_correct_solution": true,
+      "reference_guardrails": true
+    }
+  }
+}
