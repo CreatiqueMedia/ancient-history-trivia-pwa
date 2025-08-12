@@ -28,8 +28,8 @@ const BillingScreen: React.FC = () => {
     return null;
   }
 
-  const isInTrial = StripeStripeTrialService.isInTrial();
-  const trialStatus = StripeStripeTrialService.getTrialStatus();
+  const isInTrial = StripeTrialService.isInTrial();
+  const trialStatus = StripeTrialService.getTrialStatus();
 
   // Refresh subscription data when component mounts - ONCE
   useEffect(() => {
