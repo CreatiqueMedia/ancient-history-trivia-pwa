@@ -2,7 +2,7 @@
 // Demonstrates the complete Stripe → Content Delivery pipeline
 
 import React, { useState } from 'react';
-import { purchaseContentDeliveryService } from '../services/PurchaseContentDeliveryService';
+import { StripePurchaseContentService } from '../services/StripePurchaseContentService';
 import { mockWebhookEndpoint } from '../api/webhookEndpoint';
 import { auth } from '../config/firebase';
 import EnhancedQuiz from './EnhancedQuiz';
@@ -69,7 +69,7 @@ export const TestPurchaseFlow: React.FC = () => {
     
     for (const bundle of availableBundles) {
       try {
-        const isPurchased = await purchaseContentDeliveryService.isPurchased(bundle.id);
+        const isPurchased = await StripePurchaseContentService.isPurchased(bundle.id);
         statuses[bundle.id] = isPurchased;
       } catch (error) {
         console.error(`Error checking purchase status for ${bundle.id}:`, error);
@@ -96,7 +96,7 @@ export const TestPurchaseFlow: React.FC = () => {
       await mockWebhookEndpoint(bundleId, user.uid);
       
       // Update purchase status
-      const isPurchased = await purchaseContentDeliveryService.isPurchased(bundleId);
+      const isPurchased = await StripePurchaseContentService.isPurchased(bundleId);
       setPurchaseStatuses(prev => ({ ...prev, [bundleId]: isPurchased }));
       
       alert(`✅ Test purchase completed for ${bundleId}!\n\nYou now have access to 100 questions instead of sample questions.`);
@@ -124,7 +124,7 @@ export const TestPurchaseFlow: React.FC = () => {
 
   const getQuestionCount = async (bundleId: string): Promise<number> => {
     try {
-      const questions = await purchaseContentDeliveryService.getQuestions(bundleId);
+      const questions = await StripePurchaseContentService.getQuestions(bundleId);
       return questions.length;
     } catch {
       return 0;

@@ -2,7 +2,7 @@
 // Receives Stripe webhook events and triggers content delivery
 
 import { auth } from '../config/firebase';
-import { purchaseContentDeliveryService } from '../services/PurchaseContentDeliveryService';
+import { StripePurchaseContentService } from '../services/StripePurchaseContentService';
 
 interface StripeWebhookEvent {
   id: string;
@@ -101,7 +101,7 @@ export class StripeWebhookHandler {
         console.log(`🎁 Delivering content: Product ${productId} to user ${userId}`);
         
         // Trigger content delivery
-        await purchaseContentDeliveryService.handleStripeSuccess(
+        await StripePurchaseContentService.handleStripeSuccess(
           sessionId,
           productId,
           customer

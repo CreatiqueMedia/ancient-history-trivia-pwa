@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { TrialService } from '../services/TrialService';
+import { StripeTrialService } from '../services/StripeTrialService';
 import { 
   getBundlePrice, 
   getSubscriptionPrice, 
@@ -503,7 +503,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     
     // Check if user has an active trial (gives access to all bundles)
-    if (TrialService.isInTrial()) {
+    if (StripeStripeTrialService.isInTrial()) {
       return true;
     }
     
@@ -563,7 +563,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     
     // Check if user has an active trial
-    if (TrialService.isInTrial()) {
+    if (StripeStripeTrialService.isInTrial()) {
       return true;
     }
     

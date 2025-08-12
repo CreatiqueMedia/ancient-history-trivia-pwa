@@ -1,7 +1,6 @@
-// Firebase Configuration - FIRESTORE RE-ENABLED + ANALYTICS LAZY LOADED
+// Firebase Configuration - HOSTING + AUTH ONLY (No Firestore)
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, OAuthProvider, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
 
 // Firebase Configuration for Ancient History Trivia PWA
 const firebaseConfig = {
@@ -24,9 +23,6 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
 export const auth = getAuth(app);
-
-// Initialize Firestore
-export const db: Firestore = getFirestore(app);
 
 // Lazy-loaded Analytics and Performance
 export let analytics: any = null;
@@ -66,22 +62,11 @@ export const initializePerformance = async () => {
   }
 };
 
-// DISABLED: Firestore emulator connection
-// Using production Firestore for development to avoid emulator dependency
-// if (process.env.NODE_ENV === 'development' && window.location.hostname === 'localhost') {
-//   try {
-//     connectFirestoreEmulator(db, 'localhost', 8080);
-//     console.log('Connected to Firestore emulator');
-//   } catch (error) {
-//     console.log('Firestore emulator not available, using production Firestore');
-//   }
-// }
-
 const isDevelopment = import.meta.env.DEV && window.location.hostname === 'localhost';
 if (isDevelopment) {
   console.log('🔧 Development mode: Using production Firestore with local data isolation');
 } else {
-  console.log('🚀 Production mode: Using production Firestore');
+  console.log('🚀 Production mode: Stripe-only backend');
 }
 
 // Auth providers
@@ -106,15 +91,5 @@ appleProvider.addScope('name');
 appleProvider.setCustomParameters({
   locale: 'en'
 });
-
-// Firestore helper functions
-export const isFirestoreAvailable = (): boolean => {
-  return true; // Firestore is now enabled
-};
-
-// Function to safely get Firestore instance
-export const getFirestoreInstance = (): Firestore => {
-  return db;
-};
 
 export default app;

@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
-import { TrialService } from '../services/TrialService';
+import { StripeTrialService } from '../services/StripeTrialService';
 import BillingManagement from './BillingManagement';
 
 interface ManageSubscriptionProps {
@@ -35,8 +35,8 @@ const ManageSubscription: React.FC<ManageSubscriptionProps> = ({
     return null;
   }
 
-  const isInTrial = TrialService.isInTrial();
-  const trialStatus = TrialService.getTrialStatus();
+  const isInTrial = StripeTrialService.isInTrial();
+  const trialStatus = StripeTrialService.getTrialStatus();
   
   const getSubscriptionDisplayName = () => {
     if (isInTrial) {

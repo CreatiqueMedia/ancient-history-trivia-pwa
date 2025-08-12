@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { TrialService } from '../services/TrialService';
+import { StripeTrialService } from '../services/StripeTrialService';
 import { TrialStatus } from '../types/enhancements';
 
 interface TrialContextType {
@@ -21,10 +21,10 @@ export function useTrial() {
 
 export function TrialProvider({ children }: { children: ReactNode }) {
   const trialService = {
-    startTrial: TrialService.startTrial,
-    getTrialStatus: TrialService.getTrialStatus,
-    isTrialActive: TrialService.isInTrial,
-    trackBundleAccess: TrialService.trackBundleAccess,
+    startTrial: StripeTrialService.startTrial,
+    getTrialStatus: StripeTrialService.getTrialStatus,
+    isTrialActive: StripeTrialService.isInTrial,
+    trackBundleAccess: StripeTrialService.trackBundleAccess,
   };
 
   return (

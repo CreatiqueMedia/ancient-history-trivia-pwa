@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
-import { TrialService } from '../services/TrialService';
+import { StripeTrialService } from '../services/StripeTrialService';
 
 interface TrialBannerProps {
   variant?: 'compact' | 'full';
@@ -28,8 +28,8 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
     
     return {
       showForPublic: false,
-      isInTrial: TrialService.isInTrial(),
-      isEligible: TrialService.isEligibleForTrial(user.uid)
+      isInTrial: StripeTrialService.isInTrial(),
+      isEligible: StripeTrialService.isEligibleForTrial(user.uid)
     };
   }, [user?.uid]);
 

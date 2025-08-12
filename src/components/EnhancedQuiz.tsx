@@ -2,7 +2,7 @@
 // Shows sample questions for free users, full 100 questions for purchased bundles
 
 import React, { useState, useEffect } from 'react';
-import { purchaseContentDeliveryService } from '../services/PurchaseContentDeliveryService';
+import { StripePurchaseContentService } from '../services/StripePurchaseContentService';
 import { mockWebhookEndpoint } from '../api/webhookEndpoint';
 import { Question } from '../types';
 import { auth } from '../config/firebase';
@@ -83,10 +83,10 @@ export const EnhancedQuiz: React.FC<EnhancedQuizProps> = ({ bundleId, onClose })
     
     try {
       // Check if user has purchased this bundle
-      const isPurchased = await purchaseContentDeliveryService.isPurchased(bundleId);
+      const isPurchased = StripePurchaseContentService.isPurchased(bundleId);
       
       // Get questions (sample or full based on purchase)
-      const questions = await purchaseContentDeliveryService.getQuestions(bundleId);
+      const questions = StripePurchaseContentService.getQuestionsForPurchase(bundleId);
       
       setPurchaseStatus({
         purchased: isPurchased,

@@ -334,6 +334,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   id="displayName"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
+                  autoComplete="name"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                   required={mode === 'signup'}
                 />
@@ -348,6 +349,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                 required
               />

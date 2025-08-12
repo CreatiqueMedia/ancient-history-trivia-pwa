@@ -13,7 +13,7 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import { useStats } from '../hooks/useStats';
 import { usePurchase } from '../context/PurchaseContext';
-import { TrialService } from '../services/TrialService';
+import { StripeTrialService } from '../services/StripeTrialService';
 import { SUBSCRIPTION_TIERS } from '../data/bundles';
 
 const UserProfileScreen: React.FC = () => {
@@ -106,7 +106,7 @@ const UserProfileScreen: React.FC = () => {
   // Map subscription to SUBSCRIPTION_TIERS for badge display using PurchaseContext
   const getSubscriptionBadge = () => {
     // Check for active trial first
-    const trialStatus = TrialService.getTrialStatus();
+    const trialStatus = StripeTrialService.getTrialStatus();
     if (trialStatus && trialStatus.isActive) {
       return { 
         icon: '🎁', 
@@ -136,7 +136,7 @@ const UserProfileScreen: React.FC = () => {
   // Get current subscription tier details using PurchaseContext
   const getCurrentSubscriptionTier = () => {
     // Check for active trial first
-    const trialStatus = TrialService.getTrialStatus();
+    const trialStatus = StripeTrialService.getTrialStatus();
     if (trialStatus && trialStatus.isActive) {
       return {
         id: 'trial',

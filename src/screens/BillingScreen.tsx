@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
-import { TrialService } from '../services/TrialService';
+import { StripeTrialService } from '../services/StripeTrialService';
 import BillingManagement from '../components/BillingManagement';
 
 const BillingScreen: React.FC = () => {
@@ -28,8 +28,8 @@ const BillingScreen: React.FC = () => {
     return null;
   }
 
-  const isInTrial = TrialService.isInTrial();
-  const trialStatus = TrialService.getTrialStatus();
+  const isInTrial = StripeStripeTrialService.isInTrial();
+  const trialStatus = StripeStripeTrialService.getTrialStatus();
 
   // Refresh subscription data when component mounts - ONCE
   useEffect(() => {

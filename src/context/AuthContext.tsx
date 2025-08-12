@@ -19,7 +19,7 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider, appleProvider } from '../config/firebase';
 import type { UserProfile, SubscriptionTier } from '../types';
-import { TrialService } from '../services/TrialService';
+import { StripeTrialService } from '../services/StripeTrialService';
 
 interface AuthContextType {
   user: User | null;

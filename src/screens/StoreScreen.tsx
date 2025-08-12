@@ -43,7 +43,7 @@ import AuthModal from '../components/AuthModal';
 import TrialSuccessModal from '../components/TrialSuccessModal';
 import TrialBanner from '../components/TrialBanner';
 import ManageSubscription from '../components/ManageSubscription';
-import { TrialService } from '../services/TrialService';
+import { StripeTrialService } from '../services/StripeTrialService';
 
 // Helper function to format subscription period display
 const formatPeriod = (period: string): string => {
@@ -288,10 +288,10 @@ const StoreScreen: React.FC = () => {
   const handleAuthenticatedTrialStart = async () => {
     if (!user) return;
     
-    if (TrialService.isEligibleForTrial(user.uid)) {
+    if (StripeTrialService.isEligibleForTrial(user.uid)) {
       try {
         // Start the free trial
-        const trialStatus = await TrialService.startTrial(user.uid);
+        const trialStatus = await StripeTrialService.startTrial(user.uid);
         
         // Set trial data and show custom modal
         setTrialDaysRemaining(trialStatus.daysRemaining);
@@ -306,7 +306,7 @@ const StoreScreen: React.FC = () => {
       if (user.email === 'ron@theawakenedhybrid.com') {
         // Developer override - allow unlimited trials
         try {
-          const trialStatus = await TrialService.startTrial(user.uid);
+          const trialStatus = await StripeTrialService.startTrial(user.uid);
           setTrialDaysRemaining(trialStatus.daysRemaining);
           setShowTrialSuccessModal(true);
         } catch (error) {
@@ -332,10 +332,10 @@ const StoreScreen: React.FC = () => {
             const parsed = JSON.parse(pendingPurchase);
             if (parsed.type === 'trial' && parsed.action === 'start_trial') {
               // Check if user is eligible for trial
-              if (TrialService.isEligibleForTrial(user.uid)) {
+              if (StripeTrialService.isEligibleForTrial(user.uid)) {
                 try {
                   // Start the free trial
-                  const trialStatus = await TrialService.startTrial(user.uid);
+                  const trialStatus = await StripeTrialService.startTrial(user.uid);
                   
                   // Set trial data and show custom modal
                   setTrialDaysRemaining(trialStatus.daysRemaining);
@@ -354,7 +354,7 @@ const StoreScreen: React.FC = () => {
                 if (user.email === 'ron@theawakenedhybrid.com') {
                   // Developer override - allow unlimited trials
                   try {
-                    const trialStatus = await TrialService.startTrial(user.uid);
+                    const trialStatus = await StripeTrialService.startTrial(user.uid);
                     setTrialDaysRemaining(trialStatus.daysRemaining);
                     setShowTrialSuccessModal(true);
                     localStorage.removeItem('pendingPurchase');
@@ -765,9 +765,9 @@ const StoreScreen: React.FC = () => {
                     </span>
                   )
                 ) : isPremiumUser ? (
-                  TrialService.isInTrial() ? (
+                  StripeTrialService.isInTrial() ? (
                     <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                      Access via 3-Day Trial ({TrialService.getTrialStatus()?.daysRemaining || 0} days left)
+                      Access via 3-Day Trial ({StripeTrialService.getTrialStatus()?.daysRemaining || 0} days left)
                     </span>
                   ) : (
                     <span className="text-xs text-green-600 dark:text-green-400 font-medium">
@@ -952,9 +952,9 @@ const StoreScreen: React.FC = () => {
                           </p>
                         )
                       ) : isPremiumUser ? (
-                        TrialService.isInTrial() ? (
+                        StripeTrialService.isInTrial() ? (
                           <p className="text-center text-sm text-blue-300 font-medium">
-                            Access via 3-Day Trial ({TrialService.getTrialStatus()?.daysRemaining || 0} days left)
+                            Access via 3-Day Trial ({StripeTrialService.getTrialStatus()?.daysRemaining || 0} days left)
                           </p>
                         ) : (
                           <p className="text-center text-sm text-green-300 font-medium">
@@ -1327,8 +1327,8 @@ const StoreScreen: React.FC = () => {
                     <CheckCircleIcon className="w-6 h-6 text-green-500" />
                     <div>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {TrialService.isInTrial() 
-                          ? `3-Day Trial (${TrialService.getTrialStatus()?.daysRemaining || 0} days left)`
+                        {StripeTrialService.isInTrial() 
+                          ? `3-Day Trial (${StripeTrialService.getTrialStatus()?.daysRemaining || 0} days left)`
                           : subscriptionPeriod === 'monthly' 
                             ? 'Pro Monthly' 
                             : subscriptionPeriod === 'annual' 
@@ -1338,14 +1338,14 @@ const StoreScreen: React.FC = () => {
                                 : 'Premium Plan'
                         }
                       </p>
-                      {subscriptionExpiry && !TrialService.isInTrial() && (
+                      {subscriptionExpiry && !StripeTrialService.isInTrial() && (
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Renews on {new Date(subscriptionExpiry).toLocaleDateString()}
                         </p>
                       )}
-                      {TrialService.isInTrial() && (
+                      {StripeTrialService.isInTrial() && (
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Converts to Pro Monthly on {new Date(TrialService.getTrialStatus()?.endDate || new Date()).toLocaleDateString()}
+                          Converts to Pro Monthly on {new Date(StripeTrialService.getTrialStatus()?.endDate || new Date()).toLocaleDateString()}
                         </p>
                       )}
                     </div>
@@ -1370,10 +1370,10 @@ const StoreScreen: React.FC = () => {
                 <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
                   <div className="text-center">
                     <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-                      Need to make changes to your {TrialService.isInTrial() ? 'trial' : 'subscription'}?
+                      Need to make changes to your {StripeTrialService.isInTrial() ? 'trial' : 'subscription'}?
                     </h4>
                     <div className="space-y-3">
-                      {TrialService.isInTrial() ? (
+                      {StripeTrialService.isInTrial() ? (
                         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                           <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-3">
                             Your trial will automatically convert to Pro Monthly ($4.99/month) when it expires. 

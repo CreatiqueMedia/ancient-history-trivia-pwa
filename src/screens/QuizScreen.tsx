@@ -6,11 +6,11 @@ import { useSettings } from '../context/SettingsContext';
 import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
 
-import { TrialService } from '../services/TrialService';
+import { StripeTrialService } from '../services/StripeTrialService';
 import { DailyChallengeService } from '../services/DailyChallengeService';
 import { EnhancedQuizService } from '../services/EnhancedQuizService';
 import { FullQuestionService } from '../services/FullQuestionService';
-import { FirestoreQuestionService } from '../services/FirestoreQuestionService';
+import { LocalQuestionService } from '../services/LocalQuestionService';
 import AuthModal from '../components/AuthModal';
 import { getBundleById, getRandomQuestions, getQuestionsForBundle } from '../data/questions';
 import { sampleQuestionsByBundle } from '../data/sampleQuestions';
@@ -154,13 +154,13 @@ const QuizScreen: React.FC = () => {
         setCurrentBundle(bundle);
         
         // Determine question count based on user access level
-        const userHasFullAccess = user && (isPremiumUser || hasAccessToBundle(effectiveBundleId) || TrialService.isInTrial());
+        const userHasFullAccess = user && (isPremiumUser || hasAccessToBundle(effectiveBundleId) || StripeTrialService.isInTrial());
         
         if (userHasFullAccess) {
           // Premium users and trial users get FULL question sets from Firestore
           try {
             // Try to get questions from Firestore first
-            quizQuestions = await FirestoreQuestionService.getQuestionsFromFirestore(effectiveBundleId);
+            quizQuestions = LocalQuestionService.getQuestionsForBundle(effectiveBundleId);
             
             if (quizQuestions.length === 0) {
               quizQuestions = EnhancedQuizService.generateQuickQuiz(100);
@@ -189,7 +189,7 @@ const QuizScreen: React.FC = () => {
         }
       } else {
         // Determine question count based on user access level for general quiz
-        const userHasFullAccess = user && (isPremiumUser || TrialService.isInTrial());
+        const userHasFullAccess = user && (isPremiumUser || StripeTrialService.isInTrial());
         
         if (userHasFullAccess) {
           // Premium users and trial users get full 100 questions

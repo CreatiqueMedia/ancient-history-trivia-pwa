@@ -10,7 +10,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { useAuth } from '../hooks/useAuth';
 import { usePurchase } from '../context/PurchaseContext';
-import { TrialService } from '../services/TrialService';
+import { StripeTrialService } from '../services/StripeTrialService';
 
 interface BillingManagementProps {
   isOpen: boolean;
@@ -26,8 +26,8 @@ const BillingManagement: React.FC<BillingManagementProps> = ({ isOpen, onClose }
 
   if (!isOpen || !user || !isPremiumUser) return null;
 
-  const isInTrial = TrialService.isInTrial();
-  const trialStatus = TrialService.getTrialStatus();
+  const isInTrial = StripeStripeTrialService.isInTrial();
+  const trialStatus = StripeStripeTrialService.getTrialStatus();
 
   const getSubscriptionDisplayName = () => {
     if (isInTrial) {
@@ -62,7 +62,7 @@ const BillingManagement: React.FC<BillingManagementProps> = ({ isOpen, onClose }
     setIsProcessing(true);
     try {
       // Cancel trial immediately
-      TrialService.cancelTrial(user.uid);
+      StripeStripeTrialService.endTrial(user.uid);
       
       // Clear subscription data
       localStorage.removeItem('subscription');
