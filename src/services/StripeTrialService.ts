@@ -233,10 +233,34 @@ export class StripeTrialService {
     // 3. Require payment method collection
     // 4. Return payment method collection URL
     
-    // For demo: Return payment required flag
+    // For now: Return payment required flag to trigger Stripe Elements form
     return {
       trialStatus: await this.startTrial(userId),
       paymentRequired: true
     };
+  }
+
+  /**
+   * Complete trial setup with payment method
+   * Called after payment method is successfully collected via Stripe Elements
+   */
+  static async completeTrialSetup(userId: string, paymentMethodId: string): Promise<TrialStatus> {
+    // In production, this would:
+    // 1. Attach payment method to Stripe customer
+    // 2. Create subscription with trial period and payment method
+    // 3. Update trial status with subscription ID
+    
+    console.log('Trial setup completed with payment method:', paymentMethodId);
+    
+    // For demo: Just return the trial status
+    const trialStatus = this.getTrialStatus();
+    if (!trialStatus) {
+      throw new Error('No active trial found');
+    }
+    
+    // Track trial setup completion
+    analyticsService.trackFeatureUsage('trial_payment_method_added', `${userId}_${paymentMethodId}`);
+    
+    return trialStatus;
   }
 }

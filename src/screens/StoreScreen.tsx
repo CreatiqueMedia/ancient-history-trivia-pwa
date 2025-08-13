@@ -42,6 +42,7 @@ import { QuestionBundle, BundleGroup, SubscriptionTier } from '../types/bundles'
 import AuthModal from '../components/AuthModal';
 import TrialSuccessModal from '../components/TrialSuccessModal';
 import TrialBanner from '../components/TrialBanner';
+import TrialPaymentForm from '../components/TrialPaymentForm';
 import ManageSubscription from '../components/ManageSubscription';
 import { StripeTrialService } from '../services/StripeTrialService';
 
@@ -115,6 +116,7 @@ const StoreScreen: React.FC = () => {
   const [processingBundles, setProcessingBundles] = useState<Set<string>>(new Set());
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showTrialSuccessModal, setShowTrialSuccessModal] = useState(false);
+  const [showTrialPaymentForm, setShowTrialPaymentForm] = useState(false);
   const [trialDaysRemaining, setTrialDaysRemaining] = useState(3);
 
   // Listen for custom events (keeping for backward compatibility)
@@ -308,18 +310,14 @@ const StoreScreen: React.FC = () => {
         const { trialStatus, paymentRequired } = await StripeTrialService.startTrialWithPaymentMethod(user.uid);
         
         if (paymentRequired) {
-          // In production: Redirect to Stripe payment method collection
-          // For demo: Show success with payment method reminder
-          alert(
-            '✅ Trial started successfully!\n\n' +
-            '⚠️ Payment method would be collected here in production.\n\n' +
-            'You now have access to all premium features for 3 days.'
-          );
+          // Show Stripe payment form for real payment method collection
+          setTrialDaysRemaining(trialStatus.daysRemaining);
+          setShowTrialPaymentForm(true);
+        } else {
+          // Fallback - show success modal directly
+          setTrialDaysRemaining(trialStatus.daysRemaining);
+          setShowTrialSuccessModal(true);
         }
-        
-        // Set trial data and show custom modal
-        setTrialDaysRemaining(trialStatus.daysRemaining);
-        setShowTrialSuccessModal(true);
         
       } catch (error) {
         console.error('Error starting trial:', error);
@@ -342,6 +340,31 @@ const StoreScreen: React.FC = () => {
       }
     }
   };
+
+  // Handle successful payment method collection for trial
+  const handleTrialPaymentSuccess = async () => {
+    try {
+      if (!user) return;
+      
+      // Complete trial setup (in production, this would finalize the Stripe subscription)
+      await StripeTrialService.completeTrialSetup(user.uid, 'payment_method_placeholder');
+      
+      // Close payment form and show success modal
+      setShowTrialPaymentForm(false);
+      setShowTrialSuccessModal(true);
+      
+    } catch (error) {
+      console.error('Error completing trial setup:', error);
+      alert('Sorry, there was an error completing your trial setup. Please try again.');
+    }
+  };
+
+  // Handle trial payment form cancellation
+  const handleTrialPaymentCancel = () => {
+    setShowTrialPaymentForm(false);
+    // Optionally show a message about trial cancellation
+  };
+
   // Track if pending trial has been processed to prevent loops
   const pendingTrialProcessed = useRef(false);
 
@@ -1640,6 +1663,14 @@ const StoreScreen: React.FC = () => {
           // No navigation needed - they're already on the store
         }}
       />
+
+      {/* Trial Payment Form Modal */}
+      {showTrialPaymentForm && (
+        <TrialPaymentForm
+          onSuccess={handleTrialPaymentSuccess}
+          onCancel={handleTrialPaymentCancel}
+        />
+      )}
     </div>
   );
 };
