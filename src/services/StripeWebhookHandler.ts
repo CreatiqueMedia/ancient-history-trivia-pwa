@@ -100,9 +100,8 @@ export class StripeWebhookHandler {
       if (productId && userId) {
         console.log(`🎁 Delivering content: Product ${productId} to user ${userId}`);
         
-        // Trigger content delivery
-        await StripePurchaseContentService.handleStripeSuccess(
-          sessionId,
+        // Record the purchase in localStorage
+        StripePurchaseContentService.recordPurchase(
           productId,
           customer
         );
