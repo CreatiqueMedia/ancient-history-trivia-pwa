@@ -290,8 +290,32 @@ const StoreScreen: React.FC = () => {
     
     if (StripeTrialService.isEligibleForTrial(user.uid)) {
       try {
-        // Start the free trial
-        const trialStatus = await StripeTrialService.startTrial(user.uid);
+        // Show payment method collection dialog first
+        const confirmPaymentMethod = confirm(
+          '🔒 Trial requires payment method\n\n' +
+          'To start your 3-day free trial, we need to collect a payment method. ' +
+          'You will NOT be charged during the trial period.\n\n' +
+          'After the trial ends, you will be automatically subscribed to Pro Monthly ($4.99/month) ' +
+          'unless you cancel before then.\n\n' +
+          'Do you want to proceed with payment method setup?'
+        );
+        
+        if (!confirmPaymentMethod) {
+          return; // User cancelled
+        }
+        
+        // Start trial with payment method requirement
+        const { trialStatus, paymentRequired } = await StripeTrialService.startTrialWithPaymentMethod(user.uid);
+        
+        if (paymentRequired) {
+          // In production: Redirect to Stripe payment method collection
+          // For demo: Show success with payment method reminder
+          alert(
+            '✅ Trial started successfully!\n\n' +
+            '⚠️ Payment method would be collected here in production.\n\n' +
+            'You now have access to all premium features for 3 days.'
+          );
+        }
         
         // Set trial data and show custom modal
         setTrialDaysRemaining(trialStatus.daysRemaining);
@@ -306,7 +330,7 @@ const StoreScreen: React.FC = () => {
       if (user.email === 'ron@theawakenedhybrid.com') {
         // Developer override - allow unlimited trials
         try {
-          const trialStatus = await StripeTrialService.startTrial(user.uid);
+          const { trialStatus } = await StripeTrialService.startTrialWithPaymentMethod(user.uid);
           setTrialDaysRemaining(trialStatus.daysRemaining);
           setShowTrialSuccessModal(true);
         } catch (error) {
@@ -334,8 +358,8 @@ const StoreScreen: React.FC = () => {
               // Check if user is eligible for trial
               if (StripeTrialService.isEligibleForTrial(user.uid)) {
                 try {
-                  // Start the free trial
-                  const trialStatus = await StripeTrialService.startTrial(user.uid);
+                  // Start trial with payment method requirement
+                  const { trialStatus } = await StripeTrialService.startTrialWithPaymentMethod(user.uid);
                   
                   // Set trial data and show custom modal
                   setTrialDaysRemaining(trialStatus.daysRemaining);
@@ -354,7 +378,7 @@ const StoreScreen: React.FC = () => {
                 if (user.email === 'ron@theawakenedhybrid.com') {
                   // Developer override - allow unlimited trials
                   try {
-                    const trialStatus = await StripeTrialService.startTrial(user.uid);
+                    const { trialStatus } = await StripeTrialService.startTrialWithPaymentMethod(user.uid);
                     setTrialDaysRemaining(trialStatus.daysRemaining);
                     setShowTrialSuccessModal(true);
                     localStorage.removeItem('pendingPurchase');

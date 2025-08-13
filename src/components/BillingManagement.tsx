@@ -19,7 +19,7 @@ interface BillingManagementProps {
 
 const BillingManagement: React.FC<BillingManagementProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
-  const { isPremiumUser, subscriptionTier, subscriptionPeriod, subscriptionExpiry } = usePurchase();
+  const { isPremiumUser, subscriptionTier, subscriptionPeriod, subscriptionExpiry, refreshSubscriptionData } = usePurchase();
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
@@ -68,13 +68,18 @@ const BillingManagement: React.FC<BillingManagementProps> = ({ isOpen, onClose }
       localStorage.removeItem('subscription');
       localStorage.removeItem('trial_status');
       
-      // Use navigation instead of reload to prevent refresh loops
-      // window.location.reload(); // REMOVED - causes refresh loops
+      // Refresh the purchase context to update UI state
+      refreshSubscriptionData();
       
-      // Trigger a state update to reflect the cancellation
-      // The parent component should handle re-rendering based on auth/purchase context
+      // Close the modal after successful cancellation
+      onClose();
+      
+      // Show confirmation message
+      alert('Trial cancelled successfully. Your access has ended.');
+      
     } catch (error) {
       console.error('Error cancelling trial:', error);
+      alert('Sorry, there was an error cancelling your trial. Please try again.');
     }
     setIsProcessing(false);
   };
