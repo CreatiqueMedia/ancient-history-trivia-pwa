@@ -22,11 +22,12 @@ const BillingScreen: React.FC = () => {
   const { isPremiumUser, subscriptionTier, subscriptionPeriod, subscriptionExpiry, refreshSubscriptionData } = usePurchase();
   const [showBillingModal, setShowBillingModal] = useState(false);
 
-  // Redirect if not authenticated
-  if (!user) {
-    navigate('/');
-    return null;
-  }
+  // Redirect if not authenticated - moved to useEffect to prevent hook order issues
+  useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const isInTrial = StripeTrialService.isInTrial();
   const trialStatus = StripeTrialService.getTrialStatus();
@@ -38,6 +39,11 @@ const BillingScreen: React.FC = () => {
       refreshSubscriptionData();
     }
   }, []); // Remove dependencies to prevent infinite loops
+
+  // Don't render if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
   const getSubscriptionDisplayName = () => {
     if (isInTrial) {
