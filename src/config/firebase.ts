@@ -64,7 +64,7 @@ export const initializePerformance = async () => {
 
 const isDevelopment = import.meta.env.DEV && window.location.hostname === 'localhost';
 if (isDevelopment) {
-  console.log('🔧 Development mode: Using production Firestore with local data isolation');
+  console.log('🔧 Development mode: Stripe-only backend with local storage');
 } else {
   console.log('🚀 Production mode: Stripe-only backend');
 }
