@@ -74,7 +74,7 @@ const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({ className = '' 
       case 'easy':
         return 'text-green-600 bg-green-100 dark:bg-green-900 dark:text-green-300';
       case 'medium':
-        return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300';
+        return 'text-yellow-800 bg-yellow-50 dark:bg-yellow-900 dark:text-yellow-300';
       case 'hard':
         return 'text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-300';
       default:

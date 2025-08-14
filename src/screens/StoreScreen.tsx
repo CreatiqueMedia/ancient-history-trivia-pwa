@@ -44,6 +44,8 @@ import TrialSuccessModal from '../components/TrialSuccessModal';
 import TrialBanner from '../components/TrialBanner';
 import TrialPaymentForm from '../components/TrialPaymentForm';
 import ManageSubscription from '../components/ManageSubscription';
+import ConditionalStripeProvider from '../components/ConditionalStripeProvider';
+import { useStripeLoader } from '../hooks/useStripeLoader';
 import { StripeTrialService } from '../services/StripeTrialService';
 
 // Helper function to format subscription period display
@@ -118,6 +120,9 @@ const StoreScreen: React.FC = () => {
   const [showTrialSuccessModal, setShowTrialSuccessModal] = useState(false);
   const [showTrialPaymentForm, setShowTrialPaymentForm] = useState(false);
   const [trialDaysRemaining, setTrialDaysRemaining] = useState(3);
+
+  // Lazy load Stripe only when needed (for trial payment)
+  const { stripePromise, isLoading: stripeLoading, loadStripe } = useStripeLoader();
 
   // Listen for custom events (keeping for backward compatibility)
   useEffect(() => {
@@ -310,6 +315,9 @@ const StoreScreen: React.FC = () => {
         const { trialStatus, paymentRequired } = await StripeTrialService.startTrialWithPaymentMethod(user.uid);
         
         if (paymentRequired) {
+          // Load Stripe before showing payment form
+          await loadStripe();
+          
           // Show Stripe payment form for real payment method collection
           setTrialDaysRemaining(trialStatus.daysRemaining);
           setShowTrialPaymentForm(true);
@@ -1666,10 +1674,12 @@ const StoreScreen: React.FC = () => {
 
       {/* Trial Payment Form Modal */}
       {showTrialPaymentForm && (
-        <TrialPaymentForm
-          onSuccess={handleTrialPaymentSuccess}
-          onCancel={handleTrialPaymentCancel}
-        />
+        <ConditionalStripeProvider needsStripe={true} stripePromise={stripePromise}>
+          <TrialPaymentForm
+            onSuccess={handleTrialPaymentSuccess}
+            onCancel={handleTrialPaymentCancel}
+          />
+        </ConditionalStripeProvider>
       )}
     </div>
   );
