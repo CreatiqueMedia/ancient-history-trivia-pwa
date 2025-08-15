@@ -129,7 +129,7 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
       displayName: user.displayName || user.email?.split('@')[0] || 'User',
       photoURL: user.photoURL || undefined,
       provider,
-      subscription: 'free',
+      subscription: 'free', // 🆓 Auto-enroll new users in FREE PLAN
       preferences: {
         theme: 'system',
         soundEnabled: true,
@@ -167,6 +167,19 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
     // Save new profile to localStorage
     try {
       localStorage.setItem(`userProfile_${user.uid}`, JSON.stringify(profile));
+      
+      // Log successful FREE PLAN enrollment for new users
+      console.log(`✅ New user ${user.uid} automatically enrolled in FREE PLAN`);
+      
+      // Track FREE PLAN enrollment for analytics
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'signup', {
+          method: provider,
+          user_id: user.uid,
+          subscription_tier: 'free',
+          value: 0
+        });
+      }
     } catch (error) {
       console.warn('Could not save profile to localStorage:', error);
     }

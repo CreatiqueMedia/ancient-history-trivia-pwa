@@ -26,6 +26,7 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import AuthModal from './AuthModal';
 import FeedbackModal from './FeedbackModal';
+import WelcomeModal from './WelcomeModal';
 import { Logo } from './Logo';
 
 interface LayoutProps {
@@ -37,6 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // Start with sidebar closed by default
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [welcomeModalOpen, setWelcomeModalOpen] = useState(false);
   const { user, userProfile, logout } = useAuth();
 
   // Close auth modal when user becomes authenticated
@@ -45,6 +47,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       setAuthModalOpen(false);
     }
   }, [user, authModalOpen]);
+
+  // Show welcome modal for new users who just signed up
+  React.useEffect(() => {
+    if (user && userProfile && !userProfile.isAnonymous) {
+      const hasSeenWelcome = localStorage.getItem(`welcomeShown_${user.uid}`);
+      if (!hasSeenWelcome) {
+        setWelcomeModalOpen(true);
+      }
+    }
+  }, [user, userProfile]);
+
+  const handleWelcomeClose = () => {
+    setWelcomeModalOpen(false);
+    if (user) {
+      localStorage.setItem(`welcomeShown_${user.uid}`, 'true');
+    }
+  };
   
   const navItems = [
     { 
@@ -456,6 +475,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <FeedbackModal
         isOpen={feedbackModalOpen}
         onClose={() => setFeedbackModalOpen(false)}
+      />
+
+      {/* Welcome Modal for new users enrolled in FREE PLAN */}
+      <WelcomeModal
+        isOpen={welcomeModalOpen}
+        onClose={handleWelcomeClose}
       />
 
       {/* Floating Feedback Button */}

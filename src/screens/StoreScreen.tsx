@@ -1407,13 +1407,18 @@ const StoreScreen: React.FC = () => {
                   </div>
                 ) : (
                   <div className="flex items-center justify-center space-x-3">
-                    <div className="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                      <span className="text-xs font-bold text-gray-600 dark:text-gray-300">F</span>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-400 to-green-500 flex items-center justify-center">
+                      <span className="text-xs font-bold text-white">🆓</span>
                     </div>
                     <div>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">Free Plan</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                        FREE Plan 
+                        <span className="ml-2 text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded-full">
+                          Active
+                        </span>
+                      </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Access to sample quizzes and basic features
+                        Enjoying sample quizzes and basic features
                       </p>
                     </div>
                   </div>
