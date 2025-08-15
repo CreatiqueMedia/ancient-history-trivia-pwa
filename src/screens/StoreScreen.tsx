@@ -1674,7 +1674,7 @@ const StoreScreen: React.FC = () => {
 
       {/* Trial Payment Form Modal */}
       {showTrialPaymentForm && (
-        <ConditionalStripeProvider needsStripe={true} stripePromise={stripePromise}>
+        <ConditionalStripeProvider needsStripe={true} stripePromise={stripePromise || undefined}>
           <TrialPaymentForm
             onSuccess={handleTrialPaymentSuccess}
             onCancel={handleTrialPaymentCancel}

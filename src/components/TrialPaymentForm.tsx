@@ -36,7 +36,7 @@ const TrialPaymentFormContent: React.FC<TrialPaymentFormProps> = ({ onSuccess, o
     
     try {
       // Create a payment method to attach to the customer
-      const { error: paymentMethodError, paymentMethod } = await stripe.createPaymentMethod!({
+      const { error: paymentMethodError, paymentMethod } = await (stripe as any).createPaymentMethod({
         type: 'card',
         card: cardElement,
         billing_details: {
