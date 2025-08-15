@@ -167,7 +167,7 @@ const StoreScreen: React.FC = () => {
   // Get authentication state
   const { user } = useAuth();
 
-  // Handle start trial action from URL parameters - ONE TIME ONLY
+  // Handle start trial action from URL parameters - REDIRECT TO SUBSCRIPTION SELECTION
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const action = urlParams.get('action');
@@ -177,18 +177,20 @@ const StoreScreen: React.FC = () => {
       const newUrl = window.location.pathname + window.location.search.replace(/[?&]action=start_trial/, '');
       window.history.replaceState({}, '', newUrl);
       
+      // 🔒 SECURITY: Don't allow bypassing membership selection
+      // Instead, redirect to subscription tab so user must choose a plan
+      setActiveTab('subscription');
+      
       if (!user) {
-        // User not authenticated - show auth modal
+        // User not authenticated - show auth modal after they see subscription options
         localStorage.setItem('pendingPurchase', JSON.stringify({
-          type: 'trial',
-          action: 'start_trial'
+          type: 'subscription',
+          action: 'choose_membership'
         }));
         
         setShowAuthModal(true);
-      } else {
-        // User is authenticated - proceed with trial
-        handleAuthenticatedTrialStart();
       }
+      // Note: Authenticated users will see the subscription tab and can choose their plan
     }
   }, []); // Remove user dependency to prevent loops
 
@@ -379,64 +381,45 @@ const StoreScreen: React.FC = () => {
   // Track if pending trial has been processed to prevent loops
   const pendingTrialProcessed = useRef(false);
 
-  // Handle authentication success and process pending trial
+  // Handle authentication success and process pending purchases
   useEffect(() => {
-    const processPendingTrial = async () => {
+    const processPendingPurchase = async () => {
       if (user && !pendingTrialProcessed.current) {
         const pendingPurchase = localStorage.getItem('pendingPurchase');
         if (pendingPurchase) {
           pendingTrialProcessed.current = true; // Mark as processed
           try {
             const parsed = JSON.parse(pendingPurchase);
+            
+            // 🔒 SECURITY: No more direct trial bypass - redirect to subscription selection
             if (parsed.type === 'trial' && parsed.action === 'start_trial') {
-              // Check if user is eligible for trial
-              if (StripeTrialService.isEligibleForTrial(user.uid)) {
-                try {
-                  // Start trial with payment method requirement
-                  const { trialStatus } = await StripeTrialService.startTrialWithPaymentMethod(user.uid);
-                  
-                  // Set trial data and show custom modal
-                  setTrialDaysRemaining(trialStatus.daysRemaining);
-                  setShowTrialSuccessModal(true);
-                  
-                  // Clear pending purchase
-                  localStorage.removeItem('pendingPurchase');
-                  
-                } catch (error) {
-                  console.error('Error starting trial after auth:', error);
-                  alert('Sorry, there was an error starting your free trial. Please try again.');
-                  localStorage.removeItem('pendingPurchase');
-                }
-              } else {
-                // User already had a trial - but allow developer to bypass this
-                if (user.email === 'ron@theawakenedhybrid.com') {
-                  // Developer override - allow unlimited trials
-                  try {
-                    const { trialStatus } = await StripeTrialService.startTrialWithPaymentMethod(user.uid);
-                    setTrialDaysRemaining(trialStatus.daysRemaining);
-                    setShowTrialSuccessModal(true);
-                    localStorage.removeItem('pendingPurchase');
-                  } catch (error) {
-                    console.error('Error starting developer trial after auth:', error);
-                    alert('Sorry, there was an error starting your free trial. Please try again.');
-                    localStorage.removeItem('pendingPurchase');
-                  }
-                } else {
-                  alert('You have already used your free trial. Please choose a subscription plan to continue.');
-                  localStorage.removeItem('pendingPurchase');
-                }
-              }
+              // Clear old trial action and redirect to subscription tab
+              localStorage.removeItem('pendingPurchase');
+              setActiveTab('subscription');
+              console.log('🔒 Redirected trial bypass to subscription selection');
+            }
+            // Handle subscription selection (new approach)
+            else if (parsed.type === 'subscription' && parsed.action === 'choose_membership') {
+              // User authenticated, show subscription tab for plan selection
+              setActiveTab('subscription');
+              localStorage.removeItem('pendingPurchase');
+              console.log('✅ User authenticated - showing subscription plans');
+            }
+            // Handle specific subscription purchases
+            else if (parsed.type === 'subscription') {
+              // Process specific subscription purchase
+              console.log('Processing subscription purchase:', parsed.id);
             }
           } catch (error) {
-            console.error('Error parsing pending purchase:', error);
+            console.error('Error parsing pendingPurchase:', error);
             localStorage.removeItem('pendingPurchase');
           }
         }
       }
     };
 
-    processPendingTrial();
-  }, [user?.uid]); // Only depend on user ID to prevent excessive re-renders
+    processPendingPurchase();
+  }, [user]);
 
   // Get version information
   const currentBundles = QUESTION_BUNDLES.filter(bundle => bundle.isCurrentVersion !== false && !bundle.isMegaBundle);

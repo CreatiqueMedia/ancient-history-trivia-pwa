@@ -33,8 +33,8 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
     };
   }, [user?.uid]);
 
-  // Memoize the trial URL since it never changes
-  const trialUrl = useMemo(() => '/store?action=start_trial&tab=subscription', []);
+  // Memoize the subscription URL to redirect to membership selection
+  const subscriptionUrl = useMemo(() => '/store?tab=subscription', []);
 
   // Show for unauthenticated users (public view)
   if (!user) {
@@ -57,28 +57,29 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
     }
   }
 
-  const handleTrialClick = (e: React.MouseEvent) => {
+  const handleSubscriptionClick = (e: React.MouseEvent) => {
     // Check if we're already on the store page
     if (window.location.pathname === '/store') {
       e.preventDefault();
       
-      // Store pending trial action
-      localStorage.setItem('pendingPurchase', JSON.stringify({
-        type: 'trial',
-        action: 'start_trial'
-      }));
-      
-      // Trigger custom event to show auth modal immediately
-      const event = new CustomEvent('showAuthModal', { 
-        detail: { context: 'trial' } 
-      });
-      window.dispatchEvent(event);
-      
-      // Also set the tab to subscription
+      // Set the tab to subscription to show membership selection
       const tabEvent = new CustomEvent('setStoreTab', { 
         detail: 'subscription' 
       });
       window.dispatchEvent(tabEvent);
+      
+      // If user is not authenticated, show auth modal
+      if (!user) {
+        localStorage.setItem('pendingPurchase', JSON.stringify({
+          type: 'subscription',
+          action: 'choose_membership'
+        }));
+        
+        const event = new CustomEvent('showAuthModal', { 
+          detail: { context: 'subscription' } 
+        });
+        window.dispatchEvent(event);
+      }
     }
     // If not on store page, let React Router handle navigation normally
   };
@@ -90,16 +91,16 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
           <div className="flex items-center space-x-3">
             <SparklesIcon className="w-6 h-6 text-yellow-300" />
             <div>
-              <h3 className="font-bold text-sm text-white">Try 3-Day Free Trial</h3>
-              <p className="text-xs text-emerald-100">Unlock all premium features</p>
+              <h3 className="font-bold text-sm text-white">Choose Premium Plan</h3>
+              <p className="text-xs text-emerald-100">Get 3-day trial with credit card</p>
             </div>
           </div>
           <Link
-            to={trialUrl}
-            onClick={handleTrialClick}
+            to={subscriptionUrl}
+            onClick={handleSubscriptionClick}
             className="bg-white text-emerald-700 px-4 py-2 rounded-md text-sm font-bold hover:bg-emerald-50 transition-colors flex items-center space-x-1 shadow-sm"
           >
-            <span>Start Trial</span>
+            <span>Premium Subscription</span>
             <ArrowRightIcon className="w-4 h-4" />
           </Link>
         </div>
@@ -115,23 +116,23 @@ const TrialBanner: React.FC<TrialBannerProps> = ({
             <SparklesIcon className="w-8 h-8 text-yellow-300" />
           </div>
           <div>
-            <h3 className="text-xl font-bold mb-2 text-white">Start Your 3-Day Free Trial</h3>
+            <h3 className="text-xl font-bold mb-2 text-white">Choose Your Premium Plan</h3>
             <p className="text-emerald-100 mb-3 font-medium">
-              Get unlimited access to all premium features and question bundles
+              Start with 3-day trial (credit card required) then continue with your chosen plan
             </p>
             <div className="flex items-center space-x-2">
               <CheckCircleIcon className="w-5 h-5 text-yellow-300" />
-              <span className="font-bold text-white">3 days free</span>
+              <span className="font-bold text-white">3 days free, then billing starts</span>
             </div>
           </div>
         </div>
         <Link
-          to={trialUrl}
-          onClick={handleTrialClick}
+          to={subscriptionUrl}
+          onClick={handleSubscriptionClick}
           className="bg-white text-emerald-700 px-6 py-3 rounded-lg font-bold hover:bg-emerald-50 transition-colors shadow-md flex items-center space-x-2 border border-emerald-200"
         >
           <SparklesIcon className="w-5 h-5" />
-          <span>Start Free Trial</span>
+          <span>Premium Subscription</span>
         </Link>
       </div>
     </div>
