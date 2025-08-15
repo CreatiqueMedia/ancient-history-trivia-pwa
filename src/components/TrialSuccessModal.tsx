@@ -130,7 +130,7 @@ const TrialSuccessModal: React.FC<TrialSuccessModalProps> = ({
             {/* Trial reminder */}
             <div className="mt-4 text-center">
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Your trial will automatically end in {daysRemaining} days. No payment required.
+                Your {daysRemaining}-day trial will convert to Pro Monthly ($4.99/month) unless cancelled. Cancel anytime to return to FREE plan.
               </p>
             </div>
           </div>

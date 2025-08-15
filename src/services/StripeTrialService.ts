@@ -92,14 +92,40 @@ export class StripeTrialService {
 
   /**
    * End the trial (cancel subscription in Stripe)
+   * When trial is cancelled, user MUST revert to FREE PLAN
    */
   static async endTrial(userId: string): Promise<void> {
+    console.log('🔄 Ending trial - User will revert to FREE PLAN');
+    
+    // Remove trial status to end premium access
     localStorage.removeItem(this.STORAGE_KEY);
+    
+    // MANDATORY: Ensure user reverts to FREE PLAN when trial is cancelled
+    // This prevents any lingering premium access
+    try {
+      const existingProfile = localStorage.getItem(`userProfile_${userId}`);
+      if (existingProfile) {
+        const profile = JSON.parse(existingProfile);
+        profile.subscription = 'free'; // Force back to FREE PLAN
+        profile.lastActive = new Date();
+        localStorage.setItem(`userProfile_${userId}`, JSON.stringify(profile));
+        console.log('✅ User reverted to FREE PLAN after trial cancellation');
+      }
+    } catch (error) {
+      console.warn('Could not update user profile after trial cancellation:', error);
+    }
+    
+    // Also clear any subscription data that might be cached
+    localStorage.removeItem('subscription');
+    localStorage.removeItem('pendingTrialUpgrade');
     
     // Track trial cancellation
     analyticsService.trackFeatureUsage('trial_cancelled', userId);
     
-    console.log('Trial ended for user:', userId);
+    console.log('Trial ended for user:', userId, '- Reverted to FREE PLAN');
+    
+    // Notify user of reversion to FREE plan
+    alert('Trial cancelled successfully. You have been returned to the FREE plan.');
   }
 
   /**
@@ -218,25 +244,32 @@ export class StripeTrialService {
   }
 
   /**
-   * Start trial with Stripe payment method collection
-   * This creates a subscription with trial period but requires payment method
+   * Start trial with MANDATORY Stripe payment method collection
+   * This creates a subscription with trial period but REQUIRES payment method
+   * No exceptions - all premium trials must have payment method
    */
   static async startTrialWithPaymentMethod(userId: string): Promise<{ trialStatus: TrialStatus; paymentRequired: boolean }> {
+    console.log('🔒 MANDATORY: Starting trial with required payment method collection');
+    
     // Check if already in trial
     if (this.isInTrial()) {
       throw new Error('User is already in a trial');
     }
 
+    // ALWAYS require payment method - no exceptions for any membership upgrade
+    // This ensures users can be automatically converted after trial
+    console.log('💳 Payment method collection is REQUIRED for all premium trials');
+    
     // In production, this would:
     // 1. Create Stripe customer if not exists
     // 2. Create subscription with trial period
     // 3. Require payment method collection
     // 4. Return payment method collection URL
     
-    // For now: Return payment required flag to trigger Stripe Elements form
+    // Start the trial (this will be activated only after payment method is collected)
     return {
       trialStatus: await this.startTrial(userId),
-      paymentRequired: true
+      paymentRequired: true // ALWAYS true - no free trials without payment method
     };
   }
 

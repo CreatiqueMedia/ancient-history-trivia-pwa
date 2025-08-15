@@ -78,6 +78,53 @@
 4. **Mobile Optimization:** Further optimize for mobile-specific performance
 5. **PWA Features:** Enhance offline capabilities and caching strategies
 
+## 🆓 FREE PLAN Auto-Enrollment System
+
+### New User Experience Enhancement
+
+**Automatic FREE PLAN Enrollment:**
+- All new users are **automatically enrolled** in the FREE PLAN upon first authentication
+- No manual setup required - instant access to FREE PLAN benefits
+- Consistent onboarding experience across all authentication methods (Google, Apple, email, anonymous)
+
+**Welcome Flow:**
+- **WelcomeModal** greets new users and explains FREE PLAN benefits
+- Shows only once per user (tracked via localStorage)
+- Clear communication about available features and upgrade options
+
+**FREE PLAN Features:**
+- Access to sample quizzes (10 questions each)
+- Basic daily challenges
+- Limited statistics and analytics
+- Community features access
+- Foundation for upgrading to premium plans
+
+### Technical Implementation
+
+1. **AuthContext Enhancement:**
+   - `createUserProfile()` automatically sets `subscription: 'free'`
+   - Analytics tracking for new user signups
+   - Console logging for enrollment verification
+
+2. **User Interface Updates:**
+   - Enhanced FREE PLAN display in StoreScreen with "Active" badge
+   - Prominent FREE PLAN status in billing sections
+   - Clear feature comparison in subscription tiers
+
+3. **Onboarding Integration:**
+   - WelcomeModal integrated into Layout component
+   - Seamless transition from authentication to FREE PLAN access
+   - No additional user action required
+
+### User Benefits
+
+- **Immediate Value:** Users can start using the app instantly after signup
+- **Clear Expectations:** Welcome modal explains exactly what's included
+- **Upgrade Path:** Natural progression to premium plans when ready
+- **Zero Friction:** No payment details required for initial access
+
+---
+
 ### 🏆 Achievement Summary
 
 This optimization effort represents a **major performance and accessibility milestone** for the Ancient History Trivia PWA:

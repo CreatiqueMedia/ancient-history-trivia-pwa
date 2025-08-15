@@ -63,10 +63,13 @@ const formatPeriod = (period: string): string => {
 const getPlanTagline = (planId: string) => {
   switch (planId) {
     // Free plan removed for paid-only subscription model
+    case 'pro_monthly':
     case 'scholar':
-      return 'Unlock all question bundles and advanced features. Try free for 3 days!';
+      return 'Unlock all question bundles and advanced features. FREE plan users get 3-day trial with credit card!';
+    case 'pro_annual':
     case 'historian':
-      return 'Go deeper with exclusive content, analytics, and offline access. 14-day free trial!';
+      return 'Go deeper with exclusive content, analytics, and offline access. FREE plan users get 3-day trial!';
+    case 'pro_biennial':
     case 'academy':
       return 'Best value: 2 years of premium access, institution features, and the ultimate learning toolkit.';
     default:
@@ -670,7 +673,65 @@ const StoreScreen: React.FC = () => {
       setShowAuthModal(true);
       return;
     }
+
+    // 🔒 MANDATORY: Users already on FREE plan must go through trial with payment method
+    // This ensures ALL premium upgrades require credit card processing
+    if (!isPremiumUser && !StripeTrialService.isInTrial()) {
+      console.log('🆓➡️💳 FREE plan user upgrading to premium - MUST collect payment method with 3-day trial');
+      
+      // Show confirmation dialog about trial and payment method requirement
+      const confirmTrial = confirm(
+        '🔒 Premium Upgrade Requires Payment Method\n\n' +
+        `You're currently on the FREE plan. To upgrade to ${tier.name}, we'll start you with a 3-day free trial that requires a payment method.\n\n` +
+        'During the trial:\n' +
+        '• You get full premium access for 3 days\n' +
+        '• Your payment method is saved but NOT charged\n' +
+        '• After 3 days, you\'ll be charged and continue with premium\n' +
+        '• Cancel anytime during trial to return to FREE plan\n\n' +
+        'Ready to start your 3-day trial with payment method setup?'
+      );
+      
+      if (!confirmTrial) {
+        return; // User cancelled
+      }
+
+      // Add tier to processing state
+      setProcessingTiers(prev => new Set([...prev, tier.id]));
+      
+      try {
+        // Start trial with MANDATORY payment method collection
+        const { trialStatus, paymentRequired } = await StripeTrialService.startTrialWithPaymentMethod(user.uid);
+        
+        if (paymentRequired) {
+          // Load Stripe before showing payment form
+          await loadStripe();
+          
+          // Store the target subscription tier for after trial
+          localStorage.setItem('pendingTrialUpgrade', JSON.stringify({
+            targetTier: tier.id,
+            targetPeriod: tier.period
+          }));
+          
+          // Show Stripe payment form for real payment method collection
+          setTrialDaysRemaining(trialStatus.daysRemaining);
+          setShowTrialPaymentForm(true);
+        }
+        
+      } catch (error) {
+        console.error('Error starting trial for FREE plan upgrade:', error);
+        alert('Sorry, there was an error starting your free trial. Please try again.');
+      } finally {
+        // Remove tier from processing state
+        setProcessingTiers(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(tier.id);
+          return newSet;
+        });
+      }
+      return;
+    }
     
+    // For users already in trial or premium, use regular subscription flow
     // Add this tier to processing state
     setProcessingTiers(prev => new Set([...prev, tier.id]));
     
@@ -1139,13 +1200,15 @@ const StoreScreen: React.FC = () => {
               ? 'Current Plan' 
               : isThisTierProcessing 
                 ? 'Processing...' 
-                : tier.id === 'pro_monthly' 
-                  ? 'Start Pro Monthly' 
-                  : tier.id === 'pro_annual' 
-                    ? 'Start Pro Annual' 
-                    : tier.id === 'pro_biennial' 
-                      ? 'Unlock 2 Years – Best Value!' 
-                      : `Get ${tier.name}`
+                : !isPremiumUser && !StripeTrialService.isInTrial()
+                  ? `🆓➡️💳 Start 3-Day Trial (Credit Card Required)`
+                  : tier.id === 'pro_monthly' 
+                    ? 'Start Pro Monthly' 
+                    : tier.id === 'pro_annual' 
+                      ? 'Start Pro Annual' 
+                      : tier.id === 'pro_biennial' 
+                        ? 'Unlock 2 Years – Best Value!' 
+                        : `Get ${tier.name}`
             }
           </button>
         )}
@@ -1419,6 +1482,9 @@ const StoreScreen: React.FC = () => {
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Enjoying sample quizzes and basic features
+                      </p>
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                        💳 Upgrade to premium requires 3-day trial with credit card
                       </p>
                     </div>
                   </div>
